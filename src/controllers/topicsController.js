@@ -10,6 +10,7 @@ class TopicsController {
   async createListOfTopics(topics, courseId) {
     const arrayTopics = topics.map((t) => ({ name: t.name, courseId }));
     await Topic.bulkCreate(arrayTopics);
+    return arrayTopics;
   }
 
   async deleteTopicsFromCourse(courseId) {

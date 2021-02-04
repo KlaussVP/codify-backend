@@ -17,6 +17,33 @@ describe('createTopic', () => {
   });
 });
 
+describe('createListOfTopics', () => {
+  it('should an array with the the id included', async () => {
+    const topics = [
+      {
+        name: 'Apresentação',
+      },
+      {
+        name: 'Preparando o ambiente',
+      },
+    ];
+    const courseId = 1;
+    const expectedArray = [
+      {
+        name: 'Apresentação',
+        courseId,
+      },
+      {
+        name: 'Preparando o ambiente',
+        courseId,
+      },
+    ];
+    Topic.bulkCreate.mockResolvedValue({});
+    const resultArray = await topicsController.createListOfTopics(topics, courseId);
+    expect(resultArray).toEqual(expectedArray);
+  });
+});
+
 describe('getAllTopics', () => {
   it('should return an array', async () => {
     const expectedArray = [{ id: 1, name: 'Introduction', userId: 1 }];

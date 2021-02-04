@@ -6,7 +6,7 @@ const postCoursesSchema = joi.object({
   description: joi.string().required(),
   topics: joi.array().items(joi.object({
     name: joi.string().required(),
-  })).required(),
+  })).min(1).required(),
 });
 
 const editCourseSchema = joi.object({
