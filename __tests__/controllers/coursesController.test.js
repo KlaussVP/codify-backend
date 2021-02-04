@@ -55,6 +55,68 @@ describe('create', () => {
   });
 });
 
+describe('edit', () => {
+  it('should return the expected Object', async () => {
+    const foundObject = {
+      id: 1,
+      name: 'JavaScript',
+      image: 'https://static.imasters.com.br/wp-content/uploads/2018/12/10164438/javascript.jpg',
+      description: 'JavaScript do Zero',
+      topics: [
+        {
+          id: 4,
+          name: 'Apresentação',
+        },
+        {
+          id: 5,
+          name: 'Preparando o ambiente',
+        },
+      ],
+    };
+
+    const editObject = {
+      id: 1,
+      name: 'JavaScript123',
+      image: 'https://static.imasters.com.br/wp-content/uploads/2018/12/10164438/javascript.jpg',
+      description: 'JavaScript do Zero',
+      topics: [
+        {
+          name: 'Apresentação',
+        },
+        {
+          name: 'Preparando o ambiente',
+        },
+        {
+          name: 'Conhecendo a Base',
+        },
+      ],
+    };
+
+    jest.spyOn(coursesController, 'getCourseById').mockImplementationOnce(() => foundObject);
+
+    jest.spyOn(topicsController, 'createListOfTopics').mockImplementationOnce(() => null);
+    jest.spyOn(coursesController, 'getCourseById').mockImplementationOnce(() => null);
+    Course.save.mockResolvedValue({});
+
+    const course = await coursesController.edit(editObject);
+
+    expect(course).toBe(editObject);
+  });
+
+  // it('should throw an error of Conflict', async () => {
+  //   const CourseData = {
+  //     name: 'JavaScript',
+  //     image: 'https://static.imasters.com.br/wp-content/uploads/2018/12/10164438/javascript.jpg',
+  //     description: 'JavaScript do Zero',
+  //   };
+  //   jest.spyOn(coursesController, 'findCourseByName').mockImplementationOnce(() => true);
+
+  //   expect(async () => {
+  //     await coursesController.create(CourseData);
+  //   }).rejects.toThrow(ConflictError);
+  // });
+});
+
 describe('findCourseByName', () => {
   it('should return the same object', async () => {
     const name = 'JvaScript';
