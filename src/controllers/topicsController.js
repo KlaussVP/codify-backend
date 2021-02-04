@@ -12,6 +12,14 @@ class TopicsController {
     await Topic.bulkCreate(arrayTopics);
   }
 
+  async deleteTopicsFromCourse(courseId) {
+    await Topic.destroy({
+      where: {
+        courseId,
+      },
+    });
+  }
+
   async getAllTopics() {
     const topics = await Topic.findAll();
     return topics;

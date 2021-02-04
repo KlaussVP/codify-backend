@@ -23,6 +23,27 @@ class CoursesController {
     return courseObject;
   }
 
+  async edit({
+    id, name, image, description, topics,
+  }) {
+    const course = await this.getCourseById(id);
+    if (!course) throw new InexistingId();
+
+    course.name = name || course.name;
+    course.image = image || course.image;
+    course.description = description || course.description;
+
+    if (topics) {
+      await topicsController.deleteTopicsFromCourse(course.id);
+      await topicsController.createListOfTopics(topics, course.id);
+    }
+
+    await course.save();
+
+    const courseObject = await this.getCourseById(course.id);
+    return courseObject;
+  }
+
   async listAllCourses() {
     const courses = await Course.findAll();
     return courses;

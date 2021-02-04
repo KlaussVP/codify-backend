@@ -1,13 +1,21 @@
 const router = require('express').Router();
 
-const { postCoursesSchema } = require('../../schemas/coursesSchema');
+const { postCoursesSchema, editCourseSchema } = require('../../schemas/coursesSchema');
 const coursesController = require('../../controllers/coursesController');
 
 router.post('/', async (req, res) => {
   const validation = postCoursesSchema.validate(req.body);
   if (validation.error) return res.status(422).send({ error: 'Verifique seus dados' });
 
-  const course = await coursesController.create(req.body.name);
+  const course = await coursesController.create(req.body);
+  res.status(201).send(course);
+});
+
+router.put('/', async (req, res) => {
+  const validation = editCourseSchema.validate(req.body);
+  if (validation.error) return res.status(422).send({ error: 'Verifique seus dados' });
+
+  const course = await coursesController.edit(req.body);
   res.status(201).send(course);
 });
 
