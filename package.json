@@ -5,9 +5,10 @@
   "repository": "https://github.com/brunatb/codify-backend.git",
   "scripts": {
     "test": "jest --runInBand --coverage",
-    "build": "yarn sequelize-cli db:migrate",
+    "build": "sequelize-cli db:migrate ",
     "dev": "nodemon ./src/server.js",
-    "start": "node src/server.js"
+    "start": "node src/server.js",
+    "seed": "sequelize-cli db:seed:all"
   },
   "devDependencies": {
     "eslint": "^7.19.0",
@@ -28,5 +29,8 @@
     "pg": "^8.5.1",
     "sequelize": "^6.5.0",
     "sequelize-cli": "^6.2.0"
+  },
+  "engines": {
+    "node": "12.20.1"
   }
 }

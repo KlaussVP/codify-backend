@@ -9,21 +9,21 @@ const AuthorizationError = require('./errors/AuthorizationError');
 
 const app = express();
 const clientsRouter = require('./routers/clients/clientsRouter');
-const clientsCoursesRouter = require('./routers/clients/coursesRouter');
+const coursesRouter = require('./routers/clients/coursesRouter');
 const adminRouter = require('./routers/admin/adminRouter');
 
 app.use(cors());
 app.use(express.json());
 
 app.use('/clients', clientsRouter);
-app.use('/clients/courses', clientsCoursesRouter);
+app.use('/clients/courses', coursesRouter);
 app.use('/admin', adminRouter);
 
 // eslint-disable-next-line no-unused-vars
 app.use((error, req, res, next) => {
   console.log(error);
   if (error instanceof ConflictError) return res.status(409).send({ error: 'Conflito de dados.' });
-  if (error instanceof InexistingId) return res.status(403).send({ error: 'Id does not exists' });
+  if (error instanceof InexistingId) return res.status(403).send({ error: 'Id inexistente.' });
   if (error instanceof AuthorizationError) return res.status(403).send({ error: 'Não autorizado.' });
 
   return res.status(500).json(error);
