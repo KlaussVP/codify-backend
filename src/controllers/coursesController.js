@@ -57,6 +57,10 @@ class CoursesController {
       include: [{
         model: Chapter,
         attributes: ['id', 'name'],
+        include: {
+          model: Topic,
+          attributes: ['id', 'name'],
+        }
       }],
     });
     if (!course) throw new InexistingId();
