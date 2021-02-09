@@ -67,6 +67,32 @@ class CoursesController {
 
     return course;
   }
+
+  async getCourseByIdAsAdmin(id) {
+    const course = await Course.findOne({
+      where: { id },
+      include: [{
+        model: Chapter,
+        attributes: ['id', 'name'],
+      }],
+    });
+    if (!course) throw new InexistingId();
+
+   const chaptersIds = course.chapters.map(c => c.id);
+
+    const courseObjectToAdmin = {
+      id: course.id,
+      name: course.name,
+      deleted: course.deleted,
+      image: course.image,
+      description:course.description,
+      createdAt: course.createdAt,
+      updatedAt: course.updatedAt,
+      chapters: chaptersIds,
+    };
+    console.log('controler', courseObjectToAdmin);
+    return courseObjectToAdmin;
+  }
 }
 
 module.exports = new CoursesController();

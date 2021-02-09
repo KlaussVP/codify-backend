@@ -27,7 +27,7 @@ router.get('/', async (req, res) => {
 });
 
 router.get('/:id', async (req, res) => {
-  const course = await coursesController.getCourseById(req.params.id);
+  const course = await coursesController.getCourseByIdAsAdmin(req.params.id);
   res.send(course);
 });
 

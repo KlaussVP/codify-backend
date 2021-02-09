@@ -157,6 +157,8 @@ describe('listAllCourses', () => {
   });
 });
 
+*/
+
 describe('getCourseById', () => {
   it('should return an object', async () => {
     const id = 1;
@@ -176,4 +178,39 @@ describe('getCourseById', () => {
   });
 });
 
-*/
+describe('getCourseByIdAsAdmin', () => {
+  it('should return an object', async () => {
+    const id = 1;
+    const courseObject = {
+      id: 1,
+      name: "JavaScript",
+      deleted: false,
+      image: "https://static.imasters.com.br/wp-content/uploads/2018/12/10164438/javascript.jpg",
+      description: "JavaScript do Zero",
+      createdAt: "2021-02-09T21:57:37.042Z",
+      updatedAt: "2021-02-09T21:57:37.042Z",
+      chapters:  [
+        {
+        "id": 99,
+        },
+        {
+        "id": 100,
+        },
+      ],
+    };
+    const expectedObject = {... courseObject, "chapters": [99,100] } ;
+    Course.findOne.mockResolvedValue(courseObject);
+    const course = await coursesController.getCourseByIdAsAdmin(id);
+    expect(course).toMatchObject(expectedObject);
+  });
+
+  it('should throw an error', async () => {
+    const id = -1;
+    Course.findOne.mockResolvedValue(null);
+
+    expect(async () => {
+      await coursesController.getCourseById(id);
+    }).rejects.toThrow(InexistingId);
+  });
+});
+
