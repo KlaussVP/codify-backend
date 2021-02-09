@@ -137,6 +137,7 @@ describe('edit', () => {
   //   }).rejects.toThrow(ConflictError);
   // });
 });
+*/
 
 describe('findCourseByName', () => {
   it('should return the same object', async () => {
@@ -156,8 +157,6 @@ describe('listAllCourses', () => {
     expect(courses).toBe(expectedArray);
   });
 });
-
-*/
 
 describe('getCourseById', () => {
   it('should return an object', async () => {

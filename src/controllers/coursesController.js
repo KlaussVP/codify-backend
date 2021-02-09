@@ -90,7 +90,6 @@ class CoursesController {
       updatedAt: course.updatedAt,
       chapters: chaptersIds,
     };
-    console.log('controler', courseObjectToAdmin);
     return courseObjectToAdmin;
   }
 }
