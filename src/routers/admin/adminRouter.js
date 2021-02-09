@@ -10,6 +10,4 @@ router.post('/signin', adminMiddlewares.signInMiddleware, async (req, res) => {
   return res.status(200).send(user);
 });
 
-// router.post('/testjwt', authMiddleware, async (req, res) => res.status(200).send('ok!'));
-
 module.exports = router;

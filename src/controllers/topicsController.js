@@ -2,15 +2,24 @@ const Topic = require('../models/Topic');
 const InexistingId = require('../errors/InexistingId');
 
 class TopicsController {
-  async createTopic({ courseId, name }) {
-    const topic = await Topic.create({ courseId, name });
+  async createTopic({ chapterId, name }) {
+    const topic = await Topic.create({ chapterId, name });
     return topic;
   }
 
-  async createListOfTopics(topics, courseId) {
-    const arrayTopics = topics.map((t) => ({ name: t.name, courseId }));
+  async createListOfTopics(topics, chapterId) {
+    console.log(chapterId);
+    const arrayTopics = topics.map((t) => ({ name: t.name, chapterId }));
     await Topic.bulkCreate(arrayTopics);
     return arrayTopics;
+  }
+
+  async deleteTopicsFromCourse(chapterId) {
+    await Topic.destroy({
+      where: {
+        chapterId,
+      },
+    });
   }
 
   async getAllTopics() {

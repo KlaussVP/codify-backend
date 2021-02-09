@@ -10,6 +10,7 @@ const AuthorizationError = require('./errors/AuthorizationError');
 const app = express();
 const clientsRouter = require('./routers/clients/clientsRouter');
 const clientsCoursesRouter = require('./routers/clients/coursesRouter');
+
 const adminRouter = require('./routers/admin/adminRouter');
 const adminCoursesRouter = require('./routers/admin/coursesRouter');
 

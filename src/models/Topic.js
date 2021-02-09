@@ -15,7 +15,7 @@ Topic.init(
         type: Sequelize.STRING,
         allowNull: false,
       },
-      courseId: {
+      chapterId: {
         type: Sequelize.INTEGER,
         allowNull: false,
       },

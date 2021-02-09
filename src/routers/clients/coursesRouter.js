@@ -3,7 +3,6 @@ const router = require('express').Router();
 const { postCoursesSchema } = require('../../schemas/coursesSchema');
 const coursesController = require('../../controllers/coursesController');
 
-// eslint-disable-next-line consistent-return
 router.get('/', async (req, res) => {
   const courses = await coursesController.listAllCourses();
   res.send(courses);
