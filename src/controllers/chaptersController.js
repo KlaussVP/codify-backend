@@ -13,11 +13,18 @@ class ChaptersController {
     const arrayChapters = chapters.map( c => ({ name: c.name, courseId }));
     const chaptersCreated = await Chapter.bulkCreate(arrayChapters);
 
-    for (let i = 0; i < chapters.length; i++ ) {
-      let chapterCreated = chaptersCreated[i];
-      await topicsController.createListOfTopics(chapters[i].topics, chapterCreated.id);
-    }
+    this.addAllTopicsOfOneCourse(chapters, chaptersCreated);
+
     return arrayChapters;
+  }
+
+  async addAllTopicsOfOneCourse(arrayChaptersWithTopics, arrayChaptersWithIds) {
+
+    for (let i = 0; i < arrayChaptersWithTopics.length; i++ ) {
+      let courseId = arrayChaptersWithIds[i].id;
+      let topicsToBeAdded = arrayChaptersWithTopics[i].topics
+      await topicsController.createListOfTopics(topicsToBeAdded, courseId);
+    }
   }
 
   async deleteChaptersFromCourse(courseId) {

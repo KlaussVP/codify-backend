@@ -8,7 +8,6 @@ class TopicsController {
   }
 
   async createListOfTopics(topics, chapterId) {
-    console.log(chapterId);
     const arrayTopics = topics.map((t) => ({ name: t.name, chapterId }));
     await Topic.bulkCreate(arrayTopics);
     return arrayTopics;
