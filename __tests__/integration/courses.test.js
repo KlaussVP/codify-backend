@@ -14,33 +14,83 @@ const db = new Pool({
 
 beforeEach(async () => {
   await db.query('DELETE FROM topics');
+  await db.query('DELETE FROM chapters');
   await db.query('DELETE FROM courses');
 });
 
 afterAll(async () => {
   await db.query('DELETE FROM topics');
+  await db.query('DELETE FROM chapters');
   await db.query('DELETE FROM courses');
   await sequelize.close();
   await db.end();
 });
 
-describe('POST /clients/courses', () => {
+describe('POST /admin/courses', () => {
   it('should return 201 when passed valid parameters', async () => {
     const body = {
-      name: 'JavaScript',
-      image: 'https://static.imasters.com.br/wp-content/uploads/2018/12/10164438/javascript.jpg',
-      description: 'JavaScript do Zero',
-      topics: [
-        {
-          name: 'Apresentação',
-        },
-        {
-          name: 'Preparando o ambiente',
-        },
-      ],
-    };
+      'name': 'JavaScripter',
+      'image': 'https://static.imasters.com.br/wp-content/uploads/2018/12/10164438/javascript.jpg',
+      'description': 'JavaScript do Zero',
+      'chapters': [
+          {
+              'name': 'Apresentação AAAAA',
+              'topics': [
+                  {
+                      'name': 'Introdução a prorgramação'
+                  },
+                  {
+                      'name': 'Motivação JavaScript'
+                  }
+              ]
+          },
+          {
+              'name': 'Apresentação BBBBBB',
+              'topics': [
+                  {
+                      'name': 'Introdução a prorgramação2'
+                  },
+                  {
+                      'name': 'Motivação JavaScript2'
+                  }
+              ]
+          }
+      ]
+  };
     const response = await agent.post('/admin/courses').send(body);
     expect(response.status).toBe(201);
+    expect.objectContaining({
+    'name': 'JavaScripter',
+    'deleted': false,
+    'image': 'https://static.imasters.com.br/wp-content/uploads/2018/12/10164438/javascript.jpg',
+    'description': 'JavaScript do Zero',
+    'createdAt': '2021-02-09T19:55:43.611Z',
+    'updatedAt': '2021-02-09T19:55:43.611Z',
+    'chapters': [
+        {
+            'name': 'Apresentação AAAAA',
+            'topics': [
+                {
+                    'name': 'Introdução a prorgramação'
+                },
+                {
+                    'name': 'Motivação JavaScript'
+                }
+            ]
+        },
+        {
+            'name': 'Apresentação BBBBBB',
+            'topics': [
+              {
+                  'name': 'Introdução a prorgramação2'
+              },
+              {
+                  'name': 'Motivação JavaScript2'
+              }
+          ]
+        }
+    ]
+    })
   });
 
   it('should return 422 when passed invalid parameters', async () => {
@@ -48,7 +98,7 @@ describe('POST /clients/courses', () => {
       name: 'JavaScript',
       image: 'https://static.imasters.com.br/wp-content/uploads/2018/12/10164438/javascript.jpg',
       description: 'JavaScript do Zero',
-      topics: [],
+      chapters: [],
     };
     const response = await agent.post('/admin/courses').send(body);
 
@@ -57,17 +107,19 @@ describe('POST /clients/courses', () => {
 
   it('should return 409 when name already exists', async () => {
     const body = {
-      name: 'JavaScript',
+      name: 'JavaScript2',
       image: 'https://static.imasters.com.br/wp-content/uploads/2018/12/10164438/javascript.jpg',
       description: 'JavaScript do Zero',
-      topics: [
+      chapters: [
         {
-          name: 'Apresentação',
+            name: 'Apresentação AAAAA',
+            topics: [
+                {
+                    name: 'Introdução a prorgramação'
+                },
+            ]
         },
-        {
-          name: 'Preparando o ambiente',
-        },
-      ],
+    ]
     };
     await db.query('INSERT INTO courses (name, image, description) values ($1, $2, $3)', [body.name, body.image, body.description]);
 
