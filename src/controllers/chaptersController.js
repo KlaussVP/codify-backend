@@ -42,8 +42,8 @@ class ChaptersController {
   }
 
   async getAllChaptersAsAdmin() {
-    const chapters = await Chapter.findAll();
-    return chapters;
+    const topics = await Topic.findAll();
+    return topics;
   }
 
   async getChapterById(id) {
@@ -54,7 +54,7 @@ class ChaptersController {
         attributes: ['id', 'name'],
       }
     });
-    
+
     if (!chapter) throw new InexistingId();
     
     return chapter;
