@@ -2,7 +2,8 @@ const coursesRouter = require('express').Router();
 
 const { postCoursesSchema } = require('../../schemas/coursesSchema');
 const coursesController = require('../../controllers/coursesController');
-chapterRouter = require('./chaptersRouters');
+chapterRouter = require('./chaptersRouter');
+topicRouter = require('./topicsRouter');
 
 // eslint-disable-next-line consistent-return
 coursesRouter.post('/', async (req, res) => {
@@ -34,4 +35,5 @@ coursesRouter.get('/:id', async (req, res) => {
 module.exports = {
   coursesRouter,
   chapterRouter,
+  topicRouter
 };

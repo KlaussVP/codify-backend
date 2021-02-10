@@ -2,7 +2,7 @@ const chapterRouter = require('express').Router();
 
 const chaptersController = require('../../controllers/chaptersController');
 
-chapterRouter.get('/admin/chapters', async (req, res) => {
+chapterRouter.get('/', async (req, res) => {
     const chapters = await chaptersController.getAllChaptersAsAdmin();
     res.send(chapters);
 });

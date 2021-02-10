@@ -15,6 +15,7 @@ const adminRouter = require('./routers/admin/adminRouter');
 const {
   coursesRouter,
   chapterRouter,
+  topicRouter,
 } = require('./routers/admin/coursesRouter');
 
 app.use(cors());
@@ -26,6 +27,7 @@ app.use('/admin', adminRouter);
 
 app.use('/admin/courses', coursesRouter);
 app.use('/admin/chapters', chapterRouter);
+app.use('/admin/topics', topicRouter);
 
 // eslint-disable-next-line no-unused-vars
 app.use((error, req, res, next) => {
