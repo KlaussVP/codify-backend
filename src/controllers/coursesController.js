@@ -67,6 +67,10 @@ class CoursesController {
 
     return course;
   }
+
+  // async updateCourseAccess() {
+
+  // }
 }
 
 module.exports = new CoursesController();

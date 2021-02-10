@@ -23,6 +23,10 @@ CourseUser.init(
             type: Sequelize.BOOLEAN,
             allowNull: false,
             defaultValue: false,
+        },
+        lastAccessed: {
+            type: Sequelize.DATE,
+            defaultValue: Sequelize.NOW,
         }
     },
     {
