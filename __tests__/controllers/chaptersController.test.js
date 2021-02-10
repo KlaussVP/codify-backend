@@ -20,7 +20,7 @@ describe('getChapterById', () => {
     Chapter.findOne.mockResolvedValue(null);
 
     expect(async () => {
-      await chapterssController.getchaptersById(id);
+      await chaptersController.getChapterById(id);
     }).rejects.toThrow(InexistingId);
   });
 });

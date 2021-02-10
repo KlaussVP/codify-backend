@@ -42,8 +42,27 @@ class ChaptersController {
   }
 
   async getAllChaptersAsAdmin() {
-    const topics = await Topic.findAll();
-    return topics;
+    const chapters = await Chapter.findAll({
+      include: {
+        model: Topic,
+        attributes: ['id'],
+      }
+    });
+
+    const chaptersArrayAdminFormat = [];
+    chapters.forEach( chapter => {
+      const topicsIds = chapter.topics.map(t => t.id);
+      const chapterObjectToAdmin = {
+        id: chapter.id,
+        name: chapter.name,
+        courseId: chapter.courseId,
+        createdAt: chapter.createdAt,
+        updatedAt: chapter.updatedAt,
+        topics: topicsIds,
+      };
+      chaptersArrayAdminFormat.push(chapterObjectToAdmin);
+    }); 
+    return chaptersArrayAdminFormat;
   }
 
   async getChapterById(id) {
