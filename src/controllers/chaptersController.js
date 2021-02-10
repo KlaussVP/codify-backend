@@ -2,6 +2,7 @@ const Chapter = require('../models/Chapter');
 const InexistingId = require('../errors/InexistingId');
 
 const topicsController = require('./topicsController');
+const Topic = require('../models/Topic');
 
 class ChaptersController {
   async createChapter({ courseId, name }) {
@@ -40,10 +41,33 @@ class ChaptersController {
     return chapters;
   }
 
-  async getChapterById(id) {
-    const chapter = await Chapter.findByPk(id);
+  async getAllChaptersAsAdmin() {
+    const chapters = await Chapter.findAll();
+    return chapters;
+  }
+
+  async getChapterByIdAsAdmin(id) {
+    const chapter = await Chapter.findOne({
+      where: { id },
+      include: {
+        model: Topic,
+        attributes: ['id', 'name'],
+      }
+
+    });
     if (!chapter) throw new InexistingId();
-    return chapter;
+
+    const topicsIds = chapter.topics.map(c => c.id);
+
+    const chapterObjectToAdmin = {
+      id: chapter.id,
+      name: chapter.name,
+      courseId: chapter.courseId,
+      createdAt: chapter.createdAt,
+      updatedAt: chapter.updatedAt,
+      topics: topicsIds,
+    };
+    return chapterObjectToAdmin;
   }
 }
 
