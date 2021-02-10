@@ -51,6 +51,32 @@ class CoursesController {
     return courses;
   }
 
+  async listAllCoursesAsAdmin() {
+    const courses = await Course.findAll({
+      include: [{
+        model: Chapter,
+        attributes: ['id'],
+      }],
+    });
+
+    const coursesArrayAdminFormat = [];
+    courses.forEach( course => {
+      const chaptersIds = course.chapters.map(c => c.id);
+      const courseObjectToAdmin = {
+        id: course.id,
+        name: course.name,
+        deleted: course.deleted,
+        image: course.image,
+        description:course.description,
+        createdAt: course.createdAt,
+        updatedAt: course.updatedAt,
+        chapters: chaptersIds,
+      };
+      coursesArrayAdminFormat.push(courseObjectToAdmin);
+    }); 
+    return coursesArrayAdminFormat;
+  }
+
   async getCourseById(id) {
     const course = await Course.findOne({
       where: { id },

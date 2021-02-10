@@ -21,8 +21,7 @@ router.put('/', async (req, res) => {
 });
 
 router.get('/', async (req, res) => {
-    console.log("sasasa");
-  const courses = await coursesController.listAllCourses();
+  const courses = await coursesController.listAllCoursesAsAdmin();
   res.send(courses);
 });
 

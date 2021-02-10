@@ -181,3 +181,28 @@ describe('GET /clients/courses/:id', () => {
   });
 });
 
+describe('GET /clients/courses', () => {
+  it('should return 200 with courses array', async () => {
+
+    const course = {
+      name: 'JavaScriptOne',
+      image: 'https://static.imasters.com.br/wp-content/uploads/2018/12/10164438/javascript.jpg',
+      description: 'JavaScript do Zero',
+    };
+
+    const resultCourse = await db.query('INSERT INTO courses (name, image, description) values ($1, $2, $3) RETURNING *', [course.name, course.image, course.description]);
+    const courseId = resultCourse.rows[0].id;
+
+    const response = await agent.get(`/clients/courses`);
+
+    expect(response.status).toBe(200);
+    expect.arrayContaining({
+      'id': courseId,
+      'name': course.name,
+      'deleted': false,
+      'image': course.image,
+      'description': course.description,
+    })
+  });
+});
+
