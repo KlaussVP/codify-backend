@@ -46,6 +46,20 @@ class ChaptersController {
     return chapters;
   }
 
+  async getChapterById(id) {
+    const chapter = await Chapter.findOne({
+      where: { id },
+      include: {
+        model: Topic,
+        attributes: ['id', 'name'],
+      }
+    });
+    
+    if (!chapter) throw new InexistingId();
+    
+    return chapter;
+  }
+
   async getChapterByIdAsAdmin(id) {
     const chapter = await Chapter.findOne({
       where: { id },
@@ -53,7 +67,6 @@ class ChaptersController {
         model: Topic,
         attributes: ['id', 'name'],
       }
-
     });
     if (!chapter) throw new InexistingId();
 
