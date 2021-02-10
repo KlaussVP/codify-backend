@@ -92,6 +92,9 @@ class CoursesController {
     };
     return courseObjectToAdmin;
   }
+  // async updateCourseAccess() {
+
+  // }
 }
 
 module.exports = new CoursesController();
