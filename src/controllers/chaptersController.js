@@ -36,7 +36,7 @@ class ChaptersController {
     });
   }
 
-  async getAllChapter() {
+  async getAllChapters() {
     const chapters = await Chapter.findAll();
     return chapters;
   }
