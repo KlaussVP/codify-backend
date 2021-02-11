@@ -88,12 +88,12 @@ class ChaptersController {
     
     return chapter;
   }
-
-<<<<<<< HEAD
+  
   async getChaptersByCourse(courseId) {
     const chapters = await Chapter.findAll({ where: {courseId}});
     return chapters;
-=======
+  }
+
   async getChapterByIdAsAdmin(id) {
     const chapter = await Chapter.findOne({
       where: { id },
@@ -115,7 +115,6 @@ class ChaptersController {
       topics: topicsIds,
     };
     return chapterObjectToAdmin;
->>>>>>> db7b41d87c8d0cdb2ba78c66db7f6e235dff6395
   }
 }
 

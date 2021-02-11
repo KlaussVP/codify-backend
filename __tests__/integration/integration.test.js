@@ -100,7 +100,7 @@ describe('POST /clients/signin', () => {
 
     const response = await agent.post('/clients/signin').send(body);
 
-    expect(response.status).toBe(403);
+    expect(response.status).toBe(401);
   });
 
 });
@@ -146,7 +146,7 @@ describe('POST /admin/signin', () => {
 
     const response = await agent.post('/admin/signin').send(body);
 
-    expect(response.status).toBe(403);
+    expect(response.status).toBe(401);
   });
 
   it('should return 403 when wrong user type', async () => {
@@ -158,7 +158,7 @@ describe('POST /admin/signin', () => {
 
     const response = await agent.post('/admin/signin').send(bodyLogin);
     
-    expect(response.status).toBe(403);
+    expect(response.status).toBe(401);
   });
 
 });
