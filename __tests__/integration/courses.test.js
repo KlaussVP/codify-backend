@@ -33,28 +33,28 @@ describe('POST /admin/courses', () => {
       'image': 'https://static.imasters.com.br/wp-content/uploads/2018/12/10164438/javascript.jpg',
       'description': 'JavaScript do Zero',
       'chapters': [
-          {
-              'name': 'Apresentação AAAAA',
-              'topics': [
-                  {
-                      'name': 'Introdução a prorgramação'
-                  },
-                  {
-                      'name': 'Motivação JavaScript'
-                  }
-              ]
-          },
-          {
-              'name': 'Apresentação BBBBBB',
-              'topics': [
-                  {
-                      'name': 'Introdução a prorgramação2'
-                  },
-                  {
-                      'name': 'Motivação JavaScript2'
-                  }
-              ]
-          }
+        {
+          'name': 'Apresentação AAAAA',
+          'topics': [
+            {
+                'name': 'Introdução a prorgramação'
+            },
+            {
+                'name': 'Motivação JavaScript'
+            }
+          ]
+        },
+        {
+          'name': 'Apresentação BBBBBB',
+          'topics': [
+            {
+              'name': 'Introdução a prorgramação2'
+            },
+            {
+              'name': 'Motivação JavaScript2'
+            }
+          ]
+        }
       ]
   };
     const response = await agent.post('/admin/courses').send(body);
@@ -67,28 +67,28 @@ describe('POST /admin/courses', () => {
     'createdAt': '2021-02-09T19:55:43.611Z',
     'updatedAt': '2021-02-09T19:55:43.611Z',
     'chapters': [
-        {
-            'name': 'Apresentação AAAAA',
-            'topics': [
-                {
-                    'name': 'Introdução a prorgramação'
-                },
-                {
-                    'name': 'Motivação JavaScript'
-                }
-            ]
-        },
-        {
-            'name': 'Apresentação BBBBBB',
-            'topics': [
-              {
-                  'name': 'Introdução a prorgramação2'
-              },
-              {
-                  'name': 'Motivação JavaScript2'
-              }
-          ]
-        }
+      {
+        'name': 'Apresentação AAAAA',
+        'topics': [
+          {
+            'name': 'Introdução a prorgramação'
+          },
+          {
+            'name': 'Motivação JavaScript'
+          }
+        ]
+      },
+      {
+        'name': 'Apresentação BBBBBB',
+        'topics': [
+          {
+            'name': 'Introdução a prorgramação2'
+          },
+          {
+            'name': 'Motivação JavaScript2'
+          }
+        ]
+      }
     ]
     })
   });
@@ -112,12 +112,12 @@ describe('POST /admin/courses', () => {
       description: 'JavaScript do Zero',
       chapters: [
         {
-            name: 'Apresentação AAAAA',
-            topics: [
-                {
-                    name: 'Introdução a prorgramação'
-                },
-            ]
+          name: 'Apresentação AAAAA',
+          topics: [
+            {
+              name: 'Introdução a prorgramação'
+            },
+          ]
         },
     ]
     };
