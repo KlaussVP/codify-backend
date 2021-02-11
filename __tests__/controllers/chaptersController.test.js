@@ -20,7 +20,7 @@ describe('createChapter', () => {
 });
 
 describe('createListOfChapters', () => {
-  it('should an array with the the id included', async () => {
+  it('should return an array with the id included', async () => {
     const chapters = [
       {
         name: 'Apresentação',
@@ -48,7 +48,7 @@ describe('createListOfChapters', () => {
 });
 
 describe('getAllChapters', () => {
-  it('should return an array', async () => {
+  it('should return an array of chapters', async () => {
     const expectedArray = [{ id: 1, name: 'Introduction', courseId: 1 }];
     Chapter.findAll.mockResolvedValue(expectedArray);
     const chapters = await chaptersController.getAllChapters();
@@ -57,7 +57,7 @@ describe('getAllChapters', () => {
 });
 
 describe('getChapterById', () => {
-  it('should return an object', async () => {
+  it('should return an object chapter', async () => {
     const id = 1;
     const expectedObject = { id, name: 'Introduction', courseId: 1 };
     Chapter.findOne.mockResolvedValue(expectedObject);
@@ -76,7 +76,7 @@ describe('getChapterById', () => {
 });
 
 describe('getChapterByIdAsAdmin', () => {
-  it('should return an object', async () => {
+  it('should return an object chapters', async () => {
     const id = 1;
     const chapterObject  = {
       id,
@@ -92,7 +92,7 @@ describe('getChapterByIdAsAdmin', () => {
           id: 14,
         }
       ],
-    };;    
+    };
     const expectedObject = {... chapterObject, "topics": [6,14] } ;
 
     Chapter.findOne.mockResolvedValue(chapterObject);

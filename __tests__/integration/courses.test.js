@@ -38,8 +38,8 @@ beforeAll( async (done) => {
       done();
     });
   
-
-  // agent
+  //utilizar depois para quando rotas autenticadas forem utilizadas pelos clientes
+  // agent 
   // .post('/clients/signup')
   // .send({
   //   name: 'client',

@@ -33,10 +33,11 @@ coursesRouter.get('/', adminVerifyJWT, async (req, res) => {
 });
 
 coursesRouter.get('/:id', adminVerifyJWT, async (req, res) => {
-  const course = await coursesController.getCourseByIdAsAdmin(req.params.id);  res
-  .header('Access-Control-Expose-Headers', 'X-Total-Count')
-  .set('X-Total-Count', 1)
-  .send(course);
+  const course = await coursesController.getCourseByIdAsAdmin(req.params.id);  
+  res
+    .header('Access-Control-Expose-Headers', 'X-Total-Count')
+    .set('X-Total-Count', 1)
+    .send(course);
 });
 
 coursesRouter.delete('/:id', adminVerifyJWT, async (req, res) => {
