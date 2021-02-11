@@ -75,7 +75,7 @@ class CoursesController {
       const courseObjectToAdmin = {
         id: course.id,
         name: course.name,
-        deleted: course.deleted,
+        deleted: JSON.stringify(course.deleted),
         image: course.image,
         description:course.description,
         createdAt: course.createdAt,

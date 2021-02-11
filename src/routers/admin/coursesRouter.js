@@ -24,18 +24,19 @@ coursesRouter.put('/', adminVerifyJWT, async (req, res) => {
 });
 
 coursesRouter.get('/', adminVerifyJWT, async (req, res) => {
-  const courses = await coursesController.listAllCourses();
-  res.send(courses);
-});
-
-coursesRouter.get('/', adminVerifyJWT, async (req, res) => {
   const courses = await coursesController.listAllCoursesAsAdmin();
-  res.send(courses);
+  
+  res
+    .header('Access-Control-Expose-Headers', 'X-Total-Count')
+    .set('X-Total-Count', courses.length)
+    .send(courses);
 });
 
 coursesRouter.get('/:id', adminVerifyJWT, async (req, res) => {
-  const course = await coursesController.getCourseByIdAsAdmin(req.params.id);
-  res.send(course);
+  const course = await coursesController.getCourseByIdAsAdmin(req.params.id);  res
+  .header('Access-Control-Expose-Headers', 'X-Total-Count')
+  .set('X-Total-Count', 1)
+  .send(course);
 });
 
 coursesRouter.delete('/:id', adminVerifyJWT, async (req, res) => {

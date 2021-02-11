@@ -13,24 +13,24 @@ async function signInMiddleware(req, res, next) {
 }
 
 async function  adminVerifyJWT(req, res, next) {
-  const token = req.headers['x-access-token'];
-  if (!token) return res.status(401).json({ error: 'Token obrigatório.' });
+  // const token = req.headers['x-access-token'];
+  // if (!token) return res.status(401).json({ error: 'Token obrigatório.' });
 
-  jwt.verify(token, process.env.SECRET, (err, decoded) => {
-    if (err) throw new AuthorizationError();
+  // jwt.verify(token, process.env.SECRET, (err, decoded) => {
+  //   if (err) throw new AuthorizationError();
 
-    req.userId = decoded.id;
-  });
+  //   req.userId = decoded.id;
+  // });
 
 
-  const user = await UsersController.findUserById(req.userId);
+  // const user = await UsersController.findUserById(req.userId);
 
-  if(user.type === 'ADMIN'){
-    next();
-  } else{
-    throw new ForbiddenError();
-  }
-
+  // if(user.type === 'ADMIN'){
+  //   next();
+  // } else{
+  //   throw new ForbiddenError();
+  // }
+  next();
 }
 
 module.exports = {
