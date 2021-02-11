@@ -1,4 +1,5 @@
 /* global jest, describe, it, expect */
+const { Sequelize } = require('sequelize');
 const chaptersController = require('../../src/controllers/chaptersController');
 const InexistingId = require('../../src/errors/InexistingId');
 const Chapter = require('../../src/models/Chapter');
@@ -77,10 +78,26 @@ describe('getChapterById', () => {
 describe('getChapterByIdAsAdmin', () => {
   it('should return an object', async () => {
     const id = 1;
-    const expectedObject = { id, name: 'Introduction', courseId: 1 };
-    Chapter.findOne.mockResolvedValue(expectedObject);
-    const chapter = await chaptersController.getChapterById(id);
-    expect(chapter).toBe(expectedObject);
+    const chapterObject  = {
+      id,
+      name: "Preparando o ambiente",
+      courseId: 2,
+      createdAt: Sequelize.NOW,
+      updatedAt: Sequelize.NOW,
+      topics: [
+        {
+          id: 6,
+        },
+        {
+          id: 14,
+        }
+      ],
+    };;    
+    const expectedObject = {... chapterObject, "topics": [6,14] } ;
+
+    Chapter.findOne.mockResolvedValue(chapterObject);
+    const chapter = await chaptersController.getChapterByIdAsAdmin(id);
+    expect(chapter).toMatchObject(expectedObject);
   });
 
   it('should throw an error', async () => {
