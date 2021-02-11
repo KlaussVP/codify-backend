@@ -171,14 +171,8 @@ describe('POST /admin/courses', () => {
   });
 
   it('should return 422 when passed invalid parameters', async () => {
-    const body = {
-      name: 'JavaScript',
-      image: 'https://static.imasters.com.br/wp-content/uploads/2018/12/10164438/javascript.jpg',
-      description: 'JavaScript do Zero',
-      chapters: [],
-    };
-    const response = await agent.post('/admin/courses').set({"X-Access-Token": tokenAdmin}).send(body);
-
+    const response = await agent.post('/admin/courses').set({"X-Access-Token": tokenAdmin}).send('body');
+    console.log(response.status);
     expect(response.status).toBe(422);
   });
 

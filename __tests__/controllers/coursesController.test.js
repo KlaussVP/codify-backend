@@ -136,7 +136,7 @@ describe('listAllCoursesAsAdmin', () => {
       {
         id: 1,
         name: "JavaScript",
-        deleted: false,
+        deleted: "false",
         image: "https://static.imasters.com.br/wp-content/uploads/2018/12/10164438/javascript.jpg",
         description: "JavaScript do Zero",
         createdAt: "2021-02-09T21:57:37.042Z",
@@ -146,7 +146,7 @@ describe('listAllCoursesAsAdmin', () => {
       {
         id: 2,
         name: "JavaScript2",
-        deleted: false,
+        deleted: "false",
         image: "https://static.imasters.com.br/wp-content/uploads/2018/12/10164438/javascript.jpg",
         description: "JavaScript do Zero2",
         createdAt: "2021-02-09T21:57:37.042Z",
@@ -156,8 +156,7 @@ describe('listAllCoursesAsAdmin', () => {
     ];
     Course.findAll.mockResolvedValue(coursesArray);
     const courses = await coursesController.listAllCoursesAsAdmin();
-    expect(courses).toEqual(
-      expect.arrayContaining(expectedArray));
+    expect(courses).toEqual(expectedArray);
   });
 });
 
