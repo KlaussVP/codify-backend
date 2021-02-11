@@ -9,15 +9,18 @@ const AuthorizationError = require('./errors/AuthorizationError');
 
 const app = express();
 const clientsRouter = require('./routers/clients/clientsRouter');
-const coursesRouter = require('./routers/clients/coursesRouter');
+const clientsCoursesRouter = require('./routers/clients/coursesRouter');
+
 const adminRouter = require('./routers/admin/adminRouter');
+const adminCoursesRouter = require('./routers/admin/coursesRouter');
 
 app.use(cors());
 app.use(express.json());
 
 app.use('/clients', clientsRouter);
-app.use('/clients/courses', coursesRouter);
+app.use('/clients/courses', clientsCoursesRouter);
 app.use('/admin', adminRouter);
+app.use('/admin/courses', adminCoursesRouter);
 
 // eslint-disable-next-line no-unused-vars
 app.use((error, req, res, next) => {
@@ -25,6 +28,7 @@ app.use((error, req, res, next) => {
   if (error instanceof InexistingId) return res.status(403).send({ error: 'Id inexistente.' });
   if (error instanceof AuthorizationError) return res.status(403).send({ error: 'Não autorizado.' });
 
+  console.error(error);
   return res.status(500).json(error);
 });
 
