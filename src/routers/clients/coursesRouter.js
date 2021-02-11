@@ -13,9 +13,4 @@ router.get('/:id', async (req, res) => {
   res.send(course);
 });
 
-// router.post('/:id', async (req, res) => {
-//   await coursesController.updateCourseAccess(req.params.id, req.body.userId);
-//   res.sendStatus(200);
-// });
-
 module.exports = router;

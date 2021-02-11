@@ -158,6 +158,73 @@ describe('listAllCourses', () => {
   });
 });
 
+describe('listAllCoursesAsAdmin', () => {
+  it('should return an array', async () => {
+    const coursesArray = [
+      {
+        id: 1,
+        name: "JavaScript",
+        deleted: false,
+        image: "https://static.imasters.com.br/wp-content/uploads/2018/12/10164438/javascript.jpg",
+        description: "JavaScript do Zero",
+        createdAt: "2021-02-09T21:57:37.042Z",
+        updatedAt: "2021-02-09T21:57:37.042Z",
+        chapters:  [
+          {
+          "id": 99,
+          },
+          {
+          "id": 100,
+          },
+        ],
+      },
+      {
+        id: 2,
+        name: "JavaScript2",
+        deleted: false,
+        image: "https://static.imasters.com.br/wp-content/uploads/2018/12/10164438/javascript.jpg",
+        description: "JavaScript do Zero2",
+        createdAt: "2021-02-09T21:57:37.042Z",
+        updatedAt: "2021-02-09T21:57:37.042Z",
+        chapters:  [
+          {
+          "id": 41,
+          },
+          {
+          "id": 100,
+          },
+        ],
+      }
+    ];
+    const expectedArray = [
+      {
+        id: 1,
+        name: "JavaScript",
+        deleted: false,
+        image: "https://static.imasters.com.br/wp-content/uploads/2018/12/10164438/javascript.jpg",
+        description: "JavaScript do Zero",
+        createdAt: "2021-02-09T21:57:37.042Z",
+        updatedAt: "2021-02-09T21:57:37.042Z",
+        chapters:  [ 99,100 ],
+      },
+      {
+        id: 2,
+        name: "JavaScript2",
+        deleted: false,
+        image: "https://static.imasters.com.br/wp-content/uploads/2018/12/10164438/javascript.jpg",
+        description: "JavaScript do Zero2",
+        createdAt: "2021-02-09T21:57:37.042Z",
+        updatedAt: "2021-02-09T21:57:37.042Z",
+        chapters:  [ 41,100 ],
+      }
+    ];
+    Course.findAll.mockResolvedValue(coursesArray);
+    const courses = await coursesController.listAllCoursesAsAdmin();
+    expect(courses).toEqual(
+      expect.arrayContaining(expectedArray));
+  });
+});
+
 describe('getCourseById', () => {
   it('should return an object', async () => {
     const id = 1;

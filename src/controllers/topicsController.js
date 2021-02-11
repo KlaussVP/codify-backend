@@ -26,7 +26,12 @@ class TopicsController {
     return topics;
   }
 
-  async getTopicById(id) {
+  async getAllTopicsAsAdmin() {
+    const topics = await Topic.findAll();
+    return topics;
+  }
+
+  async getTopicByIdAsAdmin(id) {
     const topic = await Topic.findByPk(id);
     if (!topic) throw new InexistingId();
     return topic;
