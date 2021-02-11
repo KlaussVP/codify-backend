@@ -18,6 +18,7 @@ Topic.init(
       chapterId: {
         type: Sequelize.INTEGER,
         allowNull: false,
+        onDelete: 'CASCADE',
       },
   },
   {

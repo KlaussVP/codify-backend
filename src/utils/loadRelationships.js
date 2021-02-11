@@ -7,4 +7,5 @@ const Topic = require('../models/Topic');
 Course.belongsToMany(User, { through: CourseUser });
 User.belongsToMany(Course, { through: CourseUser });
 Course.hasMany(Chapter);
-Chapter.hasMany(Topic);
+Chapter.hasMany(Topic, { onDelete: 'CASCADE' });
+Topic.belongsTo(Chapter, { onDelete: 'CASCADE'});

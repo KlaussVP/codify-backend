@@ -28,10 +28,20 @@ class ChaptersController {
   }
 
   async deleteChaptersFromCourse(courseId) {
+    const chapters = await this.getChaptersByCourse(courseId);
+    
+    chapters.map((e) => {
+    })
+
+    for(let i = 0; i < chapters.length; i++){
+      await topicsController.deleteTopicsFromChapter(chapters[i].id);
+    }
+
     await Chapter.destroy({
       where: {
         courseId,
-      },
+      }, 
+      cascade: true,
     });
   }
 
@@ -44,6 +54,11 @@ class ChaptersController {
     const chapter = await Chapter.findByPk(id);
     if (!chapter) throw new InexistingId();
     return chapter;
+  }
+
+  async getChaptersByCourse(courseId) {
+    const chapters = await Chapter.findAll({ where: {courseId}});
+    return chapters;
   }
 }
 

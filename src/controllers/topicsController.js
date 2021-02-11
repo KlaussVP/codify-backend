@@ -13,7 +13,7 @@ class TopicsController {
     return arrayTopics;
   }
 
-  async deleteTopicsFromCourse(chapterId) {
+  async deleteTopicsFromChapter(chapterId) {
     await Topic.destroy({
       where: {
         chapterId,
