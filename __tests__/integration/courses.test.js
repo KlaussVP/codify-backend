@@ -6,7 +6,9 @@ const { Pool } = require('pg');
 const { NOW, Sequelize } = require('sequelize');
 const supertest = require('supertest');
 const app = require('../../src/app');
+const verifyJWT = require('../../src/middlewares/authMiddleware');
 const sequelize = require('../../src/utils/database');
+const jwt = require('jsonwebtoken');
 
 const agent = supertest(app);
 const db = new Pool({
@@ -68,12 +70,14 @@ beforeAll( async (done) => {
 beforeEach(async () => {
   await db.query('DELETE FROM topics');
   await db.query('DELETE FROM chapters');
+  await db.query('DELETE FROM "courseUsers"');
   await db.query('DELETE FROM courses');
 });
 
 afterAll(async () => {
   await db.query('DELETE FROM topics');
   await db.query('DELETE FROM chapters');
+  await db.query('DELETE FROM "courseUsers"');
   await db.query('DELETE FROM courses');
   await db.query('DELETE FROM users');
   await sequelize.close();

@@ -13,6 +13,7 @@ const db = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
 
+
 beforeEach(async () => {
   await db.query('DELETE FROM users');
 });
