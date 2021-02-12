@@ -2,6 +2,7 @@ const router = require('express').Router();
 
 const { postCoursesSchema } = require('../../schemas/coursesSchema');
 const coursesController = require('../../controllers/coursesController');
+const verifyJWT = require('../../middlewares/authMiddleware');
 
 router.get('/', async (req, res) => {
   const courses = await coursesController.listAllCourses();
@@ -13,9 +14,9 @@ router.get('/:id', async (req, res) => {
   res.send(course);
 });
 
-// router.post('/:id', async (req, res) => {
-//   await coursesController.updateCourseAccess(req.params.id, req.body.userId);
-//   res.sendStatus(200);
-// });
+router.post('/:id', verifyJWT, async (req, res) => {
+  await coursesController.startOrContinueCourse(req.params.id, req.userId);
+  res.sendStatus(200);
+});
 
 module.exports = router;

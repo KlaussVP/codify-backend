@@ -5,7 +5,10 @@ dotenv.config();
 const { Pool } = require('pg');
 const supertest = require('supertest');
 const app = require('../../src/app');
+const verifyJWT = require('../../src/middlewares/authMiddleware');
 const sequelize = require('../../src/utils/database');
+const { Sequelize } = require('sequelize');
+const jwt = require('jsonwebtoken');
 
 const agent = supertest(app);
 const db = new Pool({
@@ -14,11 +17,15 @@ const db = new Pool({
 
 beforeEach(async () => {
   await db.query('DELETE FROM topics');
+  await db.query('DELETE FROM chapters');
+  await db.query('DELETE FROM "courseUsers"');
   await db.query('DELETE FROM courses');
 });
 
 afterAll(async () => {
   await db.query('DELETE FROM topics');
+  await db.query('DELETE FROM chapters');
+  await db.query('DELETE FROM "courseUsers"');
   await db.query('DELETE FROM courses');
   await sequelize.close();
   await db.end();
@@ -74,5 +81,36 @@ describe('POST /clients/courses', () => {
     const response = await agent.post('/admin/courses').send(body);
 
     expect(response.status).toBe(409);
+  });
+});
+
+describe('POST /clients/courses/:id', () => {
+  it('should return 200 when course is successfully started or resumed', async () => {
+    const user = {
+      name: 'Teste Silva',
+      email: 'teste@teste.com',
+      password: 'senha_super_secreta_de_teste',
+    };
+
+    const course = {
+      name: 'TesteScript do zero!',
+      description: 'Aprenda TesteScript do zero ao avançado, com muita prática!',
+      image: 'https://static.imasters.com.br/wp-content/uploads/2018/12/10164438/javascript.jpg'
+    };
+
+    const testUser = await db.query('INSERT INTO users (name, email, password, "createdAt", "updatedAt", type) values ($1, $2, $3, $4, $5, $6) RETURNING *', [
+      user.name, user.email, user.password, Sequelize.NOW, Sequelize.NOW, 'CLIENT'
+    ]);
+
+    const token = jwt.sign({ id: testUser.rows[0].id }, process.env.SECRET, {
+      expiresIn: 86400,
+    });
+
+    const testCourse = await db.query('INSERT INTO courses (name, description, image, "createdAt", "updatedAt") values ($1, $2, $3, $4, $5) RETURNING *', [
+      course.name, course.description, course.image, Sequelize.NOW, Sequelize.NOW
+    ]);
+
+    const response = await agent.post(`/clients/courses/${testCourse.rows[0].id}`).set({"X-Access-Token": token});
+    expect(response.status).toBe(200);
   });
 });

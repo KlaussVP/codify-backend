@@ -5,6 +5,7 @@ const Topic = require('../models/Topic');
 const Chapter = require('../models/Chapter');
 const chaptersController = require('./chaptersController');
 const topicsController = require('./topicsController');
+const CourseUser = require('../models/CourseUser');
 
 class CoursesController {
   async findCourseByName(name) {
@@ -68,9 +69,23 @@ class CoursesController {
     return course;
   }
 
-  // async updateCourseAccess() {
+  async startOrContinueCourse(courseId, userId) {
+    const [startedCourse, created] = await CourseUser.findOrCreate({ 
+      where: {
+        courseId,
+        userId
+      } 
+    });
 
-  // }
+    if (!created) {
+      await CourseUser.update({ lastAccessed: new Date() }, { 
+        where: {
+          courseId,
+          userId
+        } 
+      });
+    }
+  }
 }
 
 module.exports = new CoursesController();
