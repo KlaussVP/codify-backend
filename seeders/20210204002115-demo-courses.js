@@ -26,7 +26,7 @@ module.exports = {
       createdAt: new Date(),
       updatedAt: new Date(),
     }], {});
-    const courseTopics = [
+    const courseChapters = [
       [
         {
           name: 'Apresentação',
@@ -143,77 +143,205 @@ module.exports = {
 
     const ids = coursesIds[0];
 
-    queryInterface.bulkInsert('topics',
+    queryInterface.bulkInsert('chapters',
       [
         {
-          ...courseTopics[0][0],
+          ...courseChapters[0][0],
           courseId: ids[0].id,
         },
         {
-          ...courseTopics[0][1],
+          ...courseChapters[0][1],
           courseId: ids[0].id,
         },
         {
-          ...courseTopics[0][2],
+          ...courseChapters[0][2],
           courseId: ids[0].id,
         },
         {
-          ...courseTopics[0][3],
+          ...courseChapters[0][3],
           courseId: ids[0].id,
         },
         {
-          ...courseTopics[1][0],
+          ...courseChapters[1][0],
           courseId: ids[1].id,
         },
         {
-          ...courseTopics[1][1],
+          ...courseChapters[1][1],
           courseId: ids[1].id,
         },
         {
-          ...courseTopics[1][2],
+          ...courseChapters[1][2],
           courseId: ids[1].id,
         },
         {
-          ...courseTopics[1][3],
+          ...courseChapters[1][3],
           courseId: ids[1].id,
         },
         {
-          ...courseTopics[2][0],
+          ...courseChapters[2][0],
           courseId: ids[2].id,
         },
         {
-          ...courseTopics[2][1],
+          ...courseChapters[2][1],
           courseId: ids[2].id,
         },
         {
-          ...courseTopics[2][2],
+          ...courseChapters[2][2],
           courseId: ids[2].id,
         },
         {
-          ...courseTopics[2][3],
+          ...courseChapters[2][3],
           courseId: ids[2].id,
         },
         {
-          ...courseTopics[3][0],
+          ...courseChapters[3][0],
           courseId: ids[3].id,
         },
         {
-          ...courseTopics[3][1],
+          ...courseChapters[3][1],
           courseId: ids[3].id,
         },
         {
-          ...courseTopics[3][2],
+          ...courseChapters[3][2],
           courseId: ids[3].id,
         },
         {
-          ...courseTopics[3][3],
+          ...courseChapters[3][3],
           courseId: ids[3].id,
+        },
+      ], {});
+
+      const topics = [
+        {
+          name: 'Como usar',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          name: 'Entrando na plataforma',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          name: 'Fazendo teorias',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          name: 'Fazendo exercícios',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      ]
+
+      const chaptersIds = await queryInterface.sequelize.query(
+        'SELECT id from chapters;',
+      );
+
+      queryInterface.bulkInsert('topics',
+      [
+        {
+          ...topics[0],
+          chapterId: chaptersIds[0][0].id,
+        },
+        {
+          ...topics[1],
+          chapterId: chaptersIds[0][0].id,
+        },
+        {
+          ...topics[2],
+          chapterId: chaptersIds[0][0].id,
+        },
+        {
+          ...topics[3],
+          chapterId: chaptersIds[0][0].id,
+        },
+        {
+          ...topics[0],
+          chapterId: chaptersIds[0][1].id,
+        },
+        {
+          ...topics[1],
+          chapterId: chaptersIds[0][1].id,
+        },
+        {
+          ...topics[2],
+          chapterId: chaptersIds[0][1].id,
+        },
+        {
+          ...topics[3],
+          chapterId: chaptersIds[0][1].id,
+        },
+        {
+          ...topics[0],
+          chapterId: chaptersIds[0][2].id,
+        },
+        {
+          ...topics[1],
+          chapterId: chaptersIds[0][2].id,
+        },
+        {
+          ...topics[2],
+          chapterId: chaptersIds[0][2].id,
+        },
+        {
+          ...topics[3],
+          chapterId: chaptersIds[0][2].id,
+        },
+        {
+          ...topics[0],
+          chapterId: chaptersIds[0][3].id,
+        },
+        {
+          ...topics[1],
+          chapterId: chaptersIds[0][3].id,
+        },
+        {
+          ...topics[2],
+          chapterId: chaptersIds[0][3].id,
+        },
+        {
+          ...topics[3],
+          chapterId: chaptersIds[0][3].id,
+        },
+        {
+          ...topics[0],
+          chapterId: chaptersIds[0][4].id,
+        },
+        {
+          ...topics[1],
+          chapterId: chaptersIds[0][4].id,
+        },
+        {
+          ...topics[2],
+          chapterId: chaptersIds[0][4].id,
+        },
+        {
+          ...topics[3],
+          chapterId: chaptersIds[0][4].id,
+        },
+        {
+          ...topics[0],
+          chapterId: chaptersIds[0][5].id,
+        },
+        {
+          ...topics[1],
+          chapterId: chaptersIds[0][5].id,
+        },
+        {
+          ...topics[2],
+          chapterId: chaptersIds[0][5].id,
+        },
+        {
+          ...topics[3],
+          chapterId: chaptersIds[0][5].id,
         },
       ], {});
   },
 
   down: async (queryInterface) => {
     await queryInterface.bulkDelete('topics', null, {});
+    await queryInterface.bulkDelete('chapters', null, {});
     await queryInterface.bulkDelete('courses', null, {});
   },
 };

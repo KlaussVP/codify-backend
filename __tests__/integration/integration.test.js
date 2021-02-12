@@ -58,7 +58,7 @@ describe('POST /clients/signup', () => {
       password: '123456',
       confirmPassword: '123456',
     };
-    await db.query('INSERT INTO users (name, email, password, type) values ($1, $2, $3, $4)', [body.name, body.email, body.password, 'CLIENT']);
+    await db.query('INSERT INTO users (name, email, password, type, "createdAt", "updatedAt") values ($1, $2, $3, $4, $5, $6)', [body.name, body.email, body.password, 'CLIENT', 'now()', 'now()']);
 
     const response = await agent.post('/clients/signup').send(body);
 
@@ -75,7 +75,7 @@ describe('POST /clients/signin', () => {
       password: '123456',
     };
 
-    await db.query('INSERT INTO users (name, email, password, type) values ($1, $2, $3, $4)', ['Test', bodyLogin.email, bcrypt.hashSync(bodyLogin.password, 10), 'CLIENT']);
+    await db.query('INSERT INTO users (name, email, password, type, "createdAt", "updatedAt") values ($1, $2, $3, $4, $5, $6)', ['Test', bodyLogin.email, bcrypt.hashSync(bodyLogin.password, 10), 'CLIENT', 'now()', 'now()']);
 
     const response = await agent.post('/clients/signin').send(bodyLogin);
     
@@ -116,7 +116,7 @@ describe('POST /admin/signin', () => {
       confirmPassword: '123456',
     };
 
-    await db.query('INSERT INTO users (name, email, password, type) values ($1, $2, $3, $4)', [bodyAdmin.name, bodyAdmin.email, bodyAdmin.password, 'ADMIN']);
+    await db.query('INSERT INTO users (name, email, password, type, "createdAt", "updatedAt") values ($1, $2, $3, $4, $5, $6)', [bodyAdmin.name, bodyAdmin.email, bodyAdmin.password, 'ADMIN', 'now()', 'now()']);
 
     const bodyLogin = {
       email: 'contato@codify.com.br',

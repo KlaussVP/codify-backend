@@ -27,7 +27,7 @@ beforeAll( async (done) => {
     confirmPassword: '123456',
   };
 
-  await db.query('INSERT INTO users (name, email, password, type) values ($1, $2, $3, $4)', [bodyAdmin.name, bodyAdmin.email, bodyAdmin.password, 'ADMIN']);
+  await db.query('INSERT INTO users (name, email, password, type, "createdAt", "updatedAt") values ($1, $2, $3, $4, $5, $6)', [bodyAdmin.name, bodyAdmin.email, bodyAdmin.password, 'ADMIN', 'now()', 'now()']);
 
   agent
     .post('/admin/signin')
@@ -96,7 +96,7 @@ describe('POST /admin/courses', () => {
       confirmPassword: '123456',
     };
 
-    await db.query('INSERT INTO users (name, email, password, type) values ($1, $2, $3, $4)', [bodyAdmin.name, bodyAdmin.email, bodyAdmin.password, 'ADMIN']);
+    await db.query('INSERT INTO users (name, email, password, type, "createdAt", "updatedAt") values ($1, $2, $3, $4, $5, $6)', [bodyAdmin.name, bodyAdmin.email, bodyAdmin.password, 'ADMIN', 'now()', 'now()']);
 
     const bodyLogin = {
       email: 'contato1@codify.com.br',
