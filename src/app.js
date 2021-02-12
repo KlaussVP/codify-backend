@@ -12,7 +12,11 @@ const clientsRouter = require('./routers/clients/clientsRouter');
 const clientsCoursesRouter = require('./routers/clients/coursesRouter');
 
 const adminRouter = require('./routers/admin/adminRouter');
-const adminCoursesRouter = require('./routers/admin/coursesRouter');
+const {
+  coursesRouter,
+  chapterRouter,
+  topicRouter,
+} = require('./routers/admin/coursesRouter');
 
 app.use(cors());
 app.use(express.json());
@@ -20,7 +24,10 @@ app.use(express.json());
 app.use('/clients', clientsRouter);
 app.use('/clients/courses', clientsCoursesRouter);
 app.use('/admin', adminRouter);
-app.use('/admin/courses', adminCoursesRouter);
+
+app.use('/admin/courses', coursesRouter);
+app.use('/admin/chapters', chapterRouter);
+app.use('/admin/topics', topicRouter);
 
 // eslint-disable-next-line no-unused-vars
 app.use((error, req, res, next) => {

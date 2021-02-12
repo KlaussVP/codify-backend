@@ -2,6 +2,7 @@ const Chapter = require('../models/Chapter');
 const InexistingId = require('../errors/InexistingId');
 
 const topicsController = require('./topicsController');
+const Topic = require('../models/Topic');
 
 class ChaptersController {
   async createChapter({ courseId, name }) {
@@ -35,15 +36,70 @@ class ChaptersController {
     });
   }
 
-  async getAllChapter() {
+  async getAllChapters() {
     const chapters = await Chapter.findAll();
     return chapters;
   }
 
+  async getAllChaptersAsAdmin() {
+    const chapters = await Chapter.findAll({
+      include: {
+        model: Topic,
+        attributes: ['id'],
+      }
+    });
+
+    const chaptersArrayAdminFormat = [];
+    chapters.forEach( chapter => {
+      const topicsIds = chapter.topics.map(t => t.id);
+      const chapterObjectToAdmin = {
+        id: chapter.id,
+        name: chapter.name,
+        courseId: chapter.courseId,
+        createdAt: chapter.createdAt,
+        updatedAt: chapter.updatedAt,
+        topics: topicsIds,
+      };
+      chaptersArrayAdminFormat.push(chapterObjectToAdmin);
+    }); 
+    return chaptersArrayAdminFormat;
+  }
+
   async getChapterById(id) {
-    const chapter = await Chapter.findByPk(id);
+    const chapter = await Chapter.findOne({
+      where: { id },
+      include: {
+        model: Topic,
+        attributes: ['id', 'name'],
+      }
+    });
+
     if (!chapter) throw new InexistingId();
+    
     return chapter;
+  }
+
+  async getChapterByIdAsAdmin(id) {
+    const chapter = await Chapter.findOne({
+      where: { id },
+      include: {
+        model: Topic,
+        attributes: ['id', 'name'],
+      }
+    });
+    if (!chapter) throw new InexistingId();
+
+    const topicsIds = chapter.topics.map(c => c.id);
+
+    const chapterObjectToAdmin = {
+      id: chapter.id,
+      name: chapter.name,
+      courseId: chapter.courseId,
+      createdAt: chapter.createdAt,
+      updatedAt: chapter.updatedAt,
+      topics: topicsIds,
+    };
+    return chapterObjectToAdmin;
   }
 }
 

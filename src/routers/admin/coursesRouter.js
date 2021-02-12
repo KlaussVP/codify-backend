@@ -1,10 +1,12 @@
-const router = require('express').Router();
+const coursesRouter = require('express').Router();
 
 const { postCoursesSchema } = require('../../schemas/coursesSchema');
 const coursesController = require('../../controllers/coursesController');
+chapterRouter = require('./chaptersRouter');
+topicRouter = require('./topicsRouter');
 
 // eslint-disable-next-line consistent-return
-router.post('/', async (req, res) => {
+coursesRouter.post('/', async (req, res) => {
   const validation = postCoursesSchema.validate(req.body);
   if (validation.error) return res.status(422).send({ error: 'Verifique seus dados' });
 
@@ -12,7 +14,7 @@ router.post('/', async (req, res) => {
   res.status(201).send(course);
 });
 
-router.put('/', async (req, res) => {
+coursesRouter.put('/', async (req, res) => {
   const validation = editCourseSchema.validate(req.body);
   if (validation.error) return res.status(422).send({ error: 'Verifique seus dados' });
 
@@ -20,15 +22,18 @@ router.put('/', async (req, res) => {
   res.status(201).send(course);
 });
 
-router.get('/', async (req, res) => {
-    console.log("sasasa");
-  const courses = await coursesController.listAllCourses();
+coursesRouter.get('/', async (req, res) => {
+  const courses = await coursesController.listAllCoursesAsAdmin();
   res.send(courses);
 });
 
-router.get('/:id', async (req, res) => {
-  const course = await coursesController.getCourseById(req.params.id);
+coursesRouter.get('/:id', async (req, res) => {
+  const course = await coursesController.getCourseByIdAsAdmin(req.params.id);
   res.send(course);
 });
 
-module.exports = router;
+module.exports = {
+  coursesRouter,
+  chapterRouter,
+  topicRouter
+};
