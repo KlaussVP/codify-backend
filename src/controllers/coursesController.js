@@ -5,6 +5,7 @@ const Topic = require('../models/Topic');
 const Chapter = require('../models/Chapter');
 const chaptersController = require('./chaptersController');
 const topicsController = require('./topicsController');
+const CourseUser = require('../models/CourseUser');
 
 class CoursesController {
   async findCourseByName(name) {
@@ -66,6 +67,24 @@ class CoursesController {
     if (!course) throw new InexistingId();
 
     return course;
+  }
+
+  async startOrContinueCourse(courseId, userId) {
+    const [startedCourse, created] = await CourseUser.findOrCreate({ 
+      where: {
+        courseId,
+        userId
+      } 
+    });
+
+    if (!created) {
+      await CourseUser.update({ lastAccessed: new Date() }, { 
+        where: {
+          courseId,
+          userId
+        } 
+      });
+    }
   }
 }
 

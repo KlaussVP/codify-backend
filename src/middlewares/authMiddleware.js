@@ -5,7 +5,7 @@ const AuthorizationError = require('../errors/AuthorizationError');
 async function verifyJWT(req, res, next) {
   const token = req.headers['x-access-token'];
   if (!token) return res.status(401).json({ error: 'Token obrigatório.' });
-
+  
   jwt.verify(token, process.env.SECRET, (err, decoded) => {
     if (err) throw new AuthorizationError();
 
