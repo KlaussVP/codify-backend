@@ -27,7 +27,7 @@ class CoursesController {
   }
 
   async edit({
-    id, name, image, description, topics,
+    id, name, image, description, chapters,
   }) {
     const course = await this.getCourseById(id);
     if (!course) throw new InexistingId();
@@ -36,9 +36,9 @@ class CoursesController {
     course.image = image || course.image;
     course.description = description || course.description;
 
-    if (topics) {
-      await chaptersController.deleteTopicsFromCourse(course.id);
-      await chaptersController.createListOfTopics(topics, course.id);
+    if (chapters) {
+      await chaptersController.deleteChaptersFromCourse(course.id);
+      await chaptersController.createListOfChapters(chapters, course.id);
     }
 
     await course.save();
@@ -47,9 +47,45 @@ class CoursesController {
     return courseObject;
   }
 
+  async deleteCourse(id) {
+    const course = await this.getCourseById(id);
+    if (!course) throw new InexistingId();
+
+    course.deleted = true;
+    await course.save();
+
+    return true;
+  }
+
   async listAllCourses() {
     const courses = await Course.findAll();
     return courses;
+  }
+
+  async listAllCoursesAsAdmin() {
+    const courses = await Course.findAll({
+      include: [{
+        model: Chapter,
+        attributes: ['id'],
+      }],
+    });
+
+    const coursesArrayAdminFormat = [];
+    courses.forEach( course => {
+      const chaptersIds = course.chapters.map(c => c.id);
+      const courseObjectToAdmin = {
+        id: course.id,
+        name: course.name,
+        deleted: JSON.stringify(course.deleted),
+        image: course.image,
+        description:course.description,
+        createdAt: course.createdAt,
+        updatedAt: course.updatedAt,
+        chapters: chaptersIds,
+      };
+      coursesArrayAdminFormat.push(courseObjectToAdmin);
+    }); 
+    return coursesArrayAdminFormat;
   }
 
   async getCourseById(id) {
@@ -76,6 +112,35 @@ class CoursesController {
         userId
       } 
     });
+  }
+
+  async getCourseByIdAsAdmin(id) {
+    const course = await Course.findOne({
+      where: { id },
+      include: [{
+        model: Chapter,
+        attributes: ['id', 'name'],
+      }],
+    });
+    if (!course) throw new InexistingId();
+
+   const chaptersIds = course.chapters.map(c => c.id);
+
+    const courseObjectToAdmin = {
+      id: course.id,
+      name: course.name,
+      deleted: course.deleted,
+      image: course.image,
+      description:course.description,
+      createdAt: course.createdAt,
+      updatedAt: course.updatedAt,
+      chapters: chaptersIds,
+    };
+    return courseObjectToAdmin;
+  }
+
+
+   async updateCourseAccess() {
 
     if (!created) {
       await CourseUser.update({ lastAccessed: new Date() }, { 

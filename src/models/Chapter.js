@@ -18,6 +18,7 @@ Chapter.init(
     courseId: {
       type: Sequelize.INTEGER,
       allowNull: false,
+      onDelete: 'CASCADE',
     },
   },
   {

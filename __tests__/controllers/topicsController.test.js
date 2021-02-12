@@ -27,20 +27,22 @@ describe('createListOfTopics', () => {
         name: 'Preparando o ambiente',
       },
     ];
-    const courseId = 1;
+    const chapterId = 1;
     const expectedArray = [
       {
         name: 'Apresentação',
-        courseId,
+        chapterId,
       },
       {
         name: 'Preparando o ambiente',
-        courseId,
+        chapterId,
       },
     ];
     Topic.bulkCreate.mockResolvedValue({});
-    const resultArray = await topicsController.createListOfTopics(topics, courseId);
-    expect(resultArray).toEqual(expectedArray);
+    const resultArray = await topicsController.createListOfTopics(topics, chapterId);
+    expect(resultArray).toEqual(
+      expect.objectContaining(expectedArray)
+    );
   });
 });
 
@@ -53,12 +55,12 @@ describe('getAllTopics', () => {
   });
 });
 
-describe('getTopicById', () => {
+describe('getTopicByIdAsAdmin', () => {
   it('should return an object', async () => {
     const id = 1;
-    const expectedObject = { id, name: 'Introduction', userId: 1 };
+    const expectedObject = { id, name: 'Introduction', chapterId: 1 };
     Topic.findByPk.mockResolvedValue(expectedObject);
-    const topic = await topicsController.getTopicById(id);
+    const topic = await topicsController.getTopicByIdAsAdmin(id);
     expect(topic).toBe(expectedObject);
   });
 
@@ -67,7 +69,7 @@ describe('getTopicById', () => {
     Topic.findByPk.mockResolvedValue(null);
 
     expect(async () => {
-      await topicsController.getTopicById(id);
+      await topicsController.getTopicByIdAsAdmin(id);
     }).rejects.toThrow(InexistingId);
   });
 });
