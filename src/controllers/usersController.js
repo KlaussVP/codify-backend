@@ -11,6 +11,11 @@ class UsersController {
     return user;
   }
 
+  async findUserById(id) {
+    const user = await User.findOne({ where: { id } });
+    return user;
+  }
+
   async postSignUp({ name, email, password }) {
     const userExists = await this.findUserByEmail(email);
     if (userExists) throw new ConflictError();

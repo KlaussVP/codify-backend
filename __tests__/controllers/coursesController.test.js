@@ -75,7 +75,6 @@ describe('create', () => {
   });
 });
 
-
 describe('findCourseByName', () => {
   it('should return the same object', async () => {
     const name = 'JvaScript';
@@ -87,7 +86,7 @@ describe('findCourseByName', () => {
 });
 
 describe('listAllCourses', () => {
-  it('should return an array', async () => {
+  it('should return an array of courses', async () => {
     const expectedArray = [{ id: 1, name: 'JavaScript' }];
     Course.findAll.mockResolvedValue(expectedArray);
     const courses = await coursesController.listAllCourses();
@@ -96,7 +95,7 @@ describe('listAllCourses', () => {
 });
 
 describe('listAllCoursesAsAdmin', () => {
-  it('should return an array', async () => {
+  it('should return an array of courses', async () => {
     const coursesArray = [
       {
         id: 1,
@@ -137,7 +136,7 @@ describe('listAllCoursesAsAdmin', () => {
       {
         id: 1,
         name: "JavaScript",
-        deleted: false,
+        deleted: "false",
         image: "https://static.imasters.com.br/wp-content/uploads/2018/12/10164438/javascript.jpg",
         description: "JavaScript do Zero",
         createdAt: "2021-02-09T21:57:37.042Z",
@@ -147,7 +146,7 @@ describe('listAllCoursesAsAdmin', () => {
       {
         id: 2,
         name: "JavaScript2",
-        deleted: false,
+        deleted: "false",
         image: "https://static.imasters.com.br/wp-content/uploads/2018/12/10164438/javascript.jpg",
         description: "JavaScript do Zero2",
         createdAt: "2021-02-09T21:57:37.042Z",
@@ -157,13 +156,12 @@ describe('listAllCoursesAsAdmin', () => {
     ];
     Course.findAll.mockResolvedValue(coursesArray);
     const courses = await coursesController.listAllCoursesAsAdmin();
-    expect(courses).toEqual(
-      expect.arrayContaining(expectedArray));
+    expect(courses).toEqual(expectedArray);
   });
 });
 
 describe('getCourseById', () => {
-  it('should return an object', async () => {
+  it('should return an object course', async () => {
     const id = 1;
     const expectedObject = { id, name: 'JavaScript' };
     Course.findOne.mockResolvedValue(expectedObject);
@@ -182,7 +180,7 @@ describe('getCourseById', () => {
 });
 
 describe('getCourseByIdAsAdmin', () => {
-  it('should return an object', async () => {
+  it('should return an object course', async () => {
     const id = 1;
     const courseObject = {
       id: 1,

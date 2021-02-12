@@ -6,6 +6,7 @@ require('./utils/loadRelationships');
 const ConflictError = require('./errors/ConflictError');
 const InexistingId = require('./errors/InexistingId');
 const AuthorizationError = require('./errors/AuthorizationError');
+const ForbiddenError = require('./errors/ForbiddenError');
 
 const app = express();
 const clientsRouter = require('./routers/clients/clientsRouter');
@@ -33,7 +34,8 @@ app.use('/admin/topics', topicRouter);
 app.use((error, req, res, next) => {
   if (error instanceof ConflictError) return res.status(409).send({ error: 'Conflito de dados.' });
   if (error instanceof InexistingId) return res.status(403).send({ error: 'Id inexistente.' });
-  if (error instanceof AuthorizationError) return res.status(403).send({ error: 'Não autorizado.' });
+  if (error instanceof AuthorizationError) return res.status(401).send({ error: 'Não autorizado.' });
+  if (error instanceof ForbiddenError) return res.status(403).send({ error: 'Não autorizado.' });
 
   console.error(error);
   return res.status(500).json(error);

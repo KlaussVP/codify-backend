@@ -26,7 +26,7 @@ class CoursesController {
   }
 
   async edit({
-    id, name, image, description, topics,
+    id, name, image, description, chapters,
   }) {
     const course = await this.getCourseById(id);
     if (!course) throw new InexistingId();
@@ -35,15 +35,25 @@ class CoursesController {
     course.image = image || course.image;
     course.description = description || course.description;
 
-    if (topics) {
-      await chaptersController.deleteTopicsFromCourse(course.id);
-      await chaptersController.createListOfTopics(topics, course.id);
+    if (chapters) {
+      await chaptersController.deleteChaptersFromCourse(course.id);
+      await chaptersController.createListOfChapters(chapters, course.id);
     }
 
     await course.save();
 
     const courseObject = await this.getCourseById(course.id);
     return courseObject;
+  }
+
+  async deleteCourse(id) {
+    const course = await this.getCourseById(id);
+    if (!course) throw new InexistingId();
+
+    course.deleted = true;
+    await course.save();
+
+    return true;
   }
 
   async listAllCourses() {
@@ -65,7 +75,7 @@ class CoursesController {
       const courseObjectToAdmin = {
         id: course.id,
         name: course.name,
-        deleted: course.deleted,
+        deleted: JSON.stringify(course.deleted),
         image: course.image,
         description:course.description,
         createdAt: course.createdAt,
@@ -118,6 +128,11 @@ class CoursesController {
     };
     return courseObjectToAdmin;
   }
+
+
+  // async updateCourseAccess() {
+
+  // }
 }
 
 module.exports = new CoursesController();
