@@ -13,7 +13,6 @@ const postCoursesSchema = joi.object({
 });
 
 const editCourseSchema = joi.object({
-  id: joi.number().required(),
   name: joi.string().min(3).max(255),
   image: joi.string().uri(),
   description: joi.string(),

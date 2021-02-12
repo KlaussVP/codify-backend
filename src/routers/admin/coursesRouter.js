@@ -15,11 +15,11 @@ coursesRouter.post('/', adminVerifyJWT, async (req, res) => {
   res.status(201).send(course);
 });
 
-coursesRouter.put('/', adminVerifyJWT, async (req, res) => {
+coursesRouter.put('/:id', adminVerifyJWT, async (req, res) => {
   const validation = editCourseSchema.validate(req.body);
   if (validation.error) return res.status(422).send({ error: 'Verifique seus dados' });
 
-  const course = await coursesController.edit(req.body);
+  const course = await coursesController.edit(req.params.id, req.body);
   res.status(201).send(course);
 });
 

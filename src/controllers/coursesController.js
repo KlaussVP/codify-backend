@@ -25,8 +25,8 @@ class CoursesController {
     return courseObject;
   }
 
-  async edit({
-    id, name, image, description, chapters,
+  async edit(id, {
+    name, image, description, chapters,
   }) {
     const course = await this.getCourseById(id);
     if (!course) throw new InexistingId();
