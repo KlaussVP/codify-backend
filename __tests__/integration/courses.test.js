@@ -3,16 +3,68 @@ const dotenv = require('dotenv');
 
 dotenv.config();
 const { Pool } = require('pg');
+const { NOW, Sequelize } = require('sequelize');
 const supertest = require('supertest');
 const app = require('../../src/app');
 const verifyJWT = require('../../src/middlewares/authMiddleware');
 const sequelize = require('../../src/utils/database');
-const { Sequelize } = require('sequelize');
 const jwt = require('jsonwebtoken');
 
 const agent = supertest(app);
 const db = new Pool({
   connectionString: process.env.DATABASE_URL,
+});
+
+let tokenAdmin;
+let tokenClient;
+
+beforeAll( async (done) => {
+
+  const bodyAdmin = {
+    name: 'admin',
+    email: 'contato@codify.com.br',
+    password: '123456',
+    confirmPassword: '123456',
+  };
+
+  await db.query('INSERT INTO users (name, email, password, type) values ($1, $2, $3, $4)', [bodyAdmin.name, bodyAdmin.email, bodyAdmin.password, 'ADMIN']);
+
+  agent
+    .post('/admin/signin')
+    .send({
+      email: 'contato@codify.com.br',
+      password: '123456',
+    })
+    .end((err, response) => {
+      tokenAdmin = response.body.token;
+      done();
+    });
+  
+  //utilizar depois para quando rotas autenticadas forem utilizadas pelos clientes
+  // agent 
+  // .post('/clients/signup')
+  // .send({
+  //   name: 'client',
+  //   email: 'client@gmail.com',
+  //   password: '123456',
+  //   confirmPassword: '123456',
+  // })
+  // .end((err, response) => {
+  //   console.log(response.body)
+  //   done();
+  // });
+
+  // agent
+  // .post('/clients/signin')
+  // .send({
+  //   email: 'client@gmail.com',
+  //   password: '123456',
+  // })
+  // .end((err, response) => {
+  //   tokenClient = response.body.token;
+  //   console.log(response.body);
+  //   done();
+  // });
 });
 
 beforeEach(async () => {
@@ -27,11 +79,35 @@ afterAll(async () => {
   await db.query('DELETE FROM chapters');
   await db.query('DELETE FROM "courseUsers"');
   await db.query('DELETE FROM courses');
+  await db.query('DELETE FROM users');
   await sequelize.close();
   await db.end();
 });
 
+
 describe('POST /admin/courses', () => {
+  
+  it('should return 200 when passed valid login data', async () => {
+
+    const bodyAdmin = {
+      name: 'admin',
+      email: 'contato1@codify.com.br',
+      password: '123456',
+      confirmPassword: '123456',
+    };
+
+    await db.query('INSERT INTO users (name, email, password, type) values ($1, $2, $3, $4)', [bodyAdmin.name, bodyAdmin.email, bodyAdmin.password, 'ADMIN']);
+
+    const bodyLogin = {
+      email: 'contato1@codify.com.br',
+      password: '123456',
+    };
+
+    const response = await agent.post('/admin/signin').set({"X-Access-Token": tokenAdmin}).send(bodyLogin);
+    
+    expect(response.status).toBe(200);
+  });
+
   it('should return 201 when passed valid parameters', async () => {
     const body = {
       'name': 'JavaScripter',
@@ -62,7 +138,7 @@ describe('POST /admin/courses', () => {
         }
       ]
   };
-    const response = await agent.post('/admin/courses').send(body);
+    const response = await agent.post('/admin/courses').set({"X-Access-Token": tokenAdmin}).send(body);
     expect(response.status).toBe(201);
     expect.objectContaining({
     'name': 'JavaScripter',
@@ -99,14 +175,8 @@ describe('POST /admin/courses', () => {
   });
 
   it('should return 422 when passed invalid parameters', async () => {
-    const body = {
-      name: 'JavaScript',
-      image: 'https://static.imasters.com.br/wp-content/uploads/2018/12/10164438/javascript.jpg',
-      description: 'JavaScript do Zero',
-      chapters: [],
-    };
-    const response = await agent.post('/admin/courses').send(body);
-
+    const response = await agent.post('/admin/courses').set({"X-Access-Token": tokenAdmin}).send('body');
+    console.log(response.status);
     expect(response.status).toBe(422);
   });
 
@@ -128,39 +198,85 @@ describe('POST /admin/courses', () => {
     };
     await db.query('INSERT INTO courses (name, image, description) values ($1, $2, $3)', [body.name, body.image, body.description]);
 
-    const response = await agent.post('/admin/courses').send(body);
+    const response = await agent.post('/admin/courses').set({"X-Access-Token": tokenAdmin}).send(body);
 
     expect(response.status).toBe(409);
   });
 });
 
-describe('POST /clients/courses/:id', () => {
-  it('should return 200 when course is successfully started or resumed', async () => {
-    const user = {
-      name: 'Teste Silva',
-      email: 'teste@teste.com',
-      password: 'senha_super_secreta_de_teste',
-    };
+describe('GET /clients/courses/:id', () => {
+  it('should return 200 when passed valid Id', async () => {
 
     const course = {
-      name: 'TesteScript do zero!',
-      description: 'Aprenda TesteScript do zero ao avançado, com muita prática!',
-      image: 'https://static.imasters.com.br/wp-content/uploads/2018/12/10164438/javascript.jpg'
+      name: 'JavaScript21122',
+      image: 'https://static.imasters.com.br/wp-content/uploads/2018/12/10164438/javascript.jpg',
+      description: 'JavaScript do Zero',
     };
+    const chapter = {
+      name: 'Apresentação Programação',
+      topics: [
+          {
+              'name': 'Introdução a programação'
+          },
+      ]
 
-    const testUser = await db.query('INSERT INTO users (name, email, password, "createdAt", "updatedAt", type) values ($1, $2, $3, $4, $5, $6) RETURNING *', [
-      user.name, user.email, user.password, Sequelize.NOW, Sequelize.NOW, 'CLIENT'
-    ]);
+  }
+    const resultCourse = await db.query('INSERT INTO courses (name, image, description) values ($1, $2, $3) RETURNING *', [course.name, course.image, course.description]);
+    const courseId = resultCourse.rows[0].id;
 
-    const token = jwt.sign({ id: testUser.rows[0].id }, process.env.SECRET, {
-      expiresIn: 86400,
-    });
+    const resultChapter = await db.query(`INSERT INTO chapters (name, "courseId", "createdAt", "updatedAt") values ($1, $2, $3, $4) RETURNING *`, [chapter.name,courseId, Sequelize.NOW, Sequelize.NOW]);
+    const chapterId = resultChapter.rows[0].id;
 
-    const testCourse = await db.query('INSERT INTO courses (name, description, image, "createdAt", "updatedAt") values ($1, $2, $3, $4, $5) RETURNING *', [
-      course.name, course.description, course.image, Sequelize.NOW, Sequelize.NOW
-    ]);
+    const resultTopic = await db.query(`INSERT INTO topics (name, "chapterId", "createdAt", "updatedAt") values ($1, $2, $3, $4) RETURNING *`, [chapter.topics[0].name,chapterId, Sequelize.NOW, Sequelize.NOW]);
+    const topicId = resultTopic.rows[0].id;
 
-    const response = await agent.post(`/clients/courses/${testCourse.rows[0].id}`).set({"X-Access-Token": token});
+    const response = await agent.get(`/clients/courses/${courseId}`).set({"X-Access-Token": tokenAdmin});
+
     expect(response.status).toBe(200);
+    expect.objectContaining({
+      'id': courseId,
+      'name': course.name,
+      'deleted': false,
+      'image': course.image,
+      'description': course.description,
+      'chapters': [
+          {
+            'id': chapterId,
+              'name': chapter.name,
+              'topics': [
+                  {
+                      'id': topicId,
+                      'name': chapter.topics.name,
+                  },
+              ]
+          },
+      ]
+    })
   });
 });
+
+describe('GET /clients/courses', () => {
+  it('should return 200 with courses array', async () => {
+
+    const course = {
+      name: 'JavaScriptOne',
+      image: 'https://static.imasters.com.br/wp-content/uploads/2018/12/10164438/javascript.jpg',
+      description: 'JavaScript do Zero',
+    };
+
+    const resultCourse = await db.query('INSERT INTO courses (name, image, description) values ($1, $2, $3) RETURNING *', [course.name, course.image, course.description]);
+    const courseId = resultCourse.rows[0].id;
+
+    const response = await agent.get(`/clients/courses`).set({"X-Access-Token": tokenAdmin});
+
+    expect(response.status).toBe(200);
+    expect.arrayContaining({
+      'id': courseId,
+      'name': course.name,
+      'deleted': false,
+      'image': course.image,
+      'description': course.description,
+    })
+  });
+});
+
