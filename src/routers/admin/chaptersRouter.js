@@ -5,8 +5,8 @@ const chaptersController = require('../../controllers/chaptersController');
 chapterRouter.get('/', async (req, res) => {
     const chapters = await chaptersController.getAllChaptersAsAdmin();
     res
-    .header('Access-Control-Expose-Headers', 'X-Total-Count')
-    .set('X-Total-Count', chapters.length)
+    .header('Access-Control-Expose-Headers', 'Content-Range')
+    .set('Content-Range', chapters.length )
     .send(chapters);
 });
   

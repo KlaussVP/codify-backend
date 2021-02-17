@@ -28,8 +28,8 @@ coursesRouter.get('/', adminVerifyJWT, async (req, res) => {
   const courses = await coursesController.listAllCoursesAsAdmin();
   
   res
-    .header('Access-Control-Expose-Headers', 'X-Total-Count')
-    .set('X-Total-Count', courses.length)
+    .header('Access-Control-Expose-Headers', 'Content-Range')
+    .set('Content-Range', courses.length )
     .send(courses);
 });
 
