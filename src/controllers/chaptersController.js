@@ -16,15 +16,15 @@ class ChaptersController {
     chapter.courseId = courseId || chapter.courseId;
     await chapter.save();
     return chapter;
-}
+  }
 
-async deleteOneChapter(chapterId) {
+  async deleteOneChapter(chapterId) {
   await topicsController.deleteTopicsFromChapter(chapterId);
   await Chapter.destroy({
     where: { id: chapterId },
     cascade: true
   });
-}
+  }
 
   async createListOfChapters(chapters, courseId) {
     const arrayChapters = chapters.map( c => ({ name: c.name, courseId }));
