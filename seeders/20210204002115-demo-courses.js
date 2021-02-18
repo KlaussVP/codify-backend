@@ -338,7 +338,7 @@ module.exports = {
         },
       ], {});
 
-      const theorie = {
+      const theory = {
         youtubeLink: 'https://www.youtube.com/embed/Ptbk2af68e8',
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -351,19 +351,77 @@ module.exports = {
       queryInterface.bulkInsert('theories',
       [
         {
-          ...theorie,
+          ...theory,
           topicId: topicsIds[0][0].id
         },
         {
-          ...theorie,
+          ...theory,
           topicId: topicsIds[0][1].id
         },
         {
-          ...theorie,
+          ...theory,
           topicId: topicsIds[0][2].id
         },
         {
-          ...theorie,
+          ...theory,
+          topicId: topicsIds[0][3].id
+        },
+      ], {});
+
+      const exercise = {
+        title: 'Exercício',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      }
+
+      queryInterface.bulkInsert('theories',
+      [
+        {
+          ...exercise,
+          topicId: topicsIds[0][0].id
+        },
+        {
+          ...exercise,
+          topicId: topicsIds[0][0].id
+        },
+        {
+          ...exercise,
+          topicId: topicsIds[0][0].id
+        },
+        {
+          ...exercise,
+          topicId: topicsIds[0][1].id
+        },
+        {
+          ...exercise,
+          topicId: topicsIds[0][1].id
+        },
+        {
+          ...exercise,
+          topicId: topicsIds[0][1].id
+        },
+        {
+          ...exercise,
+          topicId: topicsIds[0][2].id
+        },
+        {
+          ...exercise,
+          topicId: topicsIds[0][2].id
+        },
+        {
+          ...exercise,
+          topicId: topicsIds[0][2].id
+        },
+        {
+          ...exercise,
+          topicId: topicsIds[0][3].id
+        },
+        {
+          ...exercise,
+          topicId: topicsIds[0][3].id
+        },
+        {
+          ...exercise,
           topicId: topicsIds[0][3].id
         },
       ], {});
