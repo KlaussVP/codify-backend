@@ -162,6 +162,37 @@ describe('PUT /admin/courses/:id', () => {
   });
 });
 
+describe('DELETE /admin/courses/:id', () => {
+  it('should return 202 when passed valid Id', async () => {
+    const course = {
+      name: 'JavaScript21122',
+      image: 'https://static.imasters.com.br/wp-content/uploads/2018/12/10164438/javascript.jpg',
+      description: 'JavaScript do Zero',
+    };
+
+    const resultCourse = await db.query('INSERT INTO courses (name, image, description, "createdAt", "updatedAt") values ($1, $2, $3, $4, $5) RETURNING *', [course.name, course.image, course.description, NOW, NOW]);
+    const courseId = resultCourse.rows[0].id;
+
+    const response = await agent.delete(`/admin/courses/${courseId}`).set({ 'X-Access-Token': tokenAdmin });
+
+    expect(response.status).toBe(202);
+    expect.objectContaining({
+      id: courseId,
+      name: course.name,
+      deleted: true,
+      image: course.image,
+      description: course.description,
+    });
+  });
+
+  it('should return 403 when passed valid Id', async () => {
+    const courseId = -999;
+    const response = await agent.delete(`/admin/courses/${courseId}`).set({ 'X-Access-Token': tokenAdmin });
+
+    expect(response.status).toBe(403);
+  });
+});
+
 describe('GET /admin/courses/:id', () => {
   it('should return 200 when passed valid Id', async () => {
     const course = {
@@ -192,7 +223,7 @@ describe('GET /admin/courses/:id', () => {
     });
   });
 
-  it('should return 200 when passed valid Id', async () => {
+  it('should return 403 when passed valid Id', async () => {
     const courseId = -999;
     const response = await agent.get(`/admin/courses/${courseId}`).set({ 'X-Access-Token': tokenAdmin });
 

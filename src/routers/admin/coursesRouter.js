@@ -41,7 +41,7 @@ coursesRouter.get('/:id', adminVerifyJWT, async (req, res) => {
 
 coursesRouter.delete('/:id', adminVerifyJWT, async (req, res) => {
   const deleted = await coursesController.deleteCourse(req.params.id);
-  if (deleted) return res.status(202).send('ok!');
+  if (deleted) return res.status(202).send(deleted);
   return res.status(500).send({ error: 'send this to a developer' });
 });
 
