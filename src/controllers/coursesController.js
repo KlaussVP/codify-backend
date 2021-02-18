@@ -26,6 +26,16 @@ class CoursesController {
     return courseObject;
   }
 
+  async createAsAdmin({
+    name, image, description,
+  }) {
+    const coursesExists = await this.findCourseByName(name);
+    if (coursesExists) throw new ConflictError();
+
+    const course = await Course.create({ name, image, description });
+    return course;
+  }
+
   async edit({
     id, name, image, description, chapters,
   }) {
@@ -47,13 +57,26 @@ class CoursesController {
     return courseObject;
   }
 
+  async editAsAdmin({
+    id, name, image, description,
+  }) {
+    const course = await this.getCourseById(id);
+    if (!course) throw new InexistingId();
+
+    course.name = name || course.name;
+    course.image = image || course.image;
+    course.description = description || course.description;
+
+    await course.save();
+    return course;
+  }
+
   async deleteCourse(id) {
     const course = await this.getCourseById(id);
     if (!course) throw new InexistingId();
 
     course.deleted = true;
     await course.save();
-
     return true;
   }
 
