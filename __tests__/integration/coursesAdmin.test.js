@@ -97,6 +97,71 @@ describe('POST /admin/courses', () => {
   });
 });
 
+describe('PUT /admin/courses/:id', () => {
+  it('should return 200 when passed valid parameters', async () => {
+    const course = {
+      name: 'JavaScript21122',
+      image: 'https://static.imasters.com.br/wp-content/uploads/2018/12/10164438/javascript.jpg',
+      description: 'JavaScript do Zero',
+    };
+    const resultCourse = await db.query('INSERT INTO courses (name, image, description, "createdAt", "updatedAt") values ($1, $2, $3, $4, $5) RETURNING *', [course.name, course.image, course.description, NOW, NOW]);
+
+    const courseId = resultCourse.rows[0].id;
+
+    const courseToBeEdited = {
+      id: courseId,
+      name: 'JavaScript EDITADO ',
+    };
+    const response = await agent.put(`/admin/courses/${courseId}`).set({ 'X-Access-Token': tokenAdmin }).send(courseToBeEdited);
+
+    expect(response.status).toBe(200);
+    expect.objectContaining({
+      id: courseId,
+      name: courseToBeEdited.name,
+      deleted: false,
+      image: course.image,
+      description: course.description,
+    });
+  });
+
+  it('should return 422 when passed invalid parameters', async () => {
+    const course = {
+      name: 'JavaScript21122',
+      image: 'https://static.imasters.com.br/wp-content/uploads/2018/12/10164438/javascript.jpg',
+      description: 'JavaScript do Zero',
+    };
+    const resultCourse = await db.query('INSERT INTO courses (name, image, description, "createdAt", "updatedAt") values ($1, $2, $3, $4, $5) RETURNING *', [course.name, course.image, course.description, NOW, NOW]);
+
+    const courseId = resultCourse.rows[0].id;
+
+    const courseToBeEdited = {
+      id: courseId,
+      image: 'Não é uma URL',
+    };
+    const response = await agent.put(`/admin/courses/${courseId}`).set({ 'X-Access-Token': tokenAdmin }).send(courseToBeEdited);
+    expect(response.status).toBe(422);
+  });
+
+  it('should return 409 when name already exists', async () => {
+    const course = {
+      name: 'JavaScript MESMO NOME',
+      image: 'https://static.imasters.com.br/wp-content/uploads/2018/12/10164438/javascript.jpg',
+      description: 'JavaScript do Zero',
+    };
+    const resultCourse = await db.query('INSERT INTO courses (name, image, description, "createdAt", "updatedAt") values ($1, $2, $3, $4, $5) RETURNING *', [course.name, course.image, course.description, NOW, NOW]);
+
+    const courseId = resultCourse.rows[0].id;
+
+    const courseToBeEdited = {
+      id: courseId,
+      name: 'JavaScript MESMO NOME',
+    };
+
+    const response = await agent.put(`/admin/courses/${courseId}`).set({ 'X-Access-Token': tokenAdmin }).send(courseToBeEdited);
+    expect(response.status).toBe(409);
+  });
+});
+
 describe('GET /admin/courses/:id', () => {
   it('should return 200 when passed valid Id', async () => {
     const course = {

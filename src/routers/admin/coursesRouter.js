@@ -19,7 +19,7 @@ coursesRouter.put('/:id', adminVerifyJWT, async (req, res) => {
   if (validation.error) return res.status(422).send({ error: 'Verifique seus dados' });
 
   const course = await coursesController.editAsAdmin(req.body);
-  return res.status(201).send(course);
+  return res.status(200).send(course);
 });
 
 coursesRouter.get('/', adminVerifyJWT, async (req, res) => {
