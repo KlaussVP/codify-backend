@@ -10,6 +10,22 @@ class ChaptersController {
     return chapter;
   }
 
+  async editChapter(id, { name, courseId }) {
+    const chapter = await Chapter.findByPk(id);
+    chapter.name = name || chapter.name;
+    chapter.courseId = courseId || chapter.courseId;
+    await chapter.save();
+    return chapter;
+  }
+
+  async deleteOneChapter(chapterId) {
+    await topicsController.deleteTopicsFromChapter(chapterId);
+    await Chapter.destroy({
+      where: { id: chapterId },
+      cascade: true,
+    });
+  }
+
   async createListOfChapters(chapters, courseId) {
     const arrayChapters = chapters.map((c) => ({ name: c.name, courseId }));
     const chaptersCreated = await Chapter.bulkCreate(arrayChapters);
