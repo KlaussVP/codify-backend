@@ -35,7 +35,7 @@ class UsersController {
     if (!user) throw new AuthorizationError();
 
     if (type !== user.type) throw new AuthorizationError();
-    const checkPassword = (type === 'CLIENT') 
+    const checkPassword = (type === 'CLIENT')
       ? bcrypt.compareSync(password, user.password)
       : password === user.password;
 

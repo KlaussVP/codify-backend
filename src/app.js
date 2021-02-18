@@ -39,6 +39,7 @@ app.use((error, req, res, next) => {
   if (error instanceof ForbiddenError) return res.status(403).send({ error: 'Não autorizado.' });
   if (error instanceof NoCourseStarted) return res.status(404).send({ error: 'Nenhum curso iniciado.' });
 
+  /* eslint-disable-next-line no-console */
   console.error(error);
   return res.status(500).json(error);
 });

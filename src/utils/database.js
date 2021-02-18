@@ -1,9 +1,9 @@
 require('dotenv').config();
 const { Sequelize } = require('sequelize');
 
-const options = { logging: false, dialect: "postgres" };
+const options = { logging: false, dialect: 'postgres' };
 
-if (process.env.NODE_ENV === "production") {
+if (process.env.NODE_ENV === 'production') {
   options.dialectOptions = { ssl: { rejectUnauthorized: false } };
 }
 
