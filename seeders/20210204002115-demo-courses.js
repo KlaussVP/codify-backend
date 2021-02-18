@@ -337,9 +337,40 @@ module.exports = {
           chapterId: chaptersIds[0][5].id,
         },
       ], {});
+
+      const theorie = {
+        youtubeLink: 'https://www.youtube.com/embed/Ptbk2af68e8',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      }
+
+      const topicsIds = await queryInterface.sequelize.query(
+        'SELECT id from topics;',
+      );
+
+      queryInterface.bulkInsert('theories',
+      [
+        {
+          ...theorie,
+          topicId: topicsIds[0][0].id
+        },
+        {
+          ...theorie,
+          topicId: topicsIds[0][1].id
+        },
+        {
+          ...theorie,
+          topicId: topicsIds[0][2].id
+        },
+        {
+          ...theorie,
+          topicId: topicsIds[0][3].id
+        },
+      ], {});
   },
 
   down: async (queryInterface) => {
+    await queryInterface.bulkDelete('theories', null, {});
     await queryInterface.bulkDelete('topics', null, {});
     await queryInterface.bulkDelete('chapters', null, {});
     await queryInterface.bulkDelete('courses', null, {});

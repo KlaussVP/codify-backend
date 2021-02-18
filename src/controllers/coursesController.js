@@ -6,6 +6,7 @@ const Chapter = require('../models/Chapter');
 const chaptersController = require('./chaptersController');
 const topicsController = require('./topicsController');
 const CourseUser = require('../models/CourseUser');
+const Theory = require('../models/Theory');
 
 class CoursesController {
   async findCourseByName(name) {
@@ -97,6 +98,10 @@ class CoursesController {
         include: {
           model: Topic,
           attributes: ['id', 'name'],
+          include: {
+            model: Theory,
+            attributes: ['id', 'youtubeLink', 'done'],
+          }
         }
       }],
     });
