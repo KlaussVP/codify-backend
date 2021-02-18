@@ -1,6 +1,5 @@
 /* global jest, describe, it, expect */
 const coursesController = require('../../src/controllers/coursesController');
-const chaptersController = require('../../src/controllers/chaptersController');
 const InexistingId = require('../../src/errors/InexistingId');
 const ConflictError = require('../../src/errors/ConflictError');
 const Course = require('../../src/models/Course');
@@ -13,7 +12,7 @@ describe('createAsAdmin', () => {
     const CourseData = {
       name: 'JavaScript',
       image: 'https://static.imasters.com.br/wp-content/uploads/2018/12/10164438/javascript.jpg',
-      description: 'JavaScript do Zero'
+      description: 'JavaScript do Zero',
     };
     jest.spyOn(coursesController, 'findCourseByName').mockImplementationOnce(() => null);
     Course.create.mockResolvedValue(CourseData);
@@ -73,8 +72,8 @@ describe('editAsAdmin', () => {
         id: 1,
         name: 'JavaScript222',
         image: 'https://static.imasters.com.br/wp-content/uploads/2018/12/10164438/javascript.jpg',
-        description: 'JavaScript do Zero EDITADO'
-      })
+        description: 'JavaScript do Zero EDITADO',
+      }),
     );
   });
 
@@ -100,8 +99,8 @@ describe('editAsAdmin', () => {
         id: 1,
         name: 'JavaScript EDITADO',
         image: 'https://static.imasters.com.br/wp-content/uploads/2018/12/10164438/javascript.jpg',
-        description: 'JavaScript do Zero'
-      })
+        description: 'JavaScript do Zero',
+      }),
     );
   });
 
@@ -145,9 +144,9 @@ describe('listAllCourses', () => {
     expect(courses.length).toBe(1);
     expect(courses).toEqual(
       expect.arrayContaining([
-        { id: 1, name: 'JavaScript', deleted: false }
-      ])
-    )
+        { id: 1, name: 'JavaScript', deleted: false },
+      ]),
+    );
   });
 });
 
@@ -156,60 +155,60 @@ describe('listAllCoursesAsAdmin', () => {
     const coursesArray = [
       {
         id: 1,
-        name: "JavaScript",
+        name: 'JavaScript',
         deleted: false,
-        image: "https://static.imasters.com.br/wp-content/uploads/2018/12/10164438/javascript.jpg",
-        description: "JavaScript do Zero",
-        createdAt: "2021-02-09T21:57:37.042Z",
-        updatedAt: "2021-02-09T21:57:37.042Z",
-        chapters:  [
+        image: 'https://static.imasters.com.br/wp-content/uploads/2018/12/10164438/javascript.jpg',
+        description: 'JavaScript do Zero',
+        createdAt: '2021-02-09T21:57:37.042Z',
+        updatedAt: '2021-02-09T21:57:37.042Z',
+        chapters: [
           {
-          "id": 99,
+            id: 99,
           },
           {
-          "id": 100,
+            id: 100,
           },
         ],
       },
       {
         id: 2,
-        name: "JavaScript2",
+        name: 'JavaScript2',
         deleted: false,
-        image: "https://static.imasters.com.br/wp-content/uploads/2018/12/10164438/javascript.jpg",
-        description: "JavaScript do Zero2",
-        createdAt: "2021-02-09T21:57:37.042Z",
-        updatedAt: "2021-02-09T21:57:37.042Z",
-        chapters:  [
+        image: 'https://static.imasters.com.br/wp-content/uploads/2018/12/10164438/javascript.jpg',
+        description: 'JavaScript do Zero2',
+        createdAt: '2021-02-09T21:57:37.042Z',
+        updatedAt: '2021-02-09T21:57:37.042Z',
+        chapters: [
           {
-          "id": 41,
+            id: 41,
           },
           {
-          "id": 100,
+            id: 100,
           },
         ],
-      }
+      },
     ];
     const expectedArray = [
       {
         id: 1,
-        name: "JavaScript",
-        deleted: "false",
-        image: "https://static.imasters.com.br/wp-content/uploads/2018/12/10164438/javascript.jpg",
-        description: "JavaScript do Zero",
-        createdAt: "2021-02-09T21:57:37.042Z",
-        updatedAt: "2021-02-09T21:57:37.042Z",
-        chapters:  [ 99,100 ],
+        name: 'JavaScript',
+        deleted: 'false',
+        image: 'https://static.imasters.com.br/wp-content/uploads/2018/12/10164438/javascript.jpg',
+        description: 'JavaScript do Zero',
+        createdAt: '2021-02-09T21:57:37.042Z',
+        updatedAt: '2021-02-09T21:57:37.042Z',
+        chapters: [99, 100],
       },
       {
         id: 2,
-        name: "JavaScript2",
-        deleted: "false",
-        image: "https://static.imasters.com.br/wp-content/uploads/2018/12/10164438/javascript.jpg",
-        description: "JavaScript do Zero2",
-        createdAt: "2021-02-09T21:57:37.042Z",
-        updatedAt: "2021-02-09T21:57:37.042Z",
-        chapters:  [ 41,100 ],
-      }
+        name: 'JavaScript2',
+        deleted: 'false',
+        image: 'https://static.imasters.com.br/wp-content/uploads/2018/12/10164438/javascript.jpg',
+        description: 'JavaScript do Zero2',
+        createdAt: '2021-02-09T21:57:37.042Z',
+        updatedAt: '2021-02-09T21:57:37.042Z',
+        chapters: [41, 100],
+      },
     ];
     Course.findAll.mockResolvedValue(coursesArray);
     const courses = await coursesController.listAllCoursesAsAdmin();
@@ -219,49 +218,49 @@ describe('listAllCoursesAsAdmin', () => {
     const coursesArray = [
       {
         id: 1,
-        name: "JavaScript",
+        name: 'JavaScript',
         deleted: false,
-        image: "https://static.imasters.com.br/wp-content/uploads/2018/12/10164438/javascript.jpg",
-        description: "JavaScript do Zero",
-        createdAt: "2021-02-09T21:57:37.042Z",
-        updatedAt: "2021-02-09T21:57:37.042Z",
-        chapters:  [
+        image: 'https://static.imasters.com.br/wp-content/uploads/2018/12/10164438/javascript.jpg',
+        description: 'JavaScript do Zero',
+        createdAt: '2021-02-09T21:57:37.042Z',
+        updatedAt: '2021-02-09T21:57:37.042Z',
+        chapters: [
           {
-          "id": 99,
+            id: 99,
           },
           {
-          "id": 100,
+            id: 100,
           },
         ],
       },
       {
         id: 2,
-        name: "JavaScript2",
+        name: 'JavaScript2',
         deleted: true,
-        image: "https://static.imasters.com.br/wp-content/uploads/2018/12/10164438/javascript.jpg",
-        description: "JavaScript do Zero2",
-        createdAt: "2021-02-09T21:57:37.042Z",
-        updatedAt: "2021-02-09T21:57:37.042Z",
-        chapters:  [
+        image: 'https://static.imasters.com.br/wp-content/uploads/2018/12/10164438/javascript.jpg',
+        description: 'JavaScript do Zero2',
+        createdAt: '2021-02-09T21:57:37.042Z',
+        updatedAt: '2021-02-09T21:57:37.042Z',
+        chapters: [
           {
-          "id": 41,
+            id: 41,
           },
           {
-          "id": 100,
+            id: 100,
           },
         ],
-      }
+      },
     ];
     const expectedArray = [
       {
         id: 1,
-        name: "JavaScript",
-        deleted: "false",
-        image: "https://static.imasters.com.br/wp-content/uploads/2018/12/10164438/javascript.jpg",
-        description: "JavaScript do Zero",
-        createdAt: "2021-02-09T21:57:37.042Z",
-        updatedAt: "2021-02-09T21:57:37.042Z",
-        chapters:  [ 99,100 ],
+        name: 'JavaScript',
+        deleted: 'false',
+        image: 'https://static.imasters.com.br/wp-content/uploads/2018/12/10164438/javascript.jpg',
+        description: 'JavaScript do Zero',
+        createdAt: '2021-02-09T21:57:37.042Z',
+        updatedAt: '2021-02-09T21:57:37.042Z',
+        chapters: [99, 100],
       },
     ];
     Course.findAll.mockResolvedValue(coursesArray);
@@ -294,22 +293,22 @@ describe('getCourseByIdAsAdmin', () => {
     const id = 1;
     const courseObject = {
       id: 1,
-      name: "JavaScript",
+      name: 'JavaScript',
       deleted: false,
-      image: "https://static.imasters.com.br/wp-content/uploads/2018/12/10164438/javascript.jpg",
-      description: "JavaScript do Zero",
-      createdAt: "2021-02-09T21:57:37.042Z",
-      updatedAt: "2021-02-09T21:57:37.042Z",
-      chapters:  [
+      image: 'https://static.imasters.com.br/wp-content/uploads/2018/12/10164438/javascript.jpg',
+      description: 'JavaScript do Zero',
+      createdAt: '2021-02-09T21:57:37.042Z',
+      updatedAt: '2021-02-09T21:57:37.042Z',
+      chapters: [
         {
-        "id": 99,
+          id: 99,
         },
         {
-        "id": 100,
+          id: 100,
         },
       ],
     };
-    const expectedObject = {... courseObject, "chapters": [99,100] } ;
+    const expectedObject = { ...courseObject, chapters: [99, 100] };
     Course.findOne.mockResolvedValue(courseObject);
     const course = await coursesController.getCourseByIdAsAdmin(id);
     expect(course).toMatchObject(expectedObject);
@@ -346,7 +345,7 @@ describe('deleteCourse', () => {
         image: 'https://static.imasters.com.br/wp-content/uploads/2018/12/10164438/javascript.jpg',
         description: 'JavaScript do Zero',
         deleted: true,
-      })
+      }),
     );
   });
 

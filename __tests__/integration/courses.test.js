@@ -5,10 +5,10 @@ dotenv.config();
 const { Pool } = require('pg');
 const { NOW, Sequelize } = require('sequelize');
 const supertest = require('supertest');
+const jwt = require('jsonwebtoken');
 const app = require('../../src/app');
 const verifyJWT = require('../../src/middlewares/authMiddleware');
 const sequelize = require('../../src/utils/database');
-const jwt = require('jsonwebtoken');
 
 const agent = supertest(app);
 const db = new Pool({
@@ -18,8 +18,7 @@ const db = new Pool({
 let tokenAdmin;
 let tokenClient;
 
-beforeAll( async (done) => {
-
+beforeAll(async (done) => {
   const bodyAdmin = {
     name: 'admin',
     email: 'contato@codify.com.br',
@@ -39,9 +38,9 @@ beforeAll( async (done) => {
       tokenAdmin = response.body.token;
       done();
     });
-  
-  //utilizar depois para quando rotas autenticadas forem utilizadas pelos clientes
-  // agent 
+
+  // utilizar depois para quando rotas autenticadas forem utilizadas pelos clientes
+  // agent
   // .post('/clients/signup')
   // .send({
   //   name: 'client',
@@ -84,11 +83,8 @@ afterAll(async () => {
   await db.end();
 });
 
-
 describe('POST /admin/courses', () => {
-  
   it('should return 200 when passed valid login data', async () => {
-
     const bodyAdmin = {
       name: 'admin',
       email: 'contato1@codify.com.br',
@@ -103,79 +99,79 @@ describe('POST /admin/courses', () => {
       password: '123456',
     };
 
-    const response = await agent.post('/admin/signin').set({"X-Access-Token": tokenAdmin}).send(bodyLogin);
-    
+    const response = await agent.post('/admin/signin').set({ 'X-Access-Token': tokenAdmin }).send(bodyLogin);
+
     expect(response.status).toBe(200);
   });
 
   it('should return 201 when passed valid parameters', async () => {
     const body = {
-      'name': 'JavaScripter',
-      'image': 'https://static.imasters.com.br/wp-content/uploads/2018/12/10164438/javascript.jpg',
-      'description': 'JavaScript do Zero',
-      'chapters': [
+      name: 'JavaScripter',
+      image: 'https://static.imasters.com.br/wp-content/uploads/2018/12/10164438/javascript.jpg',
+      description: 'JavaScript do Zero',
+      chapters: [
         {
-          'name': 'Apresentação AAAAA',
-          'topics': [
+          name: 'Apresentação AAAAA',
+          topics: [
             {
-                'name': 'Introdução a prorgramação'
+              name: 'Introdução a prorgramação',
             },
             {
-                'name': 'Motivação JavaScript'
-            }
-          ]
+              name: 'Motivação JavaScript',
+            },
+          ],
         },
         {
-          'name': 'Apresentação BBBBBB',
-          'topics': [
+          name: 'Apresentação BBBBBB',
+          topics: [
             {
-              'name': 'Introdução a prorgramação2'
+              name: 'Introdução a prorgramação2',
             },
             {
-              'name': 'Motivação JavaScript2'
-            }
-          ]
-        }
-      ]
-  };
-    const response = await agent.post('/admin/courses').set({"X-Access-Token": tokenAdmin}).send(body);
+              name: 'Motivação JavaScript2',
+            },
+          ],
+        },
+      ],
+    };
+    const response = await agent.post('/admin/courses').set({ 'X-Access-Token': tokenAdmin }).send(body);
     expect(response.status).toBe(201);
     expect.objectContaining({
-    'name': 'JavaScripter',
-    'deleted': false,
-    'image': 'https://static.imasters.com.br/wp-content/uploads/2018/12/10164438/javascript.jpg',
-    'description': 'JavaScript do Zero',
-    'createdAt': '2021-02-09T19:55:43.611Z',
-    'updatedAt': '2021-02-09T19:55:43.611Z',
-    'chapters': [
-      {
-        'name': 'Apresentação AAAAA',
-        'topics': [
-          {
-            'name': 'Introdução a prorgramação'
-          },
-          {
-            'name': 'Motivação JavaScript'
-          }
-        ]
-      },
-      {
-        'name': 'Apresentação BBBBBB',
-        'topics': [
-          {
-            'name': 'Introdução a prorgramação2'
-          },
-          {
-            'name': 'Motivação JavaScript2'
-          }
-        ]
-      }
-    ]
-    })
+      name: 'JavaScripter',
+      deleted: false,
+      image: 'https://static.imasters.com.br/wp-content/uploads/2018/12/10164438/javascript.jpg',
+      description: 'JavaScript do Zero',
+      createdAt: '2021-02-09T19:55:43.611Z',
+      updatedAt: '2021-02-09T19:55:43.611Z',
+      chapters: [
+        {
+          name: 'Apresentação AAAAA',
+          topics: [
+            {
+              name: 'Introdução a prorgramação',
+            },
+            {
+              name: 'Motivação JavaScript',
+            },
+          ],
+        },
+        {
+          name: 'Apresentação BBBBBB',
+          topics: [
+            {
+              name: 'Introdução a prorgramação2',
+            },
+            {
+              name: 'Motivação JavaScript2',
+            },
+          ],
+        },
+      ],
+    });
   });
 
   it('should return 422 when passed invalid parameters', async () => {
-    const response = await agent.post('/admin/courses').set({"X-Access-Token": tokenAdmin}).send('body');
+    const response = await agent.post('/admin/courses').set({ 'X-Access-Token': tokenAdmin }).send('body');
     console.log(response.status);
     expect(response.status).toBe(422);
   });
@@ -190,15 +186,15 @@ describe('POST /admin/courses', () => {
           name: 'Apresentação AAAAA',
           topics: [
             {
-              name: 'Introdução a prorgramação'
+              name: 'Introdução a prorgramação',
             },
-          ]
+          ],
         },
-    ]
+      ],
     };
     await db.query('INSERT INTO courses (name, image, description) values ($1, $2, $3)', [body.name, body.image, body.description]);
 
-    const response = await agent.post('/admin/courses').set({"X-Access-Token": tokenAdmin}).send(body);
+    const response = await agent.post('/admin/courses').set({ 'X-Access-Token': tokenAdmin }).send(body);
 
     expect(response.status).toBe(409);
   });
@@ -206,7 +202,6 @@ describe('POST /admin/courses', () => {
 
 describe('GET /clients/courses/:id', () => {
   it('should return 200 when passed valid Id', async () => {
-
     const course = {
       name: 'JavaScript21122',
       image: 'https://static.imasters.com.br/wp-content/uploads/2018/12/10164438/javascript.jpg',
@@ -215,49 +210,48 @@ describe('GET /clients/courses/:id', () => {
     const chapter = {
       name: 'Apresentação Programação',
       topics: [
-          {
-              'name': 'Introdução a programação'
-          },
-      ]
+        {
+          name: 'Introdução a programação',
+        },
+      ],
 
-  }
+    };
     const resultCourse = await db.query('INSERT INTO courses (name, image, description) values ($1, $2, $3) RETURNING *', [course.name, course.image, course.description]);
     const courseId = resultCourse.rows[0].id;
 
-    const resultChapter = await db.query(`INSERT INTO chapters (name, "courseId", "createdAt", "updatedAt") values ($1, $2, $3, $4) RETURNING *`, [chapter.name,courseId, Sequelize.NOW, Sequelize.NOW]);
+    const resultChapter = await db.query('INSERT INTO chapters (name, "courseId", "createdAt", "updatedAt") values ($1, $2, $3, $4) RETURNING *', [chapter.name, courseId, Sequelize.NOW, Sequelize.NOW]);
     const chapterId = resultChapter.rows[0].id;
 
-    const resultTopic = await db.query(`INSERT INTO topics (name, "chapterId", "createdAt", "updatedAt") values ($1, $2, $3, $4) RETURNING *`, [chapter.topics[0].name,chapterId, Sequelize.NOW, Sequelize.NOW]);
+    const resultTopic = await db.query('INSERT INTO topics (name, "chapterId", "createdAt", "updatedAt") values ($1, $2, $3, $4) RETURNING *', [chapter.topics[0].name, chapterId, Sequelize.NOW, Sequelize.NOW]);
     const topicId = resultTopic.rows[0].id;
 
-    const response = await agent.get(`/clients/courses/${courseId}`).set({"X-Access-Token": tokenAdmin});
+    const response = await agent.get(`/clients/courses/${courseId}`).set({ 'X-Access-Token': tokenAdmin });
 
     expect(response.status).toBe(200);
     expect.objectContaining({
-      'id': courseId,
-      'name': course.name,
-      'deleted': false,
-      'image': course.image,
-      'description': course.description,
-      'chapters': [
-          {
-            'id': chapterId,
-              'name': chapter.name,
-              'topics': [
-                  {
-                      'id': topicId,
-                      'name': chapter.topics.name,
-                  },
-              ]
-          },
-      ]
-    })
+      id: courseId,
+      name: course.name,
+      deleted: false,
+      image: course.image,
+      description: course.description,
+      chapters: [
+        {
+          id: chapterId,
+          name: chapter.name,
+          topics: [
+            {
+              id: topicId,
+              name: chapter.topics.name,
+            },
+          ],
+        },
+      ],
+    });
   });
 });
 
 describe('GET /clients/courses', () => {
   it('should return 200 with courses array', async () => {
-
     const course = {
       name: 'JavaScriptOne',
       image: 'https://static.imasters.com.br/wp-content/uploads/2018/12/10164438/javascript.jpg',
@@ -267,16 +261,16 @@ describe('GET /clients/courses', () => {
     const resultCourse = await db.query('INSERT INTO courses (name, image, description) values ($1, $2, $3) RETURNING *', [course.name, course.image, course.description]);
     const courseId = resultCourse.rows[0].id;
 
-    const response = await agent.get(`/clients/courses`).set({"X-Access-Token": tokenAdmin});
+    const response = await agent.get('/clients/courses').set({ 'X-Access-Token': tokenAdmin });
 
     expect(response.status).toBe(200);
     expect.arrayContaining({
-      'id': courseId,
-      'name': course.name,
-      'deleted': false,
-      'image': course.image,
-      'description': course.description,
-    })
+      id: courseId,
+      name: course.name,
+      deleted: false,
+      image: course.image,
+      description: course.description,
+    });
   });
 });
 

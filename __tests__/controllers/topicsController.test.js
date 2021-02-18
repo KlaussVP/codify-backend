@@ -41,7 +41,7 @@ describe('createListOfTopics', () => {
     Topic.bulkCreate.mockResolvedValue({});
     const resultArray = await topicsController.createListOfTopics(topics, chapterId);
     expect(resultArray).toEqual(
-      expect.objectContaining(expectedArray)
+      expect.objectContaining(expectedArray),
     );
   });
 });
