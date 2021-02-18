@@ -1,6 +1,5 @@
 const router = require('express').Router();
 
-const { postCoursesSchema } = require('../../schemas/coursesSchema');
 const coursesController = require('../../controllers/coursesController');
 const verifyJWT = require('../../middlewares/authMiddleware');
 

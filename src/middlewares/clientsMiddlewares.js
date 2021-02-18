@@ -1,7 +1,7 @@
 const signInSchema = require('../schemas/signInSchema');
 const signUpSchema = require('../schemas/signUpSchema');
 
-async function signUpMiddleware(req, res, next) {
+function signUpMiddleware(req, res, next) {
   const signupValidation = signUpSchema.validate(req.body).error;
   if (signupValidation) {
     return res.status(422).send({
@@ -11,17 +11,17 @@ async function signUpMiddleware(req, res, next) {
     });
   }
 
-  next();
+  return next();
 }
 
-async function signInMiddleware(req, res, next) {
+function signInMiddleware(req, res, next) {
   const signInValidation = signInSchema.validate(req.body).error;
 
   if (signInValidation) {
     return res.status(400).send({ error: 'Verifique os dados enviados.' });
   }
 
-  next();
+  return next();
 }
 
 module.exports = {
