@@ -215,12 +215,11 @@ describe('GET /clients/courses/:id', () => {
     const chapter = {
       name: 'Apresentação Programação',
       topics: [
-          {
-              'name': 'Introdução a programação'
-          },
+        {
+          'name': 'Introdução a programação'
+        },
       ]
-
-  }
+    }
     const resultCourse = await db.query('INSERT INTO courses (name, image, description) values ($1, $2, $3) RETURNING *', [course.name, course.image, course.description]);
     const courseId = resultCourse.rows[0].id;
 
@@ -230,7 +229,7 @@ describe('GET /clients/courses/:id', () => {
     const resultTopic = await db.query(`INSERT INTO topics (name, "chapterId", "createdAt", "updatedAt") values ($1, $2, $3, $4) RETURNING *`, [chapter.topics[0].name,chapterId, Sequelize.NOW, Sequelize.NOW]);
     const topicId = resultTopic.rows[0].id;
 
-    const response = await agent.get(`/clients/courses/${courseId}`).set({"X-Access-Token": tokenAdmin});
+    const response = await agent.get(`/clients/courses/${courseId}`);
 
     expect(response.status).toBe(200);
     expect.objectContaining({
@@ -239,19 +238,15 @@ describe('GET /clients/courses/:id', () => {
       'deleted': false,
       'image': course.image,
       'description': course.description,
-      'chapters': [
-          {
-            'id': chapterId,
-              'name': chapter.name,
-              'topics': [
-                  {
-                      'id': topicId,
-                      'name': chapter.topics.name,
-                  },
-              ]
-          },
-      ]
-    })
+      'chapters': [{
+        'id': chapterId,
+        'name': chapter.name,
+        'topics': [{
+          'id': topicId,
+          'name': chapter.topics.name,
+        }]
+      }]
+    });
   });
 });
 
@@ -267,7 +262,7 @@ describe('GET /clients/courses', () => {
     const resultCourse = await db.query('INSERT INTO courses (name, image, description) values ($1, $2, $3) RETURNING *', [course.name, course.image, course.description]);
     const courseId = resultCourse.rows[0].id;
 
-    const response = await agent.get(`/clients/courses`).set({"X-Access-Token": tokenAdmin});
+    const response = await agent.get(`/clients/courses`);
 
     expect(response.status).toBe(200);
     expect.arrayContaining({
@@ -279,4 +274,3 @@ describe('GET /clients/courses', () => {
     })
   });
 });
-

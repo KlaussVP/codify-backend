@@ -1,12 +1,20 @@
 const router = require('express').Router();
-
-const { postCoursesSchema } = require('../../schemas/coursesSchema');
 const coursesController = require('../../controllers/coursesController');
 const verifyJWT = require('../../middlewares/authMiddleware');
 
 router.get('/', async (req, res) => {
   const courses = await coursesController.listAllCourses();
   res.send(courses);
+});
+
+router.get('/started', verifyJWT, async (req, res) => {
+  const courses = await coursesController.listStartedCourses(req.userId);
+  return res.send(courses);
+});
+
+router.get('/last-accessed', verifyJWT, async (req, res) => {
+  const course = await coursesController.getLastAccessedCourse(req.userId);
+  return res.send(course);
 });
 
 router.get('/:id', async (req, res) => {
