@@ -8,7 +8,9 @@
     "build": "sequelize-cli db:migrate ",
     "dev": "nodemon ./src/server.js",
     "start": "node src/server.js",
-    "seed": "sequelize-cli db:seed:all"
+    "seed": "sequelize-cli db:seed:all",
+    "eslint-src": "yarn eslint --fix src",
+    "eslint-tests": "yarn eslint --fix __tests__"
   },
   "devDependencies": {
     "eslint": "^7.19.0",
