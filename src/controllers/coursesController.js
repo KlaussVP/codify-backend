@@ -71,20 +71,20 @@ class CoursesController {
     });
 
     const coursesArrayAdminFormat = [];
-    courses.forEach( course => {
-      const chaptersIds = course.chapters.map(c => c.id);
+    courses.forEach((course) => {
+      const chaptersIds = course.chapters.map((c) => c.id);
       const courseObjectToAdmin = {
         id: course.id,
         name: course.name,
         deleted: JSON.stringify(course.deleted),
         image: course.image,
-        description:course.description,
+        description: course.description,
         createdAt: course.createdAt,
         updatedAt: course.updatedAt,
         chapters: chaptersIds,
       };
       coursesArrayAdminFormat.push(courseObjectToAdmin);
-    }); 
+    });
     return coursesArrayAdminFormat;
   }
 
@@ -97,7 +97,7 @@ class CoursesController {
         include: {
           model: Topic,
           attributes: ['id', 'name'],
-        }
+        },
       }],
     });
     if (!course) throw new InexistingId();
@@ -106,11 +106,11 @@ class CoursesController {
   }
 
   async startOrContinueCourse(courseId, userId) {
-    const [startedCourse, created] = await CourseUser.findOrCreate({ 
+    const [startedCourse, created] = await CourseUser.findOrCreate({
       where: {
         courseId,
-        userId
-      } 
+        userId,
+      },
     });
   }
 
@@ -124,14 +124,14 @@ class CoursesController {
     });
     if (!course) throw new InexistingId();
 
-   const chaptersIds = course.chapters.map(c => c.id);
+    const chaptersIds = course.chapters.map((c) => c.id);
 
     const courseObjectToAdmin = {
       id: course.id,
       name: course.name,
       deleted: course.deleted,
       image: course.image,
-      description:course.description,
+      description: course.description,
       createdAt: course.createdAt,
       updatedAt: course.updatedAt,
       chapters: chaptersIds,
@@ -139,15 +139,13 @@ class CoursesController {
     return courseObjectToAdmin;
   }
 
-
-   async updateCourseAccess() {
-
+  async updateCourseAccess() {
     if (!created) {
-      await CourseUser.update({ lastAccessed: new Date() }, { 
+      await CourseUser.update({ lastAccessed: new Date() }, {
         where: {
           courseId,
-          userId
-        } 
+          userId,
+        },
       });
     }
   }
