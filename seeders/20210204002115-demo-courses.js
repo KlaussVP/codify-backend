@@ -337,9 +337,99 @@ module.exports = {
           chapterId: chaptersIds[0][5].id,
         },
       ], {});
+
+      const theory = {
+        youtubeLink: 'https://www.youtube.com/embed/Ptbk2af68e8',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      }
+
+      const topicsIds = await queryInterface.sequelize.query(
+        'SELECT id from topics;',
+      );
+
+      await queryInterface.bulkInsert('theories',
+      [
+        {
+          ...theory,
+          topicId: topicsIds[0][0].id
+        },
+        {
+          ...theory,
+          topicId: topicsIds[0][1].id
+        },
+        {
+          ...theory,
+          topicId: topicsIds[0][2].id
+        },
+        {
+          ...theory,
+          topicId: topicsIds[0][3].id
+        },
+      ], {});
+
+      const exercise = {
+        title: 'Exercício',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      }
+
+      queryInterface.bulkInsert('exercises',
+      [
+        {
+          ...exercise,
+          topicId: topicsIds[0][0].id
+        },
+        {
+          ...exercise,
+          topicId: topicsIds[0][0].id
+        },
+        {
+          ...exercise,
+          topicId: topicsIds[0][0].id
+        },
+        {
+          ...exercise,
+          topicId: topicsIds[0][1].id
+        },
+        {
+          ...exercise,
+          topicId: topicsIds[0][1].id
+        },
+        {
+          ...exercise,
+          topicId: topicsIds[0][1].id
+        },
+        {
+          ...exercise,
+          topicId: topicsIds[0][2].id
+        },
+        {
+          ...exercise,
+          topicId: topicsIds[0][2].id
+        },
+        {
+          ...exercise,
+          topicId: topicsIds[0][2].id
+        },
+        {
+          ...exercise,
+          topicId: topicsIds[0][3].id
+        },
+        {
+          ...exercise,
+          topicId: topicsIds[0][3].id
+        },
+        {
+          ...exercise,
+          topicId: topicsIds[0][3].id
+        },
+      ], {});
   },
 
   down: async (queryInterface) => {
+    await queryInterface.bulkDelete('exercises', null, {});
+    await queryInterface.bulkDelete('theories', null, {});
     await queryInterface.bulkDelete('topics', null, {});
     await queryInterface.bulkDelete('chapters', null, {});
     await queryInterface.bulkDelete('courses', null, {});
