@@ -36,6 +36,20 @@ class TopicsController {
     if (!topic) throw new InexistingId();
     return topic;
   }
+
+  async editTopic(id, { name, chapterId }) {
+    const topic = await Topic.findByPk(id);
+    topic.name = name || topic.name;
+    topic.chapterId = chapterId || topic.chapterId;
+    await topic.save();
+    return topic;
+  }
+
+  async deleteOneTopic(id) {
+    await Topic.destroy({
+      where: { id },
+    });
+  }
 }
 
 module.exports = new TopicsController();

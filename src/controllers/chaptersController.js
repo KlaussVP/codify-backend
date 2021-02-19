@@ -10,8 +10,24 @@ class ChaptersController {
     return chapter;
   }
 
+  async editChapter(id, { name, courseId }) {
+    const chapter = await Chapter.findByPk(id);
+    chapter.name = name || chapter.name;
+    chapter.courseId = courseId || chapter.courseId;
+    await chapter.save();
+    return chapter;
+  }
+
+  async deleteOneChapter(chapterId) {
+    await topicsController.deleteTopicsFromChapter(chapterId);
+    await Chapter.destroy({
+      where: { id: chapterId },
+      cascade: true,
+    });
+  }
+
   async createListOfChapters(chapters, courseId) {
-    const arrayChapters = chapters.map( c => ({ name: c.name, courseId }));
+    const arrayChapters = chapters.map((c) => ({ name: c.name, courseId }));
     const chaptersCreated = await Chapter.bulkCreate(arrayChapters);
 
     this.addAllTopicsOfOneCourse(chapters, chaptersCreated);
@@ -20,25 +36,24 @@ class ChaptersController {
   }
 
   async addAllTopicsOfOneCourse(arrayChaptersWithTopics, arrayChaptersWithIds) {
-
-    for (let i = 0; i < arrayChaptersWithTopics.length; i++ ) {
-      let courseId = arrayChaptersWithIds[i].id;
-      let topicsToBeAdded = arrayChaptersWithTopics[i].topics
+    for (let i = 0; i < arrayChaptersWithTopics.length; i++) {
+      const courseId = arrayChaptersWithIds[i].id;
+      const topicsToBeAdded = arrayChaptersWithTopics[i].topics;
       await topicsController.createListOfTopics(topicsToBeAdded, courseId);
     }
   }
 
   async deleteChaptersFromCourse(courseId) {
     const chapters = await this.getChaptersByCourse(courseId);
-    
-    for(let i = 0; i < chapters.length; i++){
+
+    for (let i = 0; i < chapters.length; i++) {
       await topicsController.deleteTopicsFromChapter(chapters[i].id);
     }
 
     await Chapter.destroy({
       where: {
         courseId,
-      }, 
+      },
       cascade: true,
     });
   }
@@ -53,12 +68,12 @@ class ChaptersController {
       include: {
         model: Topic,
         attributes: ['id'],
-      }
+      },
     });
 
     const chaptersArrayAdminFormat = [];
-    chapters.forEach( chapter => {
-      const topicsIds = chapter.topics.map(t => t.id);
+    chapters.forEach((chapter) => {
+      const topicsIds = chapter.topics.map((t) => t.id);
       const chapterObjectToAdmin = {
         id: chapter.id,
         name: chapter.name,
@@ -68,7 +83,7 @@ class ChaptersController {
         topics: topicsIds,
       };
       chaptersArrayAdminFormat.push(chapterObjectToAdmin);
-    }); 
+    });
     return chaptersArrayAdminFormat;
   }
 
@@ -78,16 +93,16 @@ class ChaptersController {
       include: {
         model: Topic,
         attributes: ['id', 'name'],
-      }
+      },
     });
 
     if (!chapter) throw new InexistingId();
-    
+
     return chapter;
   }
-  
+
   async getChaptersByCourse(courseId) {
-    const chapters = await Chapter.findAll({ where: {courseId}});
+    const chapters = await Chapter.findAll({ where: { courseId } });
     return chapters;
   }
 
@@ -97,11 +112,11 @@ class ChaptersController {
       include: {
         model: Topic,
         attributes: ['id', 'name'],
-      }
+      },
     });
     if (!chapter) throw new InexistingId();
 
-    const topicsIds = chapter.topics.map(c => c.id);
+    const topicsIds = chapter.topics.map((c) => c.id);
 
     const chapterObjectToAdmin = {
       id: chapter.id,
