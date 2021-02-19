@@ -143,7 +143,7 @@ module.exports = {
 
     const ids = coursesIds[0];
 
-    queryInterface.bulkInsert('chapters',
+    await queryInterface.bulkInsert('chapters',
       [
         {
           ...courseChapters[0][0],
@@ -211,34 +211,34 @@ module.exports = {
         },
       ], {});
 
-      const topics = [
-        {
-          name: 'Como usar',
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-        {
-          name: 'Entrando na plataforma',
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-        {
-          name: 'Fazendo teorias',
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-        {
-          name: 'Fazendo exercícios',
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-      ]
+    const topics = [
+      {
+        name: 'Como usar',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        name: 'Entrando na plataforma',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        name: 'Fazendo teorias',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        name: 'Fazendo exercícios',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    ];
 
-      const chaptersIds = await queryInterface.sequelize.query(
-        'SELECT id from chapters;',
-      );
+    const chaptersIds = await queryInterface.sequelize.query(
+      'SELECT id from chapters;',
+    );
 
-      queryInterface.bulkInsert('topics',
+    await queryInterface.bulkInsert('topics',
       [
         {
           ...topics[0],
@@ -338,91 +338,91 @@ module.exports = {
         },
       ], {});
 
-      const theory = {
-        youtubeLink: 'https://www.youtube.com/embed/Ptbk2af68e8',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      }
+    const theory = {
+      youtubeLink: 'https://www.youtube.com/embed/Ptbk2af68e8',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
 
-      const topicsIds = await queryInterface.sequelize.query(
-        'SELECT id from topics;',
-      );
+    const topicsIds = await queryInterface.sequelize.query(
+      'SELECT id from topics;',
+    );
 
-      await queryInterface.bulkInsert('theories',
+    await queryInterface.bulkInsert('theories',
       [
         {
           ...theory,
-          topicId: topicsIds[0][0].id
+          topicId: topicsIds[0][0].id,
         },
         {
           ...theory,
-          topicId: topicsIds[0][1].id
+          topicId: topicsIds[0][1].id,
         },
         {
           ...theory,
-          topicId: topicsIds[0][2].id
+          topicId: topicsIds[0][2].id,
         },
         {
           ...theory,
-          topicId: topicsIds[0][3].id
+          topicId: topicsIds[0][3].id,
         },
       ], {});
 
-      const exercise = {
-        title: 'Exercício',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      }
+    const exercise = {
+      title: 'Exercício',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
 
-      queryInterface.bulkInsert('exercises',
+    await queryInterface.bulkInsert('exercises',
       [
         {
           ...exercise,
-          topicId: topicsIds[0][0].id
+          topicId: topicsIds[0][0].id,
         },
         {
           ...exercise,
-          topicId: topicsIds[0][0].id
+          topicId: topicsIds[0][0].id,
         },
         {
           ...exercise,
-          topicId: topicsIds[0][0].id
+          topicId: topicsIds[0][0].id,
         },
         {
           ...exercise,
-          topicId: topicsIds[0][1].id
+          topicId: topicsIds[0][1].id,
         },
         {
           ...exercise,
-          topicId: topicsIds[0][1].id
+          topicId: topicsIds[0][1].id,
         },
         {
           ...exercise,
-          topicId: topicsIds[0][1].id
+          topicId: topicsIds[0][1].id,
         },
         {
           ...exercise,
-          topicId: topicsIds[0][2].id
+          topicId: topicsIds[0][2].id,
         },
         {
           ...exercise,
-          topicId: topicsIds[0][2].id
+          topicId: topicsIds[0][2].id,
         },
         {
           ...exercise,
-          topicId: topicsIds[0][2].id
+          topicId: topicsIds[0][2].id,
         },
         {
           ...exercise,
-          topicId: topicsIds[0][3].id
+          topicId: topicsIds[0][3].id,
         },
         {
           ...exercise,
-          topicId: topicsIds[0][3].id
+          topicId: topicsIds[0][3].id,
         },
         {
           ...exercise,
-          topicId: topicsIds[0][3].id
+          topicId: topicsIds[0][3].id,
         },
       ], {});
   },
