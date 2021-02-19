@@ -224,19 +224,24 @@ describe('GET /clients/courses/started', () => {
       testCourseTwo.rows[0].id, testUser.rows[0].id, Sequelize.NOW, Sequelize.NOW, Sequelize.NOW,
     ]);
 
-    await agent.get('/clients/courses/started').set({ 'X-Access-Token': token });
-    expect.arrayContaining({
-      name: courseOne.name,
-      deleted: false,
-      image: courseOne.image,
-      description: courseOne.description,
-    },
-    {
-      name: courseTwo.name,
-      deleted: false,
-      image: courseTwo.image,
-      description: courseTwo.description,
-    });
+    const result = await agent.get('/clients/courses/started').set({ 'X-Access-Token': token });
+
+    expect(result.body).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          name: courseOne.name,
+          deleted: false,
+          image: courseOne.image,
+          description: courseOne.description,
+        }),
+        expect.objectContaining({
+          name: courseTwo.name,
+          deleted: false,
+          image: courseTwo.image,
+          description: courseTwo.description,
+        }),
+      ]),
+    );
 
     console.log('It got until here! (This is the end of the first test)');
   });
@@ -329,13 +334,16 @@ describe('GET /clients/courses/last-accessed', () => {
       testCourseTwo.rows[0].id, testUser.rows[0].id, Sequelize.NOW, Sequelize.NOW, Sequelize.NOW,
     ]);
 
-    await agent.get('/clients/courses/last-accessed').set({ 'X-Access-Token': token });
-    expect.objectContaining({
-      name: courseTwo.name,
-      deleted: false,
-      image: courseTwo.image,
-      description: courseTwo.description,
-    });
+    const result = await agent.get('/clients/courses/last-accessed').set({ 'X-Access-Token': token });
+
+    expect(result.body).toMatchObject(
+      expect.objectContaining({
+        name: courseTwo.name,
+        deleted: false,
+        image: courseTwo.image,
+        description: courseTwo.description,
+      }),
+    );
 
     console.log('It got until here! (This is the end of the third test)');
   });
