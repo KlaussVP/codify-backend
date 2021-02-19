@@ -7,7 +7,6 @@ function verifyJWT(req, res, next) {
   if (!token) return res.status(401).json({ error: 'Token obrigatório.' });
 
   jwt.verify(token, process.env.SECRET, (err, decoded) => {
-    console.log(err);
     if (err) throw new AuthorizationError();
 
     req.userId = decoded.id;

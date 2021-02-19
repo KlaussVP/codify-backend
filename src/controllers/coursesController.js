@@ -150,9 +150,9 @@ class CoursesController {
       attributes: ['courseId']
     });
 
-    if (!startedCoursesId) throw new NoCourseStarted();
+    if (startedCoursesId.length === 0) throw new NoCourseStarted();
 
-    const onGoingCourses = await Course.findAll({ where: { id: startedCoursesId.map(c => c.id) } });
+    const onGoingCourses = await Course.findAll({ where: { id: startedCoursesId.map(c => c.courseId) } });
 
     return onGoingCourses;
   }
@@ -162,7 +162,7 @@ class CoursesController {
       where: { userId, deleted: false },
       order: [['lastAccessed', 'DESC']] 
     });
-
+    
     if (!lastAccessed) throw new NoCourseStarted();
     
     const lastCourse = await Course.findByPk(lastAccessed.courseId);
