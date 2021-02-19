@@ -7,7 +7,6 @@ const Chapter = require('../../src/models/Chapter');
 jest.mock('../../src/models/Topic');
 jest.mock('sequelize');
 
-
 describe('createChapter', () => {
   it('should return a chapter with id', async () => {
     const name = 'Introduction';
@@ -78,9 +77,9 @@ describe('getChapterById', () => {
 describe('getChapterByIdAsAdmin', () => {
   it('should return an object chapters', async () => {
     const id = 1;
-    const chapterObject  = {
+    const chapterObject = {
       id,
-      name: "Preparando o ambiente",
+      name: 'Preparando o ambiente',
       courseId: 2,
       createdAt: Sequelize.NOW,
       updatedAt: Sequelize.NOW,
@@ -90,10 +89,10 @@ describe('getChapterByIdAsAdmin', () => {
         },
         {
           id: 14,
-        }
+        },
       ],
     };
-    const expectedObject = {... chapterObject, "topics": [6,14] } ;
+    const expectedObject = { ...chapterObject, topics: [6, 14] };
 
     Chapter.findOne.mockResolvedValue(chapterObject);
     const chapter = await chaptersController.getChapterByIdAsAdmin(id);

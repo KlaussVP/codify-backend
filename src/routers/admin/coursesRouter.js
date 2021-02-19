@@ -8,7 +8,6 @@ const { adminVerifyJWT } = require('../../middlewares/adminMiddlewares');
 
 coursesRouter.post('/', adminVerifyJWT, async (req, res) => {
   const validation = postCoursesAsAdminSchema.validate(req.body);
-
   if (validation.error) return res.status(422).send({ error: 'Verifique seus dados' });
 
   const course = await coursesController.createAsAdmin(req.body);
