@@ -7,6 +7,7 @@ const chaptersController = require('./chaptersController');
 const topicsController = require('./topicsController');
 const CourseUser = require('../models/CourseUser');
 const Theory = require('../models/Theory');
+const Exercise = require('../models/Exercise');
 
 class CoursesController {
   async findCourseByName(name) {
@@ -98,12 +99,21 @@ class CoursesController {
         include: {
           model: Topic,
           attributes: ['id', 'name'],
-          include: {
+          include: [{
             model: Theory,
             attributes: ['id', 'youtubeLink', 'done'],
-          }
-        }
+          }, {
+            model: Exercise,
+            attributes: ['id', 'title', 'done'],
+          }]
+        },
       }],
+      order: [
+        [Chapter, 'id', 'ASC'],
+        [Chapter, Topic, 'id', 'ASC'],
+        [Chapter, Topic, Theory, 'id', 'ASC'],
+        [Chapter, Topic, Exercise, 'id', 'ASC'],
+      ]
     });
     if (!course) throw new InexistingId();
 

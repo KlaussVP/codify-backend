@@ -348,7 +348,7 @@ module.exports = {
         'SELECT id from topics;',
       );
 
-      queryInterface.bulkInsert('theories',
+      await queryInterface.bulkInsert('theories',
       [
         {
           ...theory,
@@ -374,7 +374,7 @@ module.exports = {
         updatedAt: new Date(),
       }
 
-      queryInterface.bulkInsert('theories',
+      queryInterface.bulkInsert('exercises',
       [
         {
           ...exercise,
@@ -428,6 +428,7 @@ module.exports = {
   },
 
   down: async (queryInterface) => {
+    await queryInterface.bulkDelete('exercises', null, {});
     await queryInterface.bulkDelete('theories', null, {});
     await queryInterface.bulkDelete('topics', null, {});
     await queryInterface.bulkDelete('chapters', null, {});
