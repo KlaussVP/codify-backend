@@ -7,7 +7,6 @@ const Chapter = require('../models/Chapter');
 const CourseUser = require('../models/CourseUser');
 const Theory = require('../models/Theory');
 const Exercise = require('../models/Exercise');
-const chaptersController = require('./chaptersController');
 
 class CoursesController {
   async findCourseByName(name) {
@@ -117,6 +116,7 @@ class CoursesController {
   }
 
   async startOrContinueCourse(courseId, userId) {
+    // eslint-disable-next-line no-unused-vars
     const [startedCourse, created] = await CourseUser.findOrCreate({
       where: {
         courseId,
