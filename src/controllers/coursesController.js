@@ -1,9 +1,11 @@
 const Course = require('../models/Course');
 const ConflictError = require('../errors/ConflictError');
 const InexistingId = require('../errors/InexistingId');
+const NoCourseStarted = require('../errors/NoCourseStarted');
 const Topic = require('../models/Topic');
 const Chapter = require('../models/Chapter');
 const CourseUser = require('../models/CourseUser');
+const chaptersController = require('./chaptersController');
 
 class CoursesController {
   async findCourseByName(name) {
@@ -106,12 +108,13 @@ class CoursesController {
         userId,
       },
     });
+
     if (!created) {
-      await CourseUser.update({ lastAccessed: new Date() }, {
+      await CourseUser.update({ lastAccessed: new Date() }, { 
         where: {
           courseId,
-          userId,
-        },
+          userId
+        } 
       });
     }
   }
@@ -140,6 +143,33 @@ class CoursesController {
     };
     return courseObjectToAdmin;
   }
+
+  async listStartedCourses(userId) {
+    const startedCoursesId = await CourseUser.findAll({ 
+      where: { userId, deleted: false },
+      attributes: ['courseId']
+    });
+
+    if (startedCoursesId.length === 0) throw new NoCourseStarted();
+
+    const onGoingCourses = await Course.findAll({ where: { id: startedCoursesId.map(c => c.courseId) } });
+
+    return onGoingCourses;
+  }
+
+  async getLastAccessedCourse(userId) {
+    const lastAccessed = await CourseUser.findOne({
+      where: { userId, deleted: false },
+      order: [['lastAccessed', 'DESC']] 
+    });
+    
+    if (!lastAccessed) throw new NoCourseStarted();
+    
+    const lastCourse = await Course.findByPk(lastAccessed.courseId);
+
+    return lastCourse;
+  }
+
 }
 
 module.exports = new CoursesController();
