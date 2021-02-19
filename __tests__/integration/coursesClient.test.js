@@ -15,31 +15,6 @@ const db = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
 
-// let tokenClient;
-
-beforeAll(async (done) => {
-
-  // utilizar depois para quando rotas autenticadas forem utilizadas pelos clientes
-  // agent.post('/clients/signup').send({
-  //   name: 'client',
-  //   email: 'client@gmail.com',
-  //   password: '123456',
-  //   confirmPassword: '123456',
-  // }).end((err, response) => {
-  //   console.log(response.body)
-  //   done();
-  // });
-
-  // agent.post('/clients/signin').send({
-  //   email: 'client@gmail.com',
-  //   password: '123456',
-  // }).end((err, response) => {
-  //   tokenClient = response.body.token;
-  //   console.log(response.body);
-  //   done();
-  // });
-});
-
 beforeEach(async () => {
   await db.query('DELETE FROM topics');
   await db.query('DELETE FROM chapters');
