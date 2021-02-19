@@ -13,7 +13,6 @@ const db = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
 
-
 beforeEach(async () => {
   await db.query('DELETE FROM users');
 });
@@ -23,7 +22,6 @@ afterAll(async () => {
   await sequelize.close();
   await db.end();
 });
-
 
 describe('POST /clients/signup', () => {
   it('should return 201 when passed valid parameters', async () => {
@@ -69,7 +67,6 @@ describe('POST /clients/signup', () => {
 
 describe('POST /clients/signin', () => {
   it('should return 200 when passed valid login data', async () => {
-
     const bodyLogin = {
       email: 'test@test.com',
       password: '123456',
@@ -78,7 +75,7 @@ describe('POST /clients/signin', () => {
     await db.query('INSERT INTO users (name, email, password, type, "createdAt", "updatedAt") values ($1, $2, $3, $4, $5, $6)', ['Test', bodyLogin.email, bcrypt.hashSync(bodyLogin.password, 10), 'CLIENT', 'now()', 'now()']);
 
     const response = await agent.post('/clients/signin').send(bodyLogin);
-    
+
     expect(response.status).toBe(200);
   });
 
@@ -103,12 +100,10 @@ describe('POST /clients/signin', () => {
 
     expect(response.status).toBe(401);
   });
-
 });
 
 describe('POST /admin/signin', () => {
   it('should return 200 when passed valid login data', async () => {
-
     const bodyAdmin = {
       name: 'admin',
       email: 'contato@codify.com.br',
@@ -124,7 +119,7 @@ describe('POST /admin/signin', () => {
     };
 
     const response = await agent.post('/admin/signin').send(bodyLogin);
-    
+
     expect(response.status).toBe(200);
   });
 
@@ -151,15 +146,13 @@ describe('POST /admin/signin', () => {
   });
 
   it('should return 403 when wrong user type', async () => {
-
     const bodyLogin = {
       email: 'test@test.com',
       password: '123456',
     };
 
     const response = await agent.post('/admin/signin').send(bodyLogin);
-    
+
     expect(response.status).toBe(401);
   });
-
 });

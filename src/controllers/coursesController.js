@@ -3,27 +3,12 @@ const ConflictError = require('../errors/ConflictError');
 const InexistingId = require('../errors/InexistingId');
 const Topic = require('../models/Topic');
 const Chapter = require('../models/Chapter');
-const chaptersController = require('./chaptersController');
-const topicsController = require('./topicsController');
 const CourseUser = require('../models/CourseUser');
 
 class CoursesController {
   async findCourseByName(name) {
     const course = await Course.findOne({ where: { name } });
     return course;
-  }
-
-  async create({
-    name, image, description, chapters,
-  }) {
-    const coursesExists = await this.findCourseByName(name);
-    if (coursesExists) throw new ConflictError();
-
-    const course = await Course.create({ name, image, description });
-    await chaptersController.createListOfChapters(chapters, course.id);
-
-    const courseObject = await this.getCourseById(course.id);
-    return courseObject;
   }
 
   async createAsAdmin({
@@ -36,32 +21,14 @@ class CoursesController {
     return course;
   }
 
-  async edit({
-    id, name, image, description, chapters,
-  }) {
-    const course = await this.getCourseById(id);
-    if (!course) throw new InexistingId();
-
-    course.name = name || course.name;
-    course.image = image || course.image;
-    course.description = description || course.description;
-
-    if (chapters) {
-      await chaptersController.deleteChaptersFromCourse(course.id);
-      await chaptersController.createListOfChapters(chapters, course.id);
-    }
-
-    await course.save();
-
-    const courseObject = await this.getCourseById(course.id);
-    return courseObject;
-  }
-
   async editAsAdmin({
     id, name, image, description,
   }) {
     const course = await this.getCourseById(id);
     if (!course) throw new InexistingId();
+
+    const coursesExists = await this.findCourseByName(name);
+    if (coursesExists) throw new ConflictError();
 
     course.name = name || course.name;
     course.image = image || course.image;
@@ -77,12 +44,13 @@ class CoursesController {
 
     course.deleted = true;
     await course.save();
-    return true;
+    return course;
   }
 
   async listAllCourses() {
     const courses = await Course.findAll();
-    return courses;
+    const coursesNotDeleted = courses.filter((c) => c.deleted === false);
+    return coursesNotDeleted;
   }
 
   async listAllCoursesAsAdmin() {
@@ -92,9 +60,11 @@ class CoursesController {
         attributes: ['id'],
       }],
     });
+    const coursesNotDeleted = courses.filter((c) => c.deleted === false);
 
     const coursesArrayAdminFormat = [];
-    courses.forEach((course) => {
+
+    coursesNotDeleted.forEach((course) => {
       const chaptersIds = course.chapters.map((c) => c.id);
       const courseObjectToAdmin = {
         id: course.id,
@@ -108,6 +78,7 @@ class CoursesController {
       };
       coursesArrayAdminFormat.push(courseObjectToAdmin);
     });
+
     return coursesArrayAdminFormat;
   }
 
@@ -135,6 +106,14 @@ class CoursesController {
         userId,
       },
     });
+    if (!created) {
+      await CourseUser.update({ lastAccessed: new Date() }, {
+        where: {
+          courseId,
+          userId,
+        },
+      });
+    }
   }
 
   async getCourseByIdAsAdmin(id) {
@@ -160,17 +139,6 @@ class CoursesController {
       chapters: chaptersIds,
     };
     return courseObjectToAdmin;
-  }
-
-  async updateCourseAccess() {
-    if (!created) {
-      await CourseUser.update({ lastAccessed: new Date() }, {
-        where: {
-          courseId,
-          userId,
-        },
-      });
-    }
   }
 }
 

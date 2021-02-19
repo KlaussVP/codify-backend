@@ -8,7 +8,6 @@ const { adminVerifyJWT } = require('../../middlewares/adminMiddlewares');
 
 coursesRouter.post('/', adminVerifyJWT, async (req, res) => {
   const validation = postCoursesAsAdminSchema.validate(req.body);
-
   if (validation.error) return res.status(422).send({ error: 'Verifique seus dados' });
 
   const course = await coursesController.createAsAdmin(req.body);
@@ -20,7 +19,7 @@ coursesRouter.put('/:id', adminVerifyJWT, async (req, res) => {
   if (validation.error) return res.status(422).send({ error: 'Verifique seus dados' });
 
   const course = await coursesController.editAsAdmin(req.body);
-  return res.status(201).send(course);
+  return res.status(200).send(course);
 });
 
 coursesRouter.get('/', adminVerifyJWT, async (req, res) => {
@@ -42,7 +41,7 @@ coursesRouter.get('/:id', adminVerifyJWT, async (req, res) => {
 
 coursesRouter.delete('/:id', adminVerifyJWT, async (req, res) => {
   const deleted = await coursesController.deleteCourse(req.params.id);
-  if (deleted) return res.status(202).send('ok!');
+  if (deleted) return res.status(202).send(deleted);
   return res.status(500).send({ error: 'send this to a developer' });
 });
 
