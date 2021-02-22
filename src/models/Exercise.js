@@ -24,11 +24,6 @@ Exercise.init(
       },
       onDelete: 'CASCADE',
     },
-    done: {
-      type: Sequelize.BOOLEAN,
-      allowNull: false,
-      defaultValue: false,
-    },
   },
   {
     sequelize,

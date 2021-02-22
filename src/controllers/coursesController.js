@@ -96,10 +96,10 @@ class CoursesController {
           attributes: ['id', 'name'],
           include: [{
             model: Theory,
-            attributes: ['id', 'youtubeLink', 'done'],
+            attributes: ['id', 'youtubeLink'],
           }, {
             model: Exercise,
-            attributes: ['id', 'title', 'done'],
+            attributes: ['id', 'title'],
           }],
         },
       }],
