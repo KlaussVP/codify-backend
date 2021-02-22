@@ -26,11 +26,6 @@ class TopicsController {
     return topics;
   }
 
-  async getAllTopicsAsAdmin() {
-    const topics = await Topic.findAll();
-    return topics;
-  }
-
   async getTopicByIdAsAdmin(id) {
     const topic = await Topic.findByPk(id);
     if (!topic) throw new InexistingId();
@@ -39,6 +34,8 @@ class TopicsController {
 
   async editTopic(id, { name, chapterId }) {
     const topic = await Topic.findByPk(id);
+    if (!topic) throw new InexistingId();
+
     topic.name = name || topic.name;
     topic.chapterId = chapterId || topic.chapterId;
     await topic.save();

@@ -14,7 +14,7 @@ topicRouter.put('/:id', adminVerifyJWT, async (req, res) => {
 });
 
 topicRouter.get('/', async (req, res) => {
-  const topics = await topicsController.getAllTopicsAsAdmin();
+  const topics = await topicsController.getAllTopics();
   res
     .header('Access-Control-Expose-Headers', 'Content-Range')
     .set('Content-Range', topics.length)
