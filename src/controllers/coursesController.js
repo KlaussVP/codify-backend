@@ -1,3 +1,4 @@
+const { Sequelize } = require('sequelize');
 const Course = require('../models/Course');
 const ConflictError = require('../errors/ConflictError');
 const InexistingId = require('../errors/InexistingId');
@@ -88,31 +89,24 @@ class CoursesController {
   async getCourseById(id) {
     const course = await Course.findOne({
       where: { id },
+      attributes: ['id', 'name', 'description'],
       include: [{
         model: Chapter,
         attributes: ['id', 'name'],
-        include: {
+        include: [{
           model: Topic,
           attributes: ['id', 'name'],
-          include: [{
-            model: Theory,
-            attributes: ['id', 'youtubeLink'],
-          }, {
-            model: Exercise,
-            attributes: ['id', 'title'],
-          }],
-        },
+        }],
+        order: [
+          [Chapter, 'id', 'ASC'],
+        ],
       }],
-      order: [
-        [Chapter, 'id', 'ASC'],
-        [Chapter, Topic, 'id', 'ASC'],
-        [Chapter, Topic, Theory, 'id', 'ASC'],
-        [Chapter, Topic, Exercise, 'id', 'ASC'],
-      ],
     });
     if (!course) throw new InexistingId();
 
-    return course;
+    const courseToSend = await this.getNumberOfActivities(course);
+
+    return courseToSend;
   }
 
   async startOrContinueCourse(courseId, userId) {
@@ -183,6 +177,37 @@ class CoursesController {
     const lastCourse = await Course.findByPk(lastAccessed.courseId);
 
     return lastCourse;
+  }
+
+  async getNumberOfActivities(course) {
+    const newChapters = [];
+    const courseToSend = {
+      id: course.id,
+      name: course.name,
+      description: course.description,
+    };
+    for (let i = 0; i < course.chapters.length; i++) {
+      const newChapter = {
+        id: course.chapters[i].id,
+        name: course.chapters[i].name,
+        topics: course.chapters[i].topics,
+        theoryCount: course.chapters[i].topics.length,
+        exerciseCount: 0,
+      };
+      let total = 0;
+      for (let j = 0; j < course.chapters[i].topics.length; j++) {
+        const count = await Exercise.count({
+          where: {
+            topicId: course.chapters[i].topics[j].id,
+          },
+        });
+        total += count;
+      }
+      newChapter.exerciseCount = total;
+      newChapters.push(newChapter);
+    }
+    courseToSend.chapters = newChapters;
+    return courseToSend;
   }
 }
 
