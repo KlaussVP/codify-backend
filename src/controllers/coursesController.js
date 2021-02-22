@@ -191,19 +191,27 @@ class CoursesController {
         id: course.chapters[i].id,
         name: course.chapters[i].name,
         topics: course.chapters[i].topics,
-        theoryCount: course.chapters[i].topics.length,
+        theoryCount: 0,
         exerciseCount: 0,
       };
-      let total = 0;
+      let totalTheory = 0;
+      let totalExercise = 0;
       for (let j = 0; j < course.chapters[i].topics.length; j++) {
-        const count = await Exercise.count({
+        const countExercise = await Exercise.count({
           where: {
             topicId: course.chapters[i].topics[j].id,
           },
         });
-        total += count;
+        const countTheory = await Theory.count({
+          where: {
+            topicId: course.chapters[i].topics[j].id,
+          },
+        });
+        totalExercise += countExercise;
+        totalTheory += countTheory;
       }
-      newChapter.exerciseCount = total;
+      newChapter.exerciseCount = totalExercise;
+      newChapter.theoryCount = totalTheory;
       newChapters.push(newChapter);
     }
     courseToSend.chapters = newChapters;
