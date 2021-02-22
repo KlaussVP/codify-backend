@@ -1,9 +1,11 @@
 /* global jest, describe, it, expect */
 const topicsController = require('../../src/controllers/topicsController');
 const InexistingId = require('../../src/errors/InexistingId');
+const Chapter = require('../../src/models/Chapter');
 const Topic = require('../../src/models/Topic');
 
 jest.mock('../../src/models/Topic');
+jest.mock('../../src/models/Chapter');
 jest.mock('sequelize');
 
 describe('createTopic', () => {
@@ -11,10 +13,20 @@ describe('createTopic', () => {
     const name = 'Introduction';
     const chapterId = 1;
     const expectedObject = { id: 1, name, chapterId };
+    Chapter.findByPk.mockResolvedValue(true);
     Topic.create.mockResolvedValue(expectedObject);
     const topic = await topicsController.createTopic({ name, chapterId });
     expect(topic).toBe(expectedObject);
     expect(Topic.create).toHaveBeenCalledWith({ chapterId, name });
+  });
+
+  it('should throw an error', async () => {
+    const id = -1;
+    Chapter.findByPk.mockResolvedValue(null);
+
+    expect(async () => {
+      await topicsController.createTopic(id);
+    }).rejects.toThrow(InexistingId);
   });
 });
 

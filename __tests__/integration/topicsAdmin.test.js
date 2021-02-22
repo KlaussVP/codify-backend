@@ -96,70 +96,41 @@ describe('POST /admin/topics', () => {
   });
 });
 
-// describe('PUT /admin/courses/:id', () => {
-//   it('should return 200 when passed valid parameters', async () => {
-//     const course = {
-//       name: 'JavaScript21122',
-//       image: 'https://static.imasters.com.br/wp-content/uploads/2018/12/10164438/javascript.jpg',
-//       description: 'JavaScript do Zero',
-//     };
-//     const resultCourse = await db.query('INSERT INTO courses (name, image, description, "createdAt", "updatedAt") values ($1, $2, $3, $4, $5) RETURNING *', [course.name, course.image, course.description, NOW, NOW]);
+describe('PUT /admin/topics/:id', () => {
+  it('should return 200 when passed valid parameters', async () => {
+    const topic = {
+      name: 'Introduction JS',
+      chapterId,
+    };
 
-//     const courseId = resultCourse.rows[0].id;
+    const resultTopic = await db.query('INSERT INTO topics (name, "chapterId", "createdAt", "updatedAt") values ($1, $2, $3, $4) RETURNING *', [topic.name, chapterId, NOW, NOW]);
 
-//     const courseToBeEdited = {
-//       id: courseId,
-//       name: 'JavaScript EDITADO ',
-//     };
-//     const response = await agent.put(`/admin/courses/${courseId}`).set({ 'X-Access-Token': tokenAdmin }).send(courseToBeEdited);
+    const topicId = resultTopic.rows[0].id;
 
-//     expect(response.status).toBe(200);
-//     expect.objectContaining({
-//       id: courseId,
-//       name: courseToBeEdited.name,
-//       deleted: false,
-//       image: course.image,
-//       description: course.description,
-//     });
-//   });
+    const topicToBeEdited = {
+      id: topicId,
+      name: 'Introdução EDITADO ',
+    };
+    const response = await agent.put(`/admin/topics/${topicId}`).set({ 'X-Access-Token': tokenAdmin }).send(topicToBeEdited);
 
-//   it('should return 422 when passed invalid parameters', async () => {
-//     const course = {
-//       name: 'JavaScript21122',
-//       image: 'https://static.imasters.com.br/wp-content/uploads/2018/12/10164438/javascript.jpg',
-//       description: 'JavaScript do Zero',
-//     };
-//     const resultCourse = await db.query('INSERT INTO courses (name, image, description, "createdAt", "updatedAt") values ($1, $2, $3, $4, $5) RETURNING *', [course.name, course.image, course.description, NOW, NOW]);
+    expect(response.status).toBe(200);
+    expect.objectContaining({
+      id: topicId,
+      name: topicToBeEdited.name,
+      chapterId,
+    });
+  });
 
-//     const courseId = resultCourse.rows[0].id;
+  it('should return 422 when passed id smaller than 0', async () => {
+    const topicBody = {
+      name: 'Introduction JS',
+      chapterId: -9999,
+    };
 
-//     const courseToBeEdited = {
-//       id: courseId,
-//       image: 'Não é uma URL',
-//     };
-//     const response = await agent.put(`/admin/courses/${courseId}`).set({ 'X-Access-Token': tokenAdmin }).send(courseToBeEdited);
-//     expect(response.status).toBe(422);
-//   });
-
-//   it('should return 409 when name already exists', async () => {
-//     const course = {
-//       name: 'JavaScript MESMO NOME',
-//       image: 'https://static.imasters.com.br/wp-content/uploads/2018/12/10164438/javascript.jpg',
-//       description: 'JavaScript do Zero',
-//     };
-//     const resultCourse = await db.query('INSERT INTO courses (name, image, description, "createdAt", "updatedAt") values ($1, $2, $3, $4, $5) RETURNING *', [course.name, course.image, course.description, NOW, NOW]);
-
-//     const courseId = resultCourse.rows[0].id;
-
-//     const courseToBeEdited = {
-//       id: courseId,
-//       name: 'JavaScript MESMO NOME',
-//     };
-
-//     const response = await agent.put(`/admin/courses/${courseId}`).set({ 'X-Access-Token': tokenAdmin }).send(courseToBeEdited);
-//     expect(response.status).toBe(409);
-//   });
-// });
+    const response = await agent.put('/admin/topics/1').set({ 'X-Access-Token': tokenAdmin }).send(topicBody);
+    expect(response.status).toBe(422);
+  });
+});
 
 // describe('DELETE /admin/courses/:id', () => {
 //   it('should return 202 when passed valid Id', async () => {

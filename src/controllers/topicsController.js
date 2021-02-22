@@ -1,8 +1,12 @@
 const Topic = require('../models/Topic');
 const InexistingId = require('../errors/InexistingId');
+const Chapter = require('../models/Chapter');
 
 class TopicsController {
   async createTopic({ chapterId, name }) {
+    const chapter = await Chapter.findByPk(chapterId);
+    if (!chapter) throw new InexistingId();
+
     const topic = await Topic.create({ chapterId, name });
     return topic;
   }
