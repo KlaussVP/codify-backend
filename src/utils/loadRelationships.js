@@ -5,6 +5,7 @@ const Chapter = require('../models/Chapter');
 const Topic = require('../models/Topic');
 const Theory = require('../models/Theory');
 const Exercise = require('../models/Exercise');
+const TheoryUser = require('../models/TheoryUser');
 
 Course.belongsToMany(User, { through: CourseUser });
 User.belongsToMany(Course, { through: CourseUser });
@@ -15,3 +16,5 @@ Topic.hasOne(Theory, { onDelete: 'CASCADE' });
 Theory.belongsTo(Topic, { onDelete: 'CASCADE' });
 Topic.hasMany(Exercise, { onDelete: 'CASCADE' });
 Exercise.belongsTo(Topic, { onDelete: 'CASCADE' });
+Theory.belongsToMany(User, { through: TheoryUser });
+User.belongsToMany(Theory, { through: TheoryUser });
