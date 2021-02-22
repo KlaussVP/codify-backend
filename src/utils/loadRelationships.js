@@ -11,7 +11,7 @@ User.belongsToMany(Course, { through: CourseUser });
 Course.hasMany(Chapter);
 Chapter.hasMany(Topic, { onDelete: 'CASCADE' });
 Topic.belongsTo(Chapter, { onDelete: 'CASCADE' });
-Topic.hasMany(Theory, { onDelete: 'CASCADE' });
+Topic.hasOne(Theory, { onDelete: 'CASCADE' });
 Theory.belongsTo(Topic, { onDelete: 'CASCADE' });
 Topic.hasMany(Exercise, { onDelete: 'CASCADE' });
 Exercise.belongsTo(Topic, { onDelete: 'CASCADE' });
