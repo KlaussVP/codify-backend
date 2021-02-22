@@ -47,6 +47,9 @@ class TopicsController {
   }
 
   async deleteOneTopic(id) {
+    const topic = await Topic.findByPk(id);
+    if (!topic) throw new InexistingId();
+
     await Topic.destroy({
       where: { id },
     });

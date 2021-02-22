@@ -132,36 +132,29 @@ describe('PUT /admin/topics/:id', () => {
   });
 });
 
-// describe('DELETE /admin/courses/:id', () => {
-//   it('should return 202 when passed valid Id', async () => {
-//     const course = {
-//       name: 'JavaScript21122',
-//       image: 'https://static.imasters.com.br/wp-content/uploads/2018/12/10164438/javascript.jpg',
-//       description: 'JavaScript do Zero',
-//     };
+describe('DELETE /admin/topics/:id', () => {
+  it('should return 202 when passed valid Id', async () => {
+    const topic = {
+      name: 'Introduction JS',
+      chapterId,
+    };
 
-//     const resultCourse = await db.query('INSERT INTO courses (name, image, description, "createdAt", "updatedAt") values ($1, $2, $3, $4, $5) RETURNING *', [course.name, course.image, course.description, NOW, NOW]);
-//     const courseId = resultCourse.rows[0].id;
+    const resultTopic = await db.query('INSERT INTO topics (name, "chapterId", "createdAt", "updatedAt") values ($1, $2, $3, $4) RETURNING *', [topic.name, chapterId, NOW, NOW]);
 
-//     const response = await agent.delete(`/admin/courses/${courseId}`).set({ 'X-Access-Token': tokenAdmin });
+    const topicId = resultTopic.rows[0].id;
 
-//     expect(response.status).toBe(202);
-//     expect.objectContaining({
-//       id: courseId,
-//       name: course.name,
-//       deleted: true,
-//       image: course.image,
-//       description: course.description,
-//     });
-//   });
+    const response = await agent.delete(`/admin/topics/${topicId}`).set({ 'X-Access-Token': tokenAdmin });
 
-//   it('should return 403 when passed valid Id', async () => {
-//     const courseId = -999;
-//     const response = await agent.delete(`/admin/courses/${courseId}`).set({ 'X-Access-Token': tokenAdmin });
+    expect(response.status).toBe(202);
+  });
 
-//     expect(response.status).toBe(403);
-//   });
-// });
+  it('should return 403 when passed valid Id', async () => {
+    const topicId = -999;
+    const response = await agent.delete(`/admin/topics/${topicId}`).set({ 'X-Access-Token': tokenAdmin });
+
+    expect(response.status).toBe(403);
+  });
+});
 
 // describe('GET /admin/courses/:id', () => {
 //   it('should return 200 when passed valid Id', async () => {

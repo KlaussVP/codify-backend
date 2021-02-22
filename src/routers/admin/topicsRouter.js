@@ -38,7 +38,7 @@ topicRouter.get('/:id', async (req, res) => {
 
 topicRouter.delete('/:id', adminVerifyJWT, async (req, res) => {
   await topicsController.deleteOneTopic(req.params.id);
-  res.sendStatus(200);
+  res.sendStatus(202);
 });
 
 module.exports = topicRouter;
