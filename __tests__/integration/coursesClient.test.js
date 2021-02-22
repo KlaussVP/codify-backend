@@ -80,11 +80,9 @@ describe('GET /clients/courses/:id', () => {
     const resultTopic = await db.query('INSERT INTO topics (name, "chapterId", "createdAt", "updatedAt") values ($1, $2, $3, $4) RETURNING *', [chapter.topics[0].name, chapterId, Sequelize.NOW, Sequelize.NOW]);
     const topicId = resultTopic.rows[0].id;
 
-    const resultTheory = await db.query('INSERT INTO theories ("youtubeLink", "topicId", "createdAt", "updatedAt") values ($1, $2, $3, $4) RETURNING *', [theory.youtubeLink, topicId, Sequelize.NOW, Sequelize.NOW]);
-    const theoryId = resultTheory.rows[0].id;
+    await db.query('INSERT INTO theories ("youtubeLink", "topicId", "createdAt", "updatedAt") values ($1, $2, $3, $4) RETURNING *', [theory.youtubeLink, topicId, Sequelize.NOW, Sequelize.NOW]);
 
-    const resultExercise = await db.query('INSERT INTO exercises (title, "topicId", "createdAt", "updatedAt") values ($1, $2, $3, $4) RETURNING *', [exercise.title, topicId, Sequelize.NOW, Sequelize.NOW]);
-    const exerciseId = resultExercise.rows[0].id;
+    await db.query('INSERT INTO exercises (title, "topicId", "createdAt", "updatedAt") values ($1, $2, $3, $4) RETURNING *', [exercise.title, topicId, Sequelize.NOW, Sequelize.NOW]);
 
     const response = await agent.get(`/clients/courses/${courseId}`).set({ 'X-Access-Token': tokenClient });
 
@@ -99,20 +97,12 @@ describe('GET /clients/courses/:id', () => {
         {
           id: chapterId,
           name: chapter.name,
+          theoryCount: 1,
+          exerciseCount: 1,
           topics: [
             {
               id: topicId,
               name: chapter.topics.name,
-              theory: {
-                id: theoryId,
-                youtubeLink: theory.youtubeLink,
-              },
-              exercises: [
-                {
-                  id: exerciseId,
-                  title: exercise.title,
-                },
-              ],
             },
           ],
         },

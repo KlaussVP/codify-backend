@@ -89,6 +89,36 @@ class CoursesController {
   async getCourseById(id) {
     const course = await Course.findOne({
       where: { id },
+      include: [{
+        model: Chapter,
+        attributes: ['id', 'name'],
+        include: {
+          model: Topic,
+          attributes: ['id', 'name'],
+          include: [{
+            model: Theory,
+            attributes: ['id', 'youtubeLink'],
+          }, {
+            model: Exercise,
+            attributes: ['id', 'title'],
+          }],
+        },
+      }],
+      order: [
+        [Chapter, 'id', 'ASC'],
+        [Chapter, Topic, 'id', 'ASC'],
+        [Chapter, Topic, Theory, 'id', 'ASC'],
+        [Chapter, Topic, Exercise, 'id', 'ASC'],
+      ],
+    });
+    if (!course) throw new InexistingId();
+
+    return course;
+  }
+
+  async getCourseByIdAsClient(id) {
+    const course = await Course.findOne({
+      where: { id },
       attributes: ['id', 'name', 'description'],
       include: [{
         model: Chapter,
