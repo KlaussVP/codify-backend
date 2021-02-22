@@ -114,3 +114,22 @@ describe('editTopic', () => {
     }).rejects.toThrow(InexistingId);
   });
 });
+
+describe('deleteOneTopic', () => {
+  it('should return an object', async () => {
+    const id = 1;
+    Topic.findByPk.mockResolvedValue(true);
+    Topic.findByPk.mockResolvedValue(true);
+    await topicsController.deleteOneTopic(id);
+    expect(Topic.destroy).toHaveBeenCalledWith({ where: { id } });
+  });
+
+  it('should throw an error', async () => {
+    const id = -1;
+    Topic.findByPk.mockResolvedValue(null);
+
+    expect(async () => {
+      await topicsController.deleteOneTopic(id);
+    }).rejects.toThrow(InexistingId);
+  });
+});
