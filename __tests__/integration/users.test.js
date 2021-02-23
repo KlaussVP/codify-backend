@@ -179,7 +179,7 @@ describe('POST /admin/signin', () => {
   });
 });
 
-describe('POST /clients/signin', () => {
+describe('POST /clients/logout', () => {
   it('should return 200 when token exists in Redis', async () => {
     const bodyLogin = {
       email: 'test@test.com',
@@ -206,3 +206,34 @@ describe('POST /clients/signin', () => {
     expect(response.status).toBe(200);
   });
 });
+
+describe('POST /admin/logout', () => {
+  it('should return 200 when token exists in Redis', async () => {
+    const bodyAdmin = {
+      name: 'admin',
+      email: 'contato@codify.com.br',
+      password: '123456',
+      confirmPassword: '123456',
+    };
+
+    const resultUser = await db.query('INSERT INTO users (name, email, password, type, "createdAt", "updatedAt") values ($1, $2, $3, $4, $5, $6) RETURNING *', [bodyAdmin.name, bodyAdmin.email, bodyAdmin.password, 'ADMIN', 'now()', 'now()']);
+
+    const userId = resultUser.rows[0].id;
+    const token = jwt.sign({ id: userId }, process.env.SECRET, {
+      expiresIn: 86400,
+    });
+
+    const userData = {
+      id: userId,
+      token,
+      type: 'ADMIN',
+      name: bodyAdmin.name,
+    };
+
+    await sessionStore.setSession(token, userData);
+
+    const response = await agent.post('/admin/logout').set({ 'x-access-token': token });
+    expect(response.status).toBe(200);
+  });
+});
+
