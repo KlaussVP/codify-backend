@@ -3,6 +3,16 @@ const { adminVerifyJWT } = require('../../middlewares/adminMiddlewares');
 
 const topicsController = require('../../controllers/topicsController');
 
+//*************************************************************************//
+
+topicRouter.post('/bulk', adminVerifyJWT, async (req, res) => {
+  const { names, chapterId } = req.body;
+  const topics = await topicsController.createListOfTopics(names, chapterId);
+  res.send(topics);
+});
+
+//*************************************************************************//
+
 topicRouter.post('/', adminVerifyJWT, async (req, res) => {
   const topic = await topicsController.createTopic(req.body);
   res.send(topic);

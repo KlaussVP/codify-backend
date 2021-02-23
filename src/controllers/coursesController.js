@@ -160,14 +160,17 @@ class CoursesController {
   }
 
   async listStartedCourses(userId) {
-    const startedCoursesId = await CourseUser.findAll({
-      where: { userId, deleted: false },
-      attributes: ['courseId'],
+    const onGoingCourses = await Course.findAll({ 
+      include: [
+        {
+          model: CourseUser,
+          where: {
+            userId,
+            deleted: false 
+          }
+        }
+      ]
     });
-
-    if (startedCoursesId.length === 0) throw new NoCourseStarted();
-
-    const onGoingCourses = await Course.findAll({ where: { id: startedCoursesId.map((c) => c.courseId) } });
 
     return onGoingCourses;
   }
