@@ -156,6 +156,9 @@ class CoursesController {
         },
       });
     }
+
+    const ids = await this.getIdsToStartACourse(courseId);
+    return ids;
   }
 
   async getCourseByIdAsAdmin(id) {
@@ -246,6 +249,31 @@ class CoursesController {
     }
     courseToSend.chapters = newChapters;
     return courseToSend;
+  }
+
+  async getIdsToStartACourse(courseId) {
+    const chapter = await Chapter.findOne({
+      where: {
+        courseId,
+      },
+      order: [['id', 'ASC']],
+    });
+    const topic = await Topic.findOne({
+      where: {
+        chapterId: chapter.id,
+      },
+      order: [['id', 'ASC']],
+    });
+    const theory = await Theory.findOne({
+      where: {
+        topicId: topic.id,
+      },
+      order: [['id', 'ASC']],
+    });
+
+    return {
+      courseId, chapterId: chapter.id, topicId: topic.id, theoryId: theory.id,
+    };
   }
 }
 
