@@ -14,6 +14,7 @@ async function verifyJWT(req, res, next) {
   if (decodedData.id !== userData.id) throw new AuthorizationError();
 
   req.userId = userData.id;
+  req.token = userData.token;
   next();
 }
 

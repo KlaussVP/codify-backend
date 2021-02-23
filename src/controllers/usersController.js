@@ -56,6 +56,10 @@ class UsersController {
     }
     throw new AuthorizationError();
   }
+
+  async postSignOut(token) {
+    await sessionStore.deleteSession(token);
+  }
 }
 
 module.exports = new UsersController();

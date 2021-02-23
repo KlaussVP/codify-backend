@@ -34,4 +34,10 @@ async function getSession(key) {
   return false;
 }
 
-module.exports = { setSession, getSession };
+async function deleteSession(key) {
+  client = getInstance();
+  const result = await client.del(key);
+  console.log(result);
+}
+
+module.exports = { setSession, getSession, deleteSession };
