@@ -62,7 +62,7 @@ describe('editAsAdmin', () => {
       description: 'JavaScript do Zero EDITADO',
       save: () => {},
     };
-    jest.spyOn(coursesController, 'getCourseById').mockImplementationOnce(() => CourseCurrentData);
+    jest.spyOn(coursesController, 'getCourseByIdComplete').mockImplementationOnce(() => CourseCurrentData);
     jest.spyOn(coursesController, 'findCourseByName').mockImplementationOnce(() => null);
 
     const course = await coursesController.editAsAdmin(CourseNewData);
@@ -89,7 +89,7 @@ describe('editAsAdmin', () => {
       id: 1,
       name: 'JavaScript EDITADO',
     };
-    jest.spyOn(coursesController, 'getCourseById').mockImplementationOnce(() => CourseCurrentData);
+    jest.spyOn(coursesController, 'getCourseByIdComplete').mockImplementationOnce(() => CourseCurrentData);
     jest.spyOn(coursesController, 'findCourseByName').mockImplementationOnce(() => null);
 
     const course = await coursesController.editAsAdmin(CourseNewData);
@@ -111,7 +111,7 @@ describe('editAsAdmin', () => {
       image: 'https://static.imasters.com.br/wp-content/uploads/2018/12/10164438/javascript.jpg',
       description: 'JavaScript do Zero',
     };
-    jest.spyOn(coursesController, 'getCourseById').mockImplementationOnce(() => null);
+    jest.spyOn(coursesController, 'getCourseByIdComplete').mockImplementationOnce(() => null);
 
     expect(async () => {
       await coursesController.editAsAdmin(CourseData);
@@ -124,7 +124,7 @@ describe('editAsAdmin', () => {
       image: 'https://static.imasters.com.br/wp-content/uploads/2018/12/10164438/javascript.jpg',
       description: 'JavaScript do Zero',
     };
-    jest.spyOn(coursesController, 'getCourseById').mockImplementationOnce(() => CourseData);
+    jest.spyOn(coursesController, 'getCourseByIdComplete').mockImplementationOnce(() => CourseData);
     jest.spyOn(coursesController, 'findCourseByName').mockImplementationOnce(() => true);
 
     expect(async () => {
@@ -269,12 +269,12 @@ describe('listAllCoursesAsAdmin', () => {
   });
 });
 
-describe('getCourseById', () => {
+describe('getCourseByIdComplete', () => {
   it('should return an object course', async () => {
     const id = 1;
     const expectedObject = { id, name: 'JavaScript' };
     Course.findOne.mockResolvedValue(expectedObject);
-    const course = await coursesController.getCourseById(id);
+    const course = await coursesController.getCourseByIdComplete(id);
     expect(course).toBe(expectedObject);
   });
 
@@ -283,7 +283,7 @@ describe('getCourseById', () => {
     Course.findOne.mockResolvedValue(null);
 
     expect(async () => {
-      await coursesController.getCourseById(id);
+      await coursesController.getCourseByIdComplete(id);
     }).rejects.toThrow(InexistingId);
   });
 });
@@ -319,7 +319,7 @@ describe('getCourseByIdAsAdmin', () => {
     Course.findOne.mockResolvedValue(null);
 
     expect(async () => {
-      await coursesController.getCourseById(id);
+      await coursesController.getCourseByIdComplete(id);
     }).rejects.toThrow(InexistingId);
   });
 });
@@ -334,7 +334,7 @@ describe('deleteCourse', () => {
       deleted: false,
       save: () => {},
     };
-    jest.spyOn(coursesController, 'getCourseById').mockImplementationOnce(() => CourseCurrentData);
+    jest.spyOn(coursesController, 'getCourseByIdComplete').mockImplementationOnce(() => CourseCurrentData);
 
     const course = await coursesController.deleteCourse(CourseCurrentData.id);
 
@@ -357,7 +357,7 @@ describe('deleteCourse', () => {
       description: 'JavaScript do Zero',
       deleted: false,
     };
-    jest.spyOn(coursesController, 'getCourseById').mockImplementationOnce(() => null);
+    jest.spyOn(coursesController, 'getCourseByIdComplete').mockImplementationOnce(() => null);
 
     expect(async () => {
       await coursesController.deleteCourse(CourseData);

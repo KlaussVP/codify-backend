@@ -28,7 +28,7 @@ class CoursesController {
   async editAsAdmin({
     id, name, image, description,
   }) {
-    const course = await this.getCourseById(id);
+    const course = await this.getCourseByIdComplete(id);
     if (!course) throw new InexistingId();
 
     const coursesExists = await this.findCourseByName(name);
@@ -43,7 +43,7 @@ class CoursesController {
   }
 
   async deleteCourse(id) {
-    const course = await this.getCourseById(id);
+    const course = await this.getCourseByIdComplete(id);
     if (!course) throw new InexistingId();
 
     course.deleted = true;
@@ -86,7 +86,7 @@ class CoursesController {
     return coursesArrayAdminFormat;
   }
 
-  async getCourseById(id) {
+  async getCourseByIdComplete(id) {
     const course = await Course.findOne({
       where: { id },
       include: [{
@@ -116,7 +116,7 @@ class CoursesController {
     return course;
   }
 
-  async getCourseByIdAsClient(id) {
+  async getCourseById(id) {
     const course = await Course.findOne({
       where: { id },
       attributes: ['id', 'name', 'description'],
