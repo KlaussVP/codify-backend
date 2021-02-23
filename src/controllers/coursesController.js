@@ -98,6 +98,7 @@ class CoursesController {
   async getCourseByIdComplete(id, userId) {
     const course = await Course.findOne({
       where: { id },
+      attributes: ['id', 'name', 'image', 'description'],
       include: [{
         model: Chapter,
         attributes: ['id', 'name'],
@@ -142,7 +143,7 @@ class CoursesController {
   async getCourseWithNumberActivities(id) {
     const course = await Course.findOne({
       where: { id },
-      attributes: ['id', 'name', 'description'],
+      attributes: ['id', 'name', 'image', 'description'],
       include: [{
         model: Chapter,
         attributes: ['id', 'name'],
@@ -241,6 +242,7 @@ class CoursesController {
       id: course.id,
       name: course.name,
       description: course.description,
+      image: course.image,
     };
     for (let i = 0; i < course.chapters.length; i++) {
       const newChapter = {
