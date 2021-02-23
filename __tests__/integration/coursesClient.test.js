@@ -187,7 +187,7 @@ describe('GET /clients/courses/:id/activities', () => {
   });
 
   it('should return status 403 when passed invalid id', async () => {
-    const response = await agent.get('/clients/courses/1').set({ 'X-Access-Token': tokenClient });
+    const response = await agent.get('/clients/courses/1/activities').set({ 'X-Access-Token': tokenClient });
     expect(response.status).toBe(403);
   });
 });
