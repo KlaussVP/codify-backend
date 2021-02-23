@@ -27,4 +27,9 @@ router.post('/:id', verifyJWT, async (req, res) => {
   res.send(ids);
 });
 
+router.get('/:id/activities', verifyJWT, async (req, res) => {
+  const course = await coursesController.getCourseByIdComplete(req.params.id, req.userId);
+  res.send(course);
+});
+
 module.exports = router;

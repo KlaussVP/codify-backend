@@ -21,3 +21,5 @@ Theory.belongsToMany(User, { through: TheoryUser });
 User.belongsToMany(Theory, { through: TheoryUser });
 Exercise.belongsToMany(User, { through: ExerciseUser });
 User.belongsToMany(Exercise, { through: ExerciseUser });
+Theory.hasMany(TheoryUser);
+Exercise.hasMany(ExerciseUser);

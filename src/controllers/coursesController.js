@@ -1,4 +1,3 @@
-const { Sequelize } = require('sequelize');
 const Course = require('../models/Course');
 const ConflictError = require('../errors/ConflictError');
 const InexistingId = require('../errors/InexistingId');
@@ -8,6 +7,8 @@ const Chapter = require('../models/Chapter');
 const CourseUser = require('../models/CourseUser');
 const Theory = require('../models/Theory');
 const Exercise = require('../models/Exercise');
+const TheoryUser = require('../models/TheoryUser');
+const ExerciseUser = require('../models/ExerciseUser');
 
 class CoursesController {
   async findCourseByName(name) {
@@ -94,7 +95,7 @@ class CoursesController {
     return course;
   }
 
-  async getCourseByIdComplete(id) {
+  async getCourseByIdComplete(id, userId) {
     const course = await Course.findOne({
       where: { id },
       include: [{
@@ -105,9 +106,23 @@ class CoursesController {
           attributes: ['id', 'name'],
           include: [{
             model: Theory,
+            include: {
+              model: TheoryUser,
+              where: {
+                userId,
+              },
+              required: false,
+            },
             attributes: ['id', 'youtubeLink'],
           }, {
             model: Exercise,
+            include: {
+              model: ExerciseUser,
+              where: {
+                userId,
+              },
+              required: false,
+            },
             attributes: ['id', 'title'],
           }],
         },
