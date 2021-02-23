@@ -5,8 +5,15 @@ const ConflictError = require('../../src/errors/ConflictError');
 const Course = require('../../src/models/Course');
 const Theory = require('../../src/models/Theory');
 const Exercise = require('../../src/models/Exercise');
+const Chapter = require('../../src/models/Chapter');
+const Topic = require('../../src/models/Topic');
 
 jest.mock('../../src/models/Course');
+jest.mock('../../src/models/Theory');
+jest.mock('../../src/models/Exercise');
+jest.mock('../../src/models/Chapter');
+jest.mock('../../src/models/Topic');
+
 jest.mock('sequelize');
 
 describe('createAsAdmin', () => {
@@ -467,5 +474,36 @@ describe('getNumberOfActivities', () => {
     Exercise.count.mockResolvedValue(2);
     const result = await coursesController.getNumberOfActivities(course);
     expect(result).toMatchObject(expectedObject);
+  });
+});
+
+describe('getIdsToStartACourse', () => {
+  it('should return an object with courseId, chapterId, topicId and theoryId', async () => {
+    const id = 1;
+
+    const expectedObject = {
+      courseId: id,
+      chapterId: 2,
+      topicId: 3,
+      theoryId: 4,
+    };
+
+    Chapter.findOne.mockResolvedValue({ id: expectedObject.chapterId });
+    Topic.findOne.mockResolvedValue({ id: expectedObject.topicId });
+    Theory.findOne.mockResolvedValue({ id: expectedObject.theoryId });
+
+    const result = await coursesController.getIdsToStartACourse(id);
+
+    expect(result).toMatchObject(expectedObject);
+  });
+
+  it('should throw an error', async () => {
+    const id = 1;
+
+    Chapter.findOne.mockResolvedValue(null);
+
+    expect(async () => {
+      await coursesController.getIdsToStartACourse(id);
+    }).rejects.toThrow(InexistingId);
   });
 });

@@ -258,18 +258,26 @@ class CoursesController {
       },
       order: [['id', 'ASC']],
     });
+
+    if (!chapter) throw new InexistingId();
+
     const topic = await Topic.findOne({
       where: {
         chapterId: chapter.id,
       },
       order: [['id', 'ASC']],
     });
+
+    if (!topic) throw new InexistingId();
+
     const theory = await Theory.findOne({
       where: {
         topicId: topic.id,
       },
       order: [['id', 'ASC']],
     });
+
+    if (!theory) throw new InexistingId();
 
     return {
       courseId, chapterId: chapter.id, topicId: topic.id, theoryId: theory.id,
