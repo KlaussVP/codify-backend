@@ -3,11 +3,10 @@ const dotenv = require('dotenv');
 
 dotenv.config();
 const { Pool } = require('pg');
-const { NOW, Sequelize } = require('sequelize');
+const { Sequelize } = require('sequelize');
 const supertest = require('supertest');
 const jwt = require('jsonwebtoken');
 const app = require('../../src/app');
-const verifyJWT = require('../../src/middlewares/authMiddleware');
 const sequelize = require('../../src/utils/database');
 
 const agent = supertest(app);
