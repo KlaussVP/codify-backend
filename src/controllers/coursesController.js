@@ -218,7 +218,11 @@ class CoursesController {
 
     if (startedCoursesId.length === 0) throw new NoCourseStarted();
 
-    const onGoingCourses = await Course.findAll({ where: { id: startedCoursesId.map((c) => c.courseId) } });
+    const onGoingCourses = await Course.findAll({
+      where: {
+        id: startedCoursesId.map((c) => c.courseId),
+      },
+    });
 
     return onGoingCourses;
   }
