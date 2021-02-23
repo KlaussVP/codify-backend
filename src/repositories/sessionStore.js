@@ -36,8 +36,7 @@ async function getSession(key) {
 
 async function deleteSession(key) {
   client = getInstance();
-  const result = await client.del(key);
-  console.log(result);
+  await client.del(key);
 }
 
 module.exports = { setSession, getSession, deleteSession };

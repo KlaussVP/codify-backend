@@ -17,8 +17,8 @@ router.post('/signin', clientsMiddlewares.signInMiddleware, async (req, res) => 
 });
 
 router.post('/logout', verifyJWT, async (req, res) => {
-  const user = await usersController.postSignOut(req.token);
-  return res.status(200).send(user);
+  await usersController.postSignOut(req.token);
+  return res.sendStatus(200);
 });
 
 module.exports = router;
