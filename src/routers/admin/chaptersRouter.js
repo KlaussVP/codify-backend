@@ -8,7 +8,7 @@ chapterRouter.post('/', adminVerifyJWT, async (req, res) => {
   if (validation.error) return res.status(422).send({ error: 'Verifique seus dados' });
 
   const chapter = await chaptersController.createChapter(req.body);
-  return res.send(chapter);
+  return res.status(201).send(chapter);
 });
 
 chapterRouter.put('/:id', adminVerifyJWT, async (req, res) => {
@@ -27,16 +27,6 @@ chapterRouter.get('/', async (req, res) => {
     .send(chapters);
 });
 
-//*********************Verificar permanencia da rota*************************//
-
-chapterRouter.get('/:courseId', adminVerifyJWT, async (req, res) => {
-  const chapters = await chaptersController.getChaptersByCourse(req.params.courseId);
-  return res.send(chapters);
-});
-
-//*************************************************************************//
-
-
 chapterRouter.get('/:id', async (req, res) => {
   const chapter = await chaptersController.getChapterByIdAsAdmin(req.params.id);
   return res
@@ -44,16 +34,6 @@ chapterRouter.get('/:id', async (req, res) => {
     .set('X-Total-Count', 1)
     .send(chapter);
 });
-
-
-//*********************Verificar permanencia da rota*************************//
-
-chapterRouter.delete('/:courseId', adminVerifyJWT, async (req, res) => {
-  await chaptersController.deleteChaptersFromCourse(req.params.courseId);
-  return res.sendStatus(202);
-});
-
-//*************************************************************************//
 
 chapterRouter.delete('/:id', adminVerifyJWT, async (req, res) => {
   await chaptersController.deleteOneChapter(req.params.id);

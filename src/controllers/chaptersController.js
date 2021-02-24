@@ -30,23 +30,6 @@ class ChaptersController {
     });
   }
 
-  // async createListOfChapters(chapters, courseId) {
-  //   const arrayChapters = chapters.map((c) => ({ name: c.name, courseId }));
-  //   const chaptersCreated = await Chapter.bulkCreate(arrayChapters);
-
-  //   this.addAllTopicsOfOneCourse(chapters, chaptersCreated);
-
-  //   return arrayChapters;
-  // }
-
-  // async addAllTopicsOfOneCourse(arrayChaptersWithTopics, arrayChaptersWithIds) {
-  //   for (let i = 0; i < arrayChaptersWithTopics.length; i++) {
-  //     const courseId = arrayChaptersWithIds[i].id;
-  //     const topicsToBeAdded = arrayChaptersWithTopics[i].topics;
-  //     await topicsController.createListOfTopics(topicsToBeAdded, courseId);
-  //   }
-  // }
-
   async deleteChaptersFromCourse(courseId) {
     const course = await Course.findByPk(courseId);
     if (!course) throw new InexistingId();
