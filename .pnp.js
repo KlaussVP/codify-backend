@@ -50,9 +50,11 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["jsonwebtoken", "npm:8.5.1"],
             ["nodemon", "npm:2.0.7"],
             ["pg", "virtual:78c1242b5077d00fb13d0911fafb5bc21212de729efa4669e98e1fdf6cea7a34028f748122475d3ee7248a61998e515ca5199483617ec11f7d48f93f9ea2eeee#npm:8.5.1"],
+            ["promise-redis", "npm:0.0.5"],
             ["sequelize", "virtual:78c1242b5077d00fb13d0911fafb5bc21212de729efa4669e98e1fdf6cea7a34028f748122475d3ee7248a61998e515ca5199483617ec11f7d48f93f9ea2eeee#npm:6.5.0"],
             ["sequelize-cli", "npm:6.2.0"],
-            ["supertest", "npm:6.1.3"]
+            ["supertest", "npm:6.1.3"],
+            ["uuid", "npm:8.3.2"]
           ],
           "linkType": "SOFT",
         }]
@@ -261,7 +263,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/@babel-parser-npm-7.12.17-05e73cb9a8-3341099836.zip/node_modules/@babel/parser/",
           "packageDependencies": [
             ["@babel/parser", "npm:7.12.17"],
-            ["@babel/types", "npm:7.12.17"]
+            ["@babel/types", "npm:7.13.0"]
           ],
           "linkType": "HARD",
         }]
@@ -577,6 +579,16 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/@babel-types-npm-7.12.17-cd0577c0b5-31886bfea9.zip/node_modules/@babel/types/",
           "packageDependencies": [
             ["@babel/types", "npm:7.12.17"],
+            ["@babel/helper-validator-identifier", "npm:7.12.11"],
+            ["lodash", "npm:4.17.20"],
+            ["to-fast-properties", "npm:2.0.0"]
+          ],
+          "linkType": "HARD",
+        }],
+        ["npm:7.13.0", {
+          "packageLocation": "./.yarn/cache/@babel-types-npm-7.13.0-737e1b9971-a47357647a.zip/node_modules/@babel/types/",
+          "packageDependencies": [
+            ["@babel/types", "npm:7.13.0"],
             ["@babel/helper-validator-identifier", "npm:7.12.11"],
             ["lodash", "npm:4.17.20"],
             ["to-fast-properties", "npm:2.0.0"]
@@ -2077,9 +2089,11 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["jsonwebtoken", "npm:8.5.1"],
             ["nodemon", "npm:2.0.7"],
             ["pg", "virtual:78c1242b5077d00fb13d0911fafb5bc21212de729efa4669e98e1fdf6cea7a34028f748122475d3ee7248a61998e515ca5199483617ec11f7d48f93f9ea2eeee#npm:8.5.1"],
+            ["promise-redis", "npm:0.0.5"],
             ["sequelize", "virtual:78c1242b5077d00fb13d0911fafb5bc21212de729efa4669e98e1fdf6cea7a34028f748122475d3ee7248a61998e515ca5199483617ec11f7d48f93f9ea2eeee#npm:6.5.0"],
             ["sequelize-cli", "npm:6.2.0"],
-            ["supertest", "npm:6.1.3"]
+            ["supertest", "npm:6.1.3"],
+            ["uuid", "npm:8.3.2"]
           ],
           "linkType": "SOFT",
         }]
@@ -2600,6 +2614,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/delegates-npm-1.0.0-9b1942d75f-7459e34d29.zip/node_modules/delegates/",
           "packageDependencies": [
             ["delegates", "npm:1.0.0"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["denque", [
+        ["npm:1.5.0", {
+          "packageLocation": "./.yarn/cache/denque-npm-1.5.0-fd3ca7b46a-3564778cda.zip/node_modules/denque/",
+          "packageDependencies": [
+            ["denque", "npm:1.5.0"]
           ],
           "linkType": "HARD",
         }]
@@ -7051,6 +7074,17 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD",
         }]
       ]],
+      ["promise-redis", [
+        ["npm:0.0.5", {
+          "packageLocation": "./.yarn/cache/promise-redis-npm-0.0.5-d6dc567e1e-0871ee02e6.zip/node_modules/promise-redis/",
+          "packageDependencies": [
+            ["promise-redis", "npm:0.0.5"],
+            ["redis", "npm:3.0.2"],
+            ["redis-commands", "npm:1.7.0"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
       ["prompts", [
         ["npm:2.4.0", {
           "packageLocation": "./.yarn/cache/prompts-npm-2.4.0-44f1e10a9a-fd375679ad.zip/node_modules/prompts/",
@@ -7282,6 +7316,47 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageDependencies": [
             ["readdirp", "npm:3.5.0"],
             ["picomatch", "npm:2.2.2"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["redis", [
+        ["npm:3.0.2", {
+          "packageLocation": "./.yarn/cache/redis-npm-3.0.2-488560e37e-74858b9f5a.zip/node_modules/redis/",
+          "packageDependencies": [
+            ["redis", "npm:3.0.2"],
+            ["denque", "npm:1.5.0"],
+            ["redis-commands", "npm:1.7.0"],
+            ["redis-errors", "npm:1.2.0"],
+            ["redis-parser", "npm:3.0.0"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["redis-commands", [
+        ["npm:1.7.0", {
+          "packageLocation": "./.yarn/cache/redis-commands-npm-1.7.0-528f61f9d8-cbf5d33768.zip/node_modules/redis-commands/",
+          "packageDependencies": [
+            ["redis-commands", "npm:1.7.0"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["redis-errors", [
+        ["npm:1.2.0", {
+          "packageLocation": "./.yarn/cache/redis-errors-npm-1.2.0-a81fd9b0f1-b260bb64a1.zip/node_modules/redis-errors/",
+          "packageDependencies": [
+            ["redis-errors", "npm:1.2.0"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["redis-parser", [
+        ["npm:3.0.0", {
+          "packageLocation": "./.yarn/cache/redis-parser-npm-3.0.0-7ebe40abcb-45dbcb05be.zip/node_modules/redis-parser/",
+          "packageDependencies": [
+            ["redis-parser", "npm:3.0.0"],
+            ["redis-errors", "npm:1.2.0"]
           ],
           "linkType": "HARD",
         }]

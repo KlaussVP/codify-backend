@@ -356,7 +356,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/types@npm:^7.0.0, @babel/types@npm:^7.12.13, @babel/types@npm:^7.12.17, @babel/types@npm:^7.3.0, @babel/types@npm:^7.3.3, @babel/types@npm:^7.8.3":
+"@babel/types@npm:^7.0.0, @babel/types@npm:^7.12.13, @babel/types@npm:^7.12.17, @babel/types@npm:^7.3.0, @babel/types@npm:^7.3.3":
   version: 7.12.17
   resolution: "@babel/types@npm:7.12.17"
   dependencies:
@@ -364,6 +364,17 @@ __metadata:
     lodash: ^4.17.19
     to-fast-properties: ^2.0.0
   checksum: 31886bfea9c34d2d019722888d944fe5e33495826ae677ea465f0615294925a08eb4059d34b29f2808461cde85841b93ca61cdcd747fa45054a64f6b33fa2862
+  languageName: node
+  linkType: hard
+
+"@babel/types@npm:^7.8.3":
+  version: 7.13.0
+  resolution: "@babel/types@npm:7.13.0"
+  dependencies:
+    "@babel/helper-validator-identifier": ^7.12.11
+    lodash: ^4.17.19
+    to-fast-properties: ^2.0.0
+  checksum: a47357647a92c08ee2f5059210d37fd7fe190e8d4ef71dd97ba61c6ca7b7e979660bc8ba00fdc51249c037199b634dd984fde8d7a622fdd5e3e2161fe65e94c3
   languageName: node
   linkType: hard
 
@@ -1668,9 +1679,11 @@ __metadata:
     jsonwebtoken: ^8.5.1
     nodemon: ^2.0.7
     pg: ^8.5.1
+    promise-redis: ^0.0.5
     sequelize: ^6.5.0
     sequelize-cli: ^6.2.0
     supertest: ^6.1.3
+    uuid: ^8.3.2
   languageName: unknown
   linkType: soft
 
@@ -2088,6 +2101,13 @@ __metadata:
   version: 1.0.0
   resolution: "delegates@npm:1.0.0"
   checksum: 7459e34d29cadd9bfd340728bfcc70ea96da5d940fb197298b523f805822680e583cba3ec34d36a18004325f1ec9de55e202a92b414d01db18cd87bb8a2ae5bd
+  languageName: node
+  linkType: hard
+
+"denque@npm:^1.4.1":
+  version: 1.5.0
+  resolution: "denque@npm:1.5.0"
+  checksum: 3564778cda60c7dee3f1d71e397e50e6b39a8c06118aab9843b9396cb621b3191ab56d13de5237b8beee2b87bec485e8239c58ca3133472d2d1eaa3d2d518022
   languageName: node
   linkType: hard
 
@@ -6054,6 +6074,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"promise-redis@npm:^0.0.5":
+  version: 0.0.5
+  resolution: "promise-redis@npm:0.0.5"
+  dependencies:
+    redis: "*"
+    redis-commands: "*"
+  checksum: 0871ee02e6e52511654872c27001568eb9366971bb30e305d07d1d3cd5ee28aed8e4bcf14a299c92b1bb12ba67e59f8664255750a6dad8135c98f662c018d9fa
+  languageName: node
+  linkType: hard
+
 "prompts@npm:^2.0.1":
   version: 2.4.0
   resolution: "prompts@npm:2.4.0"
@@ -6265,6 +6295,41 @@ __metadata:
   dependencies:
     picomatch: ^2.2.1
   checksum: a64fe5606937d9655252230003362d95da05dbfd3baecedb4bb8c1bc0df497d051a192f9b75345c944e58a0b362c68349be602d6dbf05d03770e510b35a9f80f
+  languageName: node
+  linkType: hard
+
+"redis-commands@npm:*, redis-commands@npm:^1.5.0":
+  version: 1.7.0
+  resolution: "redis-commands@npm:1.7.0"
+  checksum: cbf5d33768b1c8e1001e2a7ffdaeb6ef830c538ef812d803a1c5e6038cf03482cf0a22b29eadf1182aa02a522331826e3af0967ae75fa7883da8a139ad2fc77b
+  languageName: node
+  linkType: hard
+
+"redis-errors@npm:^1.0.0, redis-errors@npm:^1.2.0":
+  version: 1.2.0
+  resolution: "redis-errors@npm:1.2.0"
+  checksum: b260bb64a1c8523d32a56701681ac3e5cc6bb0a4eb09f1d30729ebba397021d274216ff189909c08fe3c6b706ec8b74948e20ea410b6f69d31b35bda3fb82a59
+  languageName: node
+  linkType: hard
+
+"redis-parser@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "redis-parser@npm:3.0.0"
+  dependencies:
+    redis-errors: ^1.0.0
+  checksum: 45dbcb05bed2c80a4aac288bbefed2347ecf3508c24d542ab42efa21fd63b5aaca4208b206f05818835a2ac43abe09250c2638c11c3b0b66a5d67e83985e350f
+  languageName: node
+  linkType: hard
+
+"redis@npm:*":
+  version: 3.0.2
+  resolution: "redis@npm:3.0.2"
+  dependencies:
+    denque: ^1.4.1
+    redis-commands: ^1.5.0
+    redis-errors: ^1.2.0
+    redis-parser: ^3.0.0
+  checksum: 74858b9f5ae3859ed55435d413315ab3f911aa483a3817c0d1ebe46b966c7061f43ea0d3d5170b540ff4a1f15edd5ea2bc0e107d0e6e516c4d61ea489460f5dc
   languageName: node
   linkType: hard
 
@@ -7688,7 +7753,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"uuid@npm:^8.1.0, uuid@npm:^8.3.0":
+"uuid@npm:^8.1.0, uuid@npm:^8.3.0, uuid@npm:^8.3.2":
   version: 8.3.2
   resolution: "uuid@npm:8.3.2"
   bin:

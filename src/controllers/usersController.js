@@ -1,5 +1,6 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const sessionStore = require('../repositories/sessionStore');
 
 const ConflictError = require('../errors/ConflictError');
 const AuthorizationError = require('../errors/AuthorizationError');
@@ -33,8 +34,8 @@ class UsersController {
     const user = await this.findUserByEmail(email);
 
     if (!user) throw new AuthorizationError();
-
     if (type !== user.type) throw new AuthorizationError();
+
     const checkPassword = (type === 'CLIENT')
       ? bcrypt.compareSync(password, user.password)
       : password === user.password;
@@ -45,13 +46,19 @@ class UsersController {
         expiresIn: 86400,
       });
       const userData = {
+        id,
         token,
         type: user.type,
         name: user.name,
       };
+      await sessionStore.setSession(token, userData);
       return userData;
     }
     throw new AuthorizationError();
+  }
+
+  async postSignOut(token) {
+    await sessionStore.deleteSession(token);
   }
 }
 

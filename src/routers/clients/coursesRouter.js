@@ -2,7 +2,7 @@ const router = require('express').Router();
 const coursesController = require('../../controllers/coursesController');
 const verifyJWT = require('../../middlewares/authMiddleware');
 
-router.get('/', async (req, res) => {
+router.get('/', verifyJWT, async (req, res) => {
   const courses = await coursesController.listAllCourses();
   res.send(courses);
 });
@@ -17,7 +17,7 @@ router.get('/last-accessed', verifyJWT, async (req, res) => {
   return res.send(course);
 });
 
-router.get('/:id', async (req, res) => {
+router.get('/:id', verifyJWT, async (req, res) => {
   const course = await coursesController.getCourseById(req.params.id);
   res.send(course);
 });

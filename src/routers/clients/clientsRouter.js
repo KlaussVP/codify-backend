@@ -1,4 +1,5 @@
 const express = require('express');
+const verifyJWT = require('../../middlewares/authMiddleware');
 
 const router = express.Router();
 
@@ -13,6 +14,11 @@ router.post('/signup', clientsMiddlewares.signUpMiddleware, async (req, res) => 
 router.post('/signin', clientsMiddlewares.signInMiddleware, async (req, res) => {
   const user = await usersController.postSignIn(req.body, 'CLIENT');
   return res.status(200).send(user);
+});
+
+router.post('/logout', verifyJWT, async (req, res) => {
+  await usersController.postSignOut(req.token);
+  return res.sendStatus(200);
 });
 
 module.exports = router;
