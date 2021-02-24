@@ -7,6 +7,8 @@ const Chapter = require('../models/Chapter');
 const CourseUser = require('../models/CourseUser');
 const Theory = require('../models/Theory');
 const Exercise = require('../models/Exercise');
+const TheoryUser = require('../models/TheoryUser');
+const ExerciseUser = require('../models/ExerciseUser');
 
 class CoursesController {
   async findCourseByName(name) {
@@ -86,8 +88,17 @@ class CoursesController {
   }
 
   async getCourseById(id) {
+    const course = await Course.findByPk(id);
+
+    if (!course) throw new InexistingId();
+
+    return course;
+  }
+
+  async getCourseByIdComplete(id, userId) {
     const course = await Course.findOne({
       where: { id },
+      attributes: ['id', 'name', 'image', 'description'],
       include: [{
         model: Chapter,
         attributes: ['id', 'name'],
@@ -96,10 +107,24 @@ class CoursesController {
           attributes: ['id', 'name'],
           include: [{
             model: Theory,
-            attributes: ['id', 'youtubeLink', 'done'],
+            include: {
+              model: TheoryUser,
+              where: {
+                userId,
+              },
+              required: false,
+            },
+            attributes: ['id', 'youtubeLink'],
           }, {
             model: Exercise,
-            attributes: ['id', 'title', 'done'],
+            include: {
+              model: ExerciseUser,
+              where: {
+                userId,
+              },
+              required: false,
+            },
+            attributes: ['id', 'title'],
           }],
         },
       }],
@@ -113,6 +138,29 @@ class CoursesController {
     if (!course) throw new InexistingId();
 
     return course;
+  }
+
+  async getCourseWithNumberActivities(id) {
+    const course = await Course.findOne({
+      where: { id },
+      attributes: ['id', 'name', 'image', 'description'],
+      include: [{
+        model: Chapter,
+        attributes: ['id', 'name'],
+        include: [{
+          model: Topic,
+          attributes: ['id', 'name'],
+        }],
+        order: [
+          [Chapter, 'id', 'ASC'],
+        ],
+      }],
+    });
+    if (!course) throw new InexistingId();
+
+    const courseToSend = await this.getNumberOfActivities(course);
+
+    return courseToSend;
   }
 
   async startOrContinueCourse(courseId, userId) {
@@ -132,6 +180,9 @@ class CoursesController {
         },
       });
     }
+
+    const ids = await this.getIdsToStartACourse(courseId);
+    return ids;
   }
 
   async getCourseByIdAsAdmin(id) {
@@ -186,6 +237,79 @@ class CoursesController {
     const lastCourse = await Course.findByPk(lastAccessed.courseId);
 
     return lastCourse;
+  }
+
+  async getNumberOfActivities(course) {
+    const newChapters = [];
+    const courseToSend = {
+      id: course.id,
+      name: course.name,
+      description: course.description,
+      image: course.image,
+    };
+    for (let i = 0; i < course.chapters.length; i++) {
+      const newChapter = {
+        id: course.chapters[i].id,
+        name: course.chapters[i].name,
+        topics: course.chapters[i].topics,
+        theoryCount: 0,
+        exerciseCount: 0,
+      };
+      let totalTheory = 0;
+      let totalExercise = 0;
+      for (let j = 0; j < course.chapters[i].topics.length; j++) {
+        const countExercise = await Exercise.count({
+          where: {
+            topicId: course.chapters[i].topics[j].id,
+          },
+        });
+        const countTheory = await Theory.count({
+          where: {
+            topicId: course.chapters[i].topics[j].id,
+          },
+        });
+        totalExercise += countExercise;
+        totalTheory += countTheory;
+      }
+      newChapter.exerciseCount = totalExercise;
+      newChapter.theoryCount = totalTheory;
+      newChapters.push(newChapter);
+    }
+    courseToSend.chapters = newChapters;
+    return courseToSend;
+  }
+
+  async getIdsToStartACourse(courseId) {
+    const chapter = await Chapter.findOne({
+      where: {
+        courseId,
+      },
+      order: [['id', 'ASC']],
+    });
+
+    if (!chapter) throw new InexistingId();
+
+    const topic = await Topic.findOne({
+      where: {
+        chapterId: chapter.id,
+      },
+      order: [['id', 'ASC']],
+    });
+
+    if (!topic) throw new InexistingId();
+
+    const theory = await Theory.findOne({
+      where: {
+        topicId: topic.id,
+      },
+      order: [['id', 'ASC']],
+    });
+
+    if (!theory) throw new InexistingId();
+
+    return {
+      courseId, chapterId: chapter.id, topicId: topic.id, theoryId: theory.id,
+    };
   }
 }
 

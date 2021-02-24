@@ -3,8 +3,17 @@ const coursesController = require('../../src/controllers/coursesController');
 const InexistingId = require('../../src/errors/InexistingId');
 const ConflictError = require('../../src/errors/ConflictError');
 const Course = require('../../src/models/Course');
+const Theory = require('../../src/models/Theory');
+const Exercise = require('../../src/models/Exercise');
+const Chapter = require('../../src/models/Chapter');
+const Topic = require('../../src/models/Topic');
 
 jest.mock('../../src/models/Course');
+jest.mock('../../src/models/Theory');
+jest.mock('../../src/models/Exercise');
+jest.mock('../../src/models/Chapter');
+jest.mock('../../src/models/Topic');
+
 jest.mock('sequelize');
 
 describe('createAsAdmin', () => {
@@ -269,12 +278,13 @@ describe('listAllCoursesAsAdmin', () => {
   });
 });
 
-describe('getCourseById', () => {
+describe('getCourseWithNumberActivities', () => {
   it('should return an object course', async () => {
     const id = 1;
     const expectedObject = { id, name: 'JavaScript' };
     Course.findOne.mockResolvedValue(expectedObject);
-    const course = await coursesController.getCourseById(id);
+    jest.spyOn(coursesController, 'getNumberOfActivities').mockImplementationOnce(() => expectedObject);
+    const course = await coursesController.getCourseWithNumberActivities(id);
     expect(course).toBe(expectedObject);
   });
 
@@ -283,7 +293,26 @@ describe('getCourseById', () => {
     Course.findOne.mockResolvedValue(null);
 
     expect(async () => {
-      await coursesController.getCourseById(id);
+      await coursesController.getCourseWithNumberActivities(id);
+    }).rejects.toThrow(InexistingId);
+  });
+});
+
+describe('getCourseByIdComplete', () => {
+  it('should return an object course', async () => {
+    const id = 1;
+    const expectedObject = { id, name: 'JavaScript' };
+    Course.findOne.mockResolvedValue(expectedObject);
+    const course = await coursesController.getCourseByIdComplete(id);
+    expect(course).toBe(expectedObject);
+  });
+
+  it('should throw an error', async () => {
+    const id = -1;
+    Course.findOne.mockResolvedValue(null);
+
+    expect(async () => {
+      await coursesController.getCourseByIdComplete(id);
     }).rejects.toThrow(InexistingId);
   });
 });
@@ -361,6 +390,120 @@ describe('deleteCourse', () => {
 
     expect(async () => {
       await coursesController.deleteCourse(CourseData);
+    }).rejects.toThrow(InexistingId);
+  });
+});
+
+describe('getNumberOfActivities', () => {
+  it('should return a course with number of theories and exercises', async () => {
+    const course = {
+      id: 1,
+      name: 'JavaScript',
+      description: 'Test',
+      chapters: [
+        {
+          id: 1,
+          name: 'Introduction',
+          topics: [
+            {
+              id: 1,
+              name: 'First step',
+            },
+            {
+              id: 2,
+              name: 'Second step',
+            },
+          ],
+        },
+        {
+          id: 2,
+          name: 'Introduction',
+          topics: [
+            {
+              id: 3,
+              name: 'First step',
+            },
+            {
+              id: 4,
+              name: 'Second step',
+            },
+          ],
+        },
+      ],
+    };
+    const expectedObject = {
+      id: 1,
+      name: 'JavaScript',
+      description: 'Test',
+      chapters: [
+        {
+          exerciseCount: 4,
+          id: 1,
+          name: 'Introduction',
+          theoryCount: 2,
+          topics: [
+            {
+              id: 1,
+              name: 'First step',
+            },
+            {
+              id: 2,
+              name: 'Second step',
+            },
+          ],
+        },
+        {
+          exerciseCount: 4,
+          id: 2,
+          name: 'Introduction',
+          theoryCount: 2,
+          topics: [
+            {
+              id: 3,
+              name: 'First step',
+            },
+            {
+              id: 4,
+              name: 'Second step',
+            },
+          ],
+        },
+      ],
+    };
+    Theory.count.mockResolvedValue(1);
+    Exercise.count.mockResolvedValue(2);
+    const result = await coursesController.getNumberOfActivities(course);
+    expect(result).toMatchObject(expectedObject);
+  });
+});
+
+describe('getIdsToStartACourse', () => {
+  it('should return an object with courseId, chapterId, topicId and theoryId', async () => {
+    const id = 1;
+
+    const expectedObject = {
+      courseId: id,
+      chapterId: 2,
+      topicId: 3,
+      theoryId: 4,
+    };
+
+    Chapter.findOne.mockResolvedValue({ id: expectedObject.chapterId });
+    Topic.findOne.mockResolvedValue({ id: expectedObject.topicId });
+    Theory.findOne.mockResolvedValue({ id: expectedObject.theoryId });
+
+    const result = await coursesController.getIdsToStartACourse(id);
+
+    expect(result).toMatchObject(expectedObject);
+  });
+
+  it('should throw an error', async () => {
+    const id = 1;
+
+    Chapter.findOne.mockResolvedValue(null);
+
+    expect(async () => {
+      await coursesController.getIdsToStartACourse(id);
     }).rejects.toThrow(InexistingId);
   });
 });
