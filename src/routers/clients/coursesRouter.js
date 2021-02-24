@@ -17,14 +17,19 @@ router.get('/last-accessed', verifyJWT, async (req, res) => {
   return res.send(course);
 });
 
-router.get('/:id', async (req, res) => {
-  const course = await coursesController.getCourseById(req.params.id);
+router.get('/:id', verifyJWT, async (req, res) => {
+  const course = await coursesController.getCourseWithNumberActivities(req.params.id);
   res.send(course);
 });
 
 router.post('/:id', verifyJWT, async (req, res) => {
-  await coursesController.startOrContinueCourse(req.params.id, req.userId);
-  res.sendStatus(200);
+  const ids = await coursesController.startOrContinueCourse(req.params.id, req.userId);
+  res.send(ids);
+});
+
+router.get('/:id/activities', verifyJWT, async (req, res) => {
+  const course = await coursesController.getCourseByIdComplete(req.params.id, req.userId);
+  res.send(course);
 });
 
 module.exports = router;

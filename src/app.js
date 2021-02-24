@@ -12,6 +12,7 @@ const NoCourseStarted = require('./errors/NoCourseStarted');
 const app = express();
 const clientsRouter = require('./routers/clients/clientsRouter');
 const clientsCoursesRouter = require('./routers/clients/coursesRouter');
+const clientsActivitiesRouter = require('./routers/clients/activitiesRouter');
 
 const adminRouter = require('./routers/admin/adminRouter');
 const {
@@ -25,6 +26,7 @@ app.use(express.json());
 
 app.use('/clients', clientsRouter);
 app.use('/clients/courses', clientsCoursesRouter);
+app.use('/clients/activities', clientsActivitiesRouter);
 app.use('/admin', adminRouter);
 
 app.use('/admin/courses', coursesRouter);
