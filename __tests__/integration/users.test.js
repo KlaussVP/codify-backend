@@ -16,10 +16,12 @@ const db = new Pool({
 });
 
 beforeEach(async () => {
-  await db.query('DELETE FROM users');
+  await db.query('DELETE FROM "courseUsers";');
+  await db.query('DELETE FROM users;');
 });
 
 afterAll(async () => {
+  await db.query('DELETE FROM users;');
   await db.query('DELETE FROM users;');
   await sequelize.close();
   await db.end();
