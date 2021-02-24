@@ -1,10 +1,8 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-<<<<<<< Updated upstream
-const sessionStore = require('../repositories/sessionStore');
-=======
 const uuid = require('uuid');
->>>>>>> Stashed changes
+const sgMail = require('@sendgrid/mail');
+const sessionStore = require('../repositories/sessionStore');
 
 const ConflictError = require('../errors/ConflictError');
 const AuthorizationError = require('../errors/AuthorizationError');
@@ -64,13 +62,29 @@ class UsersController {
   async postSignOut(token) {
     await sessionStore.deleteSession(token);
   }
-  
+
   async sendEmailWithToken(email) {
     const user = await this.findUserByEmail(email);
     if (!user) throw new AuthorizationError();
 
     const token = uuid.v4();
-    return user;
+    await sessionStore.setSession(token, user.id);
+
+    sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+
+    const message = {
+      to: email,
+      from: process.env.EMAIL_CODIFY,
+      subject: 'Link para recuperar sua senha',
+      html: `http://localhost:9000/recover-password/${token}`,
+    };
+
+    sgMail.send(message).then(() => {
+      console.log('Email sent');
+    }).catch((error) => {
+      console.error(error);
+    });
+    return token;
   }
 }
 

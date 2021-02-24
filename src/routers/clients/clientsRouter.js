@@ -22,7 +22,7 @@ router.post('/logout', verifyJWT, async (req, res) => {
 });
 
 router.post('/recover-password', clientsMiddlewares.recoverPassword, async (req, res) => {
-  const user = await usersController.sendEmailWithToken(req.body);
+  const user = await usersController.sendEmailWithToken(req.body.email);
   return res.status(200).send(user);
 });
 
