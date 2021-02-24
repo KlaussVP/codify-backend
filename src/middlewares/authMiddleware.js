@@ -1,17 +1,21 @@
 const jwt = require('jsonwebtoken');
 const AuthorizationError = require('../errors/AuthorizationError');
+const sessionStore = require('../repositories/sessionStore');
 
 // eslint-disable-next-line consistent-return
-function verifyJWT(req, res, next) {
+async function verifyJWT(req, res, next) {
   const token = req.headers['x-access-token'];
   if (!token) return res.status(401).json({ error: 'Token obrigatório.' });
 
-  jwt.verify(token, process.env.SECRET, (err, decoded) => {
-    if (err) throw new AuthorizationError();
+  const decodedData = jwt.verify(token, process.env.SECRET);
 
-    req.userId = decoded.id;
-    next();
-  });
+  const userData = await sessionStore.getSession(token);
+
+  if (decodedData.id !== userData.id) throw new AuthorizationError();
+
+  req.userId = userData.id;
+  req.token = userData.token;
+  next();
 }
 
 module.exports = verifyJWT;
