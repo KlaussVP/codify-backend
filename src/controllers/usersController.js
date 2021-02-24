@@ -1,6 +1,10 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+<<<<<<< Updated upstream
 const sessionStore = require('../repositories/sessionStore');
+=======
+const uuid = require('uuid');
+>>>>>>> Stashed changes
 
 const ConflictError = require('../errors/ConflictError');
 const AuthorizationError = require('../errors/AuthorizationError');
@@ -59,6 +63,14 @@ class UsersController {
 
   async postSignOut(token) {
     await sessionStore.deleteSession(token);
+  }
+  
+  async sendEmailWithToken(email) {
+    const user = await this.findUserByEmail(email);
+    if (!user) throw new AuthorizationError();
+
+    const token = uuid.v4();
+    return user;
   }
 }
 
