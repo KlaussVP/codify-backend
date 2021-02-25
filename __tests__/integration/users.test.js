@@ -1,4 +1,4 @@
-/* global describe, it, expect, afterAll, beforeEach */
+/* global jest, describe, it, expect, afterAll, beforeEach */
 require('dotenv').config();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
@@ -14,6 +14,11 @@ const agent = supertest(app);
 const db = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
+
+jest.mock('@sendgrid/mail', () => ({
+  setApiKey: () => {},
+  send: async (message) => message,
+}));
 
 beforeEach(async () => {
   await db.query('DELETE FROM "courseUsers";');
@@ -236,6 +241,29 @@ describe('POST /admin/logout', () => {
 
     const response = await agent.post('/admin/logout').set({ 'x-access-token': token });
     expect(response.status).toBe(200);
+  });
+});
+
+describe('POST /clients/recover-password', () => {
+  it('should return 200 when an email is sent for the email from the request', async () => {
+    const newUser = {
+      name: 'test',
+      email: 'lg@gmail.com',
+      password: '123456',
+    };
+
+    await db.query('INSERT INTO users (name, email, password, type, "createdAt", "updatedAt") values ($1, $2, $3, $4, $5, $6) RETURNING *', [newUser.name, newUser.email, bcrypt.hashSync(newUser.password, 10), 'CLIENT', 'now()', 'now()']);
+
+    const response = await agent.post('/clients/recover-password').send({ email: newUser.email });
+    expect(response.status).toBe(200);
+  });
+  it('should return 422 when is not an email', async () => {
+    const response = await agent.post('/clients/recover-password').send({ email: 'no format of email' });
+    expect(response.status).toBe(422);
+  });
+  it('should return 401 when the email does not exists in users table', async () => {
+    const response = await agent.post('/clients/recover-password').send({ email: 'lg@gmail.com' });
+    expect(response.status).toBe(401);
   });
 });
 
