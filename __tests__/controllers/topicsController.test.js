@@ -162,6 +162,7 @@ describe('deleteOneTopic', () => {
     Topic.findByPk.mockResolvedValue(true);
     await topicsController.deleteOneTopic(id);
     expect(Topic.destroy).toHaveBeenCalledWith({ where: { id } });
+    expect(Theory.destroy).toHaveBeenCalledWith({ where: { topicId: id } });
   });
 
   it('should throw an error', async () => {
