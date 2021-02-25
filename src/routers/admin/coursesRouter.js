@@ -1,6 +1,7 @@
 const coursesRouter = require('express').Router();
 const chapterRouter = require('./chaptersRouter');
 const topicRouter = require('./topicsRouter');
+const theoryRouter = require('./theoriesRouter');
 
 const { postCoursesAsAdminSchema, editCourseAsAdminSchema } = require('../../schemas/coursesSchema');
 const coursesController = require('../../controllers/coursesController');
@@ -49,4 +50,5 @@ module.exports = {
   coursesRouter,
   chapterRouter,
   topicRouter,
+  theoryRouter,
 };
