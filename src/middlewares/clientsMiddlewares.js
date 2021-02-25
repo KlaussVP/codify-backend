@@ -1,6 +1,6 @@
 const signInSchema = require('../schemas/signInSchema');
 const signUpSchema = require('../schemas/signUpSchema');
-const { recoverPasswordSchema } = require('../schemas/recoverPasswordSchema');
+const { recoverPasswordSchema, newPasswordSchema } = require('../schemas/recoverPasswordSchema');
 
 function signUpMiddleware(req, res, next) {
   const signupValidation = signUpSchema.validate(req.body).error;
@@ -35,8 +35,23 @@ function recoverPassword(req, res, next) {
   return next();
 }
 
+function newPasswordMiddleware(req, res, next) {
+  const validation = newPasswordSchema.validate(req.body).error;
+
+  if (validation) {
+    return res.status(422).send({
+      error: validation.message === 'Senhas diferentes.'
+        ? validation.message
+        : 'Verifique seus dados.',
+    });
+  }
+
+  return next();
+}
+
 module.exports = {
   signUpMiddleware,
   signInMiddleware,
   recoverPassword,
+  newPasswordMiddleware,
 };

@@ -80,11 +80,23 @@ class UsersController {
     };
 
     sgMail.send(message).then(() => {
+      // eslint-disable-next-line no-console
       console.log('Email sent');
     }).catch((error) => {
+      // eslint-disable-next-line no-console
       console.error(error);
     });
     return token;
+  }
+
+  async editUserPassword({ password, token }) {
+    const id = await sessionStore.getSession(token);
+    if (!id) throw new AuthorizationError();
+
+    const user = await this.findUserById(id);
+    const hashedPassword = bcrypt.hashSync(password, 10);
+    user.password = hashedPassword;
+    await user.save();
   }
 }
 
