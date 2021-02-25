@@ -85,6 +85,12 @@ class TopicsController {
     const topic = await Topic.findByPk(id);
     if (!topic) throw new InexistingId();
 
+    await Theory.destroy({
+      where: {
+        topicId: id,
+      },
+    });
+
     await Topic.destroy({
       where: { id },
     });
