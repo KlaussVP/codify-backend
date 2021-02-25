@@ -222,3 +222,52 @@ describe('postSignOut', () => {
   });
 });
 
+describe('editUserPassword', () => {
+  it('should return user with the changing password and call the expected functions', async () => {
+    const ObjectFunctionParameter = {
+      token: 'meu-token-chave-Redis',
+      password: 'new-password',
+    };
+    const userId = 1;
+
+    const userFound = {
+      id: userId,
+      name: 'test',
+      password: '123456',
+      type: 'CLIENT',
+      save: () => {},
+    };
+    const expectedObject = {
+      id: userId,
+      name: 'test',
+      password: ObjectFunctionParameter.password,
+      type: 'CLIENT',
+    };
+
+    sessionStore.getSession.mockResolvedValue(userId);
+    jest.spyOn(usersController, 'findUserById').mockImplementationOnce(() => userFound);
+
+    const user = await usersController.editUserPassword(ObjectFunctionParameter);
+
+    expect(user).toEqual(
+      expect.objectContaining(expectedObject),
+    );
+    expect(sessionStore.getSession).toHaveBeenCalledWith(ObjectFunctionParameter.token);
+    expect(usersController.findUserById).toHaveBeenCalledWith(userId);
+  });
+  it('should throwan an Authorization error, because there is no register in Redis', async () => {
+    const ObjectFunctionParameter = {
+      token: 'meu-token-chave-Redis',
+      password: 'new-password',
+    };
+
+    sessionStore.getSession.mockResolvedValue(false);
+
+    expect(sessionStore.getSession).toHaveBeenCalledWith(ObjectFunctionParameter.token);
+
+    expect(async () => {
+      await usersController.editUserPassword(ObjectFunctionParameter);
+    }).rejects.toThrow(AuthorizationError);
+  });
+});
+

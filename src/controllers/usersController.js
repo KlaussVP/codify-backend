@@ -86,7 +86,6 @@ class UsersController {
       // eslint-disable-next-line no-console
       console.error(error);
     });
-    return token;
   }
 
   async editUserPassword({ password, token }) {
@@ -97,6 +96,7 @@ class UsersController {
     const hashedPassword = bcrypt.hashSync(password, 10);
     user.password = hashedPassword;
     await user.save();
+    return user;
   }
 }
 
