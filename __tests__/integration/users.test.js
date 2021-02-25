@@ -1,12 +1,12 @@
-/* global jest, describe, it, expect, beforeAll, afterAll */
-const dotenv = require('dotenv');
+/* global describe, it, expect, afterAll, beforeEach */
+require('dotenv').config();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const supertest = require('supertest');
+const { Pool } = require('pg');
+const uuid = require('uuid');
 const sessionStore = require('../../src/repositories/sessionStore');
 
-dotenv.config();
-const { Pool } = require('pg');
-const supertest = require('supertest');
 const app = require('../../src/app');
 const sequelize = require('../../src/utils/database');
 
@@ -239,3 +239,65 @@ describe('POST /admin/logout', () => {
   });
 });
 
+describe('POST /clients/new-password', () => {
+  it('should return 200 when data is valid and token exists in Redis', async () => {
+    const bodyNewPassword = {
+      token: uuid.v4(),
+      password: 'new-password',
+      confirmPassword: 'new-password',
+    };
+
+    const newUser = {
+      name: 'test',
+      email: 'lg@gmail.com',
+      password: '123456',
+    };
+
+    const resultUser = await db.query('INSERT INTO users (name, email, password, type, "createdAt", "updatedAt") values ($1, $2, $3, $4, $5, $6) RETURNING *', [newUser.name, newUser.email, bcrypt.hashSync(newUser.password, 10), 'CLIENT', 'now()', 'now()']);
+
+    const userId = resultUser.rows[0].id;
+
+    await sessionStore.setSession(bodyNewPassword.token, userId);
+
+    const response = await agent.post('/clients/new-password').send(bodyNewPassword);
+    expect(response.status).toBe(200);
+  });
+
+  it('should return 422 when token is not uuid v4', async () => {
+    const bodyNewPassword = {
+      token: 'token is not a v4 uuid',
+      password: 'new-password',
+      confirmPassword: 'new-password',
+    };
+
+    const newUser = {
+      name: 'test',
+      email: 'lg@gmail.com',
+      password: '123456',
+    };
+
+    await db.query('INSERT INTO users (name, email, password, type, "createdAt", "updatedAt") values ($1, $2, $3, $4, $5, $6) RETURNING *', [newUser.name, newUser.email, bcrypt.hashSync(newUser.password, 10), 'CLIENT', 'now()', 'now()']);
+
+    const response = await agent.post('/clients/new-password').send(bodyNewPassword);
+    expect(response.status).toBe(422);
+  });
+
+  it('should return 401 when uuid is not registerd in Redis', async () => {
+    const bodyNewPassword = {
+      token: uuid.v4(),
+      password: 'new-password',
+      confirmPassword: 'new-password',
+    };
+
+    const newUser = {
+      name: 'test',
+      email: 'lg@gmail.com',
+      password: '123456',
+    };
+
+    await db.query('INSERT INTO users (name, email, password, type, "createdAt", "updatedAt") values ($1, $2, $3, $4, $5, $6) RETURNING *', [newUser.name, newUser.email, bcrypt.hashSync(newUser.password, 10), 'CLIENT', 'now()', 'now()']);
+
+    const response = await agent.post('/clients/new-password').send(bodyNewPassword);
+    expect(response.status).toBe(401);
+  });
+});
