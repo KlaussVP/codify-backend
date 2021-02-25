@@ -1,6 +1,5 @@
 /* global jest, describe, it, expect */
 const jwt = require('jsonwebtoken');
-const sgMail = require('@sendgrid/mail');
 const usersController = require('../../src/controllers/usersController');
 const ConflictError = require('../../src/errors/ConflictError');
 const AuthorizationError = require('../../src/errors/AuthorizationError');
