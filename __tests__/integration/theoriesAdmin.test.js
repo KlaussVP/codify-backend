@@ -5,19 +5,45 @@ dotenv.config();
 const { Pool } = require('pg');
 const { NOW } = require('sequelize');
 const supertest = require('supertest');
+const { Sequelize } = require('sequelize');
+const jwt = require('jsonwebtoken');
 const app = require('../../src/app');
 const sequelize = require('../../src/utils/database');
+const sessionStore = require('../../src/repositories/sessionStore');
 
 const agent = supertest(app);
 const db = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
 
-let tokenAdmin;
-let courseId;
-let chapterId;
+async function getToken() {
+  const user = {
+    name: 'Teste Silva',
+    email: 'teste@teste.com',
+    password: 'senha_super_secreta_de_teste',
+  };
 
-beforeAll(async (done) => {
+  const testUser = await db.query('INSERT INTO users (name, email, password, "createdAt", "updatedAt", type) values ($1, $2, $3, $4, $5, $6) RETURNING *', [
+    user.name, user.email, user.password, Sequelize.NOW, Sequelize.NOW, 'ADMIN',
+  ]);
+
+  const token = jwt.sign({ id: testUser.rows[0].id }, process.env.SECRET, {
+    expiresIn: 86400,
+  });
+
+  const userData = {
+    id: testUser.rows[0].id,
+    token,
+    type: testUser.rows[0].type,
+    name: testUser.rows[0].name,
+  };
+
+  await sessionStore.setSession(token, userData);
+
+  return token;
+}
+
+async function insertCompleteCourse() {
   const course = {
     name: 'JavaScript',
     image: 'https://static.imasters.com.br/wp-content/uploads/2018/12/10164438/javascript.jpg',
@@ -26,30 +52,24 @@ beforeAll(async (done) => {
   const chapter = { name: 'Apresentação Programação' };
 
   const resultCourse = await db.query('INSERT INTO courses (name, image, description, "createdAt", "updatedAt") values ($1, $2, $3, $4, $5) RETURNING *', [course.name, course.image, course.description, NOW, NOW]);
-  courseId = resultCourse.rows[0].id;
+  const courseId = resultCourse.rows[0].id;
 
   const resultChapter = await db.query('INSERT INTO chapters (name, "courseId", "createdAt", "updatedAt") values ($1, $2, $3, $4) RETURNING *', [chapter.name, courseId, NOW, NOW]);
-  chapterId = resultChapter.rows[0].id;
+  const chapterId = resultChapter.rows[0].id;
 
-  const bodyAdmin = {
-    name: 'admin',
-    email: 'contato@codify.com.br',
-    password: '123456',
-    confirmPassword: '123456',
+  const resultTopic = await db.query('INSERT INTO topics (name, "chapterId", "createdAt", "updatedAt") values ($1, $2, $3, $4) RETURNING *', ['Introduction JS', chapterId, NOW, NOW]);
+  const topicId = resultTopic.rows[0].id;
+
+  const resultTheory = await db.query('INSERT INTO theories ("youtubeLink", "topicId", "createdAt", "updatedAt") values ($1, $2, $3, $4) RETURNING *', ['https://www.youtube.com/watch?v=efWrIyjmCXg', topicId, NOW, NOW]);
+  const theoryId = resultTheory.rows[0].id;
+
+  return {
+    courseId,
+    chapterId,
+    topicId,
+    theoryId,
   };
-
-  await db.query('INSERT INTO users (name, email, password, type, "createdAt", "updatedAt") values ($1, $2, $3, $4, $5, $6)', [bodyAdmin.name, bodyAdmin.email, bodyAdmin.password, 'ADMIN', 'now()', 'now()']);
-
-  agent
-    .post('/admin/signin').send({
-      email: 'contato@codify.com.br',
-      password: '123456',
-    })
-    .end((err, response) => {
-      tokenAdmin = response.body.token;
-      done();
-    });
-});
+}
 
 beforeEach(async () => {
   await db.query('DELETE FROM exercises');
@@ -71,68 +91,56 @@ afterAll(async () => {
 
 describe('PUT /admin/theories/:id', () => {
   it('should return 200 when passed valid parameters', async () => {
-    const resultTopic = await db.query('INSERT INTO topics (name, "chapterId", "createdAt", "updatedAt") values ($1, $2, $3, $4) RETURNING *', ['Introduction JS', chapterId, NOW, NOW]);
-    const topicId = resultTopic.rows[0].id;
-
-    const resultTheory = await db.query('INSERT INTO theories ("youtubeLink", "topicId", "createdAt", "updatedAt") values ($1, $2, $3, $4) RETURNING *', ['https://www.youtube.com/watch?v=efWrIyjmCXg', topicId, NOW, NOW]);
-    const theoryId = resultTheory.rows[0].id;
+    const tokenAdmin = await getToken();
+    const ids = await insertCompleteCourse();
 
     const theoryToBeEdited = {
-      id: theoryId,
+      id: ids.theoryId,
       youtubeLink: 'https://www.youtube.com/watch?v=08X9gf3mdKY',
     };
-    const response = await agent.put(`/admin/theories/${theoryId}`).set({ 'X-Access-Token': tokenAdmin }).send(theoryToBeEdited);
+    const response = await agent.put(`/admin/theories/${ids.theoryId}`).set({ 'X-Access-Token': tokenAdmin }).send(theoryToBeEdited);
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual(expect.objectContaining({
-      id: theoryId,
+      id: ids.theoryId,
       youtubeLink: theoryToBeEdited.youtubeLink,
     }));
   });
 
   it('should return 422 when passed invalid parameters', async () => {
-    const resultTopic = await db.query('INSERT INTO topics (name, "chapterId", "createdAt", "updatedAt") values ($1, $2, $3, $4) RETURNING *', ['Introduction JS', chapterId, NOW, NOW]);
-    const topicId = resultTopic.rows[0].id;
-
-    const resultTheory = await db.query('INSERT INTO theories ("youtubeLink", "topicId", "createdAt", "updatedAt") values ($1, $2, $3, $4) RETURNING *', ['https://www.youtube.com/watch?v=efWrIyjmCXg', topicId, NOW, NOW]);
-    const theoryId = resultTheory.rows[0].id;
+    const tokenAdmin = await getToken();
+    const ids = await insertCompleteCourse();
 
     const theoryBody = {
-      id: theoryId,
+      id: ids.theoryId,
       youtubeLink: 1,
     };
 
-    const response = await agent.put(`/admin/theories/${theoryId}`).set({ 'X-Access-Token': tokenAdmin }).send(theoryBody);
+    const response = await agent.put(`/admin/theories/${ids.theoryId}`).set({ 'X-Access-Token': tokenAdmin }).send(theoryBody);
     expect(response.status).toBe(422);
   });
 });
 
 describe('GET /admin/theories/:id', () => {
   it('should return 200 when passed valid Id', async () => {
-    const resultTopic = await db.query('INSERT INTO topics (name, "chapterId", "createdAt", "updatedAt") values ($1, $2, $3, $4) RETURNING *', ['Teste', chapterId, NOW, NOW]);
-    const topicId = resultTopic.rows[0].id;
+    const tokenAdmin = await getToken();
+    const ids = await insertCompleteCourse();
 
-    const theory = {
-      youtubeLink: 'https://www.youtube.com/watch?v=08X9gf3mdKY',
-      topicId,
-    };
-
-    const resultTheory = await db.query('INSERT INTO theories ("youtubeLink", "topicId", "createdAt", "updatedAt") values ($1, $2, $3, $4) RETURNING *', [theory.youtubeLink, topicId, NOW, NOW]);
-    const theoryId = resultTheory.rows[0].id;
-
-    const response = await agent.get(`/admin/theories/${theoryId}`).set({ 'X-Access-Token': tokenAdmin });
+    const response = await agent.get(`/admin/theories/${ids.theoryId}`).set({ 'X-Access-Token': tokenAdmin });
 
     expect(response.status).toBe(200);
     expect(response.headers['access-control-expose-headers']).toBeTruthy();
     expect(response.headers['x-total-count']).toBeTruthy();
     expect(response.body).toEqual(expect.objectContaining({
-      id: theoryId,
-      youtubeLink: theory.youtubeLink,
-      topicId: theory.topicId,
+      id: ids.theoryId,
+      youtubeLink: 'https://www.youtube.com/watch?v=efWrIyjmCXg',
+      topicId: ids.topicId,
     }));
   });
 
   it('should return 403 when passed invalid Id', async () => {
+    const tokenAdmin = await getToken();
+    insertCompleteCourse();
     const theoryId = -999;
     const response = await agent.get(`/admin/theories/${theoryId}`).set({ 'X-Access-Token': tokenAdmin });
 
@@ -142,21 +150,8 @@ describe('GET /admin/theories/:id', () => {
 
 describe('GET /admin/theories', () => {
   it('should return 200', async () => {
-    const topic = {
-      name: 'Introduction JS',
-      chapterId,
-    };
-
-    const resultTopic = await db.query('INSERT INTO topics (name, "chapterId", "createdAt", "updatedAt") values ($1, $2, $3, $4) RETURNING *', [topic.name, chapterId, NOW, NOW]);
-    const topicId = resultTopic.rows[0].id;
-
-    const theory = {
-      youtubeLink: 'https://www.youtube.com/watch?v=08X9gf3mdKY',
-      topicId,
-    };
-
-    const resultTheory = await db.query('INSERT INTO theories ("youtubeLink", "topicId", "createdAt", "updatedAt") values ($1, $2, $3, $4) RETURNING *', [theory.youtubeLink, topicId, NOW, NOW]);
-    const theoryId = resultTheory.rows[0].id;
+    const tokenAdmin = await getToken();
+    const ids = await insertCompleteCourse();
 
     const response = await agent.get('/admin/theories').set({ 'X-Access-Token': tokenAdmin });
 
@@ -164,17 +159,17 @@ describe('GET /admin/theories', () => {
     expect(response.headers['access-control-expose-headers']).toBeTruthy();
     expect(response.headers['content-range']).toBeTruthy();
     expect(response.body).toEqual(expect.arrayContaining([{
-      id: theoryId,
-      youtubeLink: theory.youtubeLink,
-      topicId,
+      id: ids.theoryId,
+      youtubeLink: expect.any(String),
+      topicId: ids.topicId,
       createdAt: expect.any(String),
       updatedAt: expect.any(String),
       topic: {
-        name: resultTopic.rows[0].name,
+        name: expect.any(String),
         chapter: {
-          id: chapterId,
+          id: ids.chapterId,
           course: {
-            id: courseId,
+            id: ids.courseId,
           },
         },
       },

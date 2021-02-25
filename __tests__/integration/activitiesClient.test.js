@@ -8,29 +8,39 @@ const supertest = require('supertest');
 const jwt = require('jsonwebtoken');
 const app = require('../../src/app');
 const sequelize = require('../../src/utils/database');
+const sessionStore = require('../../src/repositories/sessionStore');
 
 const agent = supertest(app);
 const db = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
 
-let tokenClient;
+async function getToken() {
+  const user = {
+    name: 'Teste Silva',
+    email: 'teste@teste.com',
+    password: 'senha_super_secreta_de_teste',
+  };
 
-beforeAll(async () => {
-  await agent.post('/clients/signup').send({
-    name: 'client',
-    email: 'client@gmail.com',
-    password: '123456',
-    confirmPassword: '123456',
+  const testUser = await db.query('INSERT INTO users (name, email, password, "createdAt", "updatedAt", type) values ($1, $2, $3, $4, $5, $6) RETURNING *', [
+    user.name, user.email, user.password, Sequelize.NOW, Sequelize.NOW, 'CLIENT',
+  ]);
+
+  const token = jwt.sign({ id: testUser.rows[0].id }, process.env.SECRET, {
+    expiresIn: 86400,
   });
 
-  const response = await agent.post('/clients/signin').send({
-    email: 'client@gmail.com',
-    password: '123456',
-  });
+  const userData = {
+    id: testUser.rows[0].id,
+    token,
+    type: testUser.rows[0].type,
+    name: testUser.rows[0].name,
+  };
 
-  tokenClient = response.body.token;
-});
+  await sessionStore.setSession(token, userData);
+
+  return token;
+}
 
 beforeEach(async () => {
   await db.query('DELETE FROM "theoryUsers"');
@@ -56,13 +66,9 @@ afterAll(async () => {
   await db.end();
 });
 
-describe('GET /clients/activities/theory/:id', () => {
+describe('POST /clients/activities/theory/:id', () => {
   it('should return 200 when passed valid Id', async () => {
-    const user = {
-      name: 'Teste Silva',
-      email: 'teste@teste.com',
-      password: 'senha_super_secreta_de_teste',
-    };
+    const tokenClient = await getToken();
     const course = {
       name: 'JavaScript21122',
       image: 'https://static.imasters.com.br/wp-content/uploads/2018/12/10164438/javascript.jpg',
@@ -92,20 +98,13 @@ describe('GET /clients/activities/theory/:id', () => {
     const resultTheory = await db.query('INSERT INTO theories ("youtubeLink", "topicId", "createdAt", "updatedAt") values ($1, $2, $3, $4) RETURNING *', [theory.youtubeLink, topicId, Sequelize.NOW, Sequelize.NOW]);
     const theoryId = resultTheory.rows[0].id;
 
-    const testUser = await db.query('INSERT INTO users (name, email, password, "createdAt", "updatedAt", type) values ($1, $2, $3, $4, $5, $6) RETURNING *', [
-      user.name, user.email, user.password, Sequelize.NOW, Sequelize.NOW, 'CLIENT',
-    ]);
-
-    const token = jwt.sign({ id: testUser.rows[0].id }, process.env.SECRET, {
-      expiresIn: 86400,
-    });
-
-    const response = await agent.post(`/clients/activities/theory/${theoryId}`).set({ 'X-Access-Token': token });
+    const response = await agent.post(`/clients/activities/theory/${theoryId}`).set({ 'X-Access-Token': tokenClient });
 
     expect(response.status).toBe(201);
   });
 
   it('should return status 403 when passed invalid id', async () => {
+    const tokenClient = await getToken();
     const response = await agent.post('/clients/activities/theory/1').set({ 'X-Access-Token': tokenClient });
     expect(response.status).toBe(403);
   });

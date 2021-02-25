@@ -11,7 +11,7 @@ class TheoriesController {
     if (!theory) throw new InexistingId();
     await TheoryUser.findOrCreate({
       where: {
-        theoryId: theory.id,
+        theoryId,
         userId,
       },
     });
