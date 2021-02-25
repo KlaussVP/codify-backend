@@ -69,135 +69,78 @@ afterAll(async () => {
   await db.end();
 });
 
-describe('POST /admin/topics', () => {
-  it('should return 201 when passed valid parameters', async () => {
-    const topicBody = {
-      name: 'Introduction JS',
-      chapterId,
-      youtubeLink: 'https://www.youtube.com/watch?v=efWrIyjmCXg',
-    };
-
-    const response = await agent.post('/admin/topics').set({ 'X-Access-Token': tokenAdmin }).send(topicBody);
-    expect(response.status).toBe(201);
-    expect.objectContaining({
-      id: expect.any(Number),
-      name: topicBody.name,
-      createdAt: NOW,
-      updatedAt: NOW,
-      theory: {
-        id: expect.any(Number),
-        youtubeLink: topicBody.youtubeLink,
-      },
-    });
-  });
-
-  it('should return 422 when passed invalid parameters', async () => {
-    const topicBody = {
-      name: 'Introduction JS',
-      chapterId: -9999,
-    };
-    const response = await agent.post('/admin/topics').set({ 'X-Access-Token': tokenAdmin }).send(topicBody);
-    expect(response.status).toBe(422);
-  });
-});
-
-describe('PUT /admin/topics/:id', () => {
+describe('PUT /admin/theories/:id', () => {
   it('should return 200 when passed valid parameters', async () => {
     const resultTopic = await db.query('INSERT INTO topics (name, "chapterId", "createdAt", "updatedAt") values ($1, $2, $3, $4) RETURNING *', ['Introduction JS', chapterId, NOW, NOW]);
-
     const topicId = resultTopic.rows[0].id;
 
     const resultTheory = await db.query('INSERT INTO theories ("youtubeLink", "topicId", "createdAt", "updatedAt") values ($1, $2, $3, $4) RETURNING *', ['https://www.youtube.com/watch?v=efWrIyjmCXg', topicId, NOW, NOW]);
     const theoryId = resultTheory.rows[0].id;
 
-    const topicToBeEdited = {
-      id: topicId,
-      name: 'Introdução EDITADO ',
-      theory: {
-        id: theoryId,
-      },
+    const theoryToBeEdited = {
+      id: theoryId,
+      youtubeLink: 'https://www.youtube.com/watch?v=08X9gf3mdKY',
     };
-    const response = await agent.put(`/admin/topics/${topicId}`).set({ 'X-Access-Token': tokenAdmin }).send(topicToBeEdited);
+    const response = await agent.put(`/admin/theories/${theoryId}`).set({ 'X-Access-Token': tokenAdmin }).send(theoryToBeEdited);
 
     expect(response.status).toBe(200);
-    expect.objectContaining({
-      id: topicId,
-      name: topicToBeEdited.name,
-      chapterId,
-      theory: {
-        id: theoryId,
-        youtubeLink: resultTheory.rows[0].youtubeLink,
-      },
-    });
+    expect(response.body).toEqual(expect.objectContaining({
+      id: theoryId,
+      youtubeLink: theoryToBeEdited.youtubeLink,
+    }));
   });
 
-  it('should return 422 when passed id smaller than 0', async () => {
-    const topicBody = {
-      name: 'Introduction JS',
-      chapterId: -9999,
+  it('should return 422 when passed invalid parameters', async () => {
+    const resultTopic = await db.query('INSERT INTO topics (name, "chapterId", "createdAt", "updatedAt") values ($1, $2, $3, $4) RETURNING *', ['Introduction JS', chapterId, NOW, NOW]);
+    const topicId = resultTopic.rows[0].id;
+
+    const resultTheory = await db.query('INSERT INTO theories ("youtubeLink", "topicId", "createdAt", "updatedAt") values ($1, $2, $3, $4) RETURNING *', ['https://www.youtube.com/watch?v=efWrIyjmCXg', topicId, NOW, NOW]);
+    const theoryId = resultTheory.rows[0].id;
+
+    const theoryBody = {
+      id: theoryId,
+      youtubeLink: 1,
     };
 
-    const response = await agent.put('/admin/topics/1').set({ 'X-Access-Token': tokenAdmin }).send(topicBody);
+    const response = await agent.put(`/admin/theories/${theoryId}`).set({ 'X-Access-Token': tokenAdmin }).send(theoryBody);
     expect(response.status).toBe(422);
   });
 });
 
-describe('DELETE /admin/topics/:id', () => {
-  it('should return 202 when passed valid Id', async () => {
-    const topic = {
-      name: 'Introduction JS',
-      chapterId,
-    };
-
-    const resultTopic = await db.query('INSERT INTO topics (name, "chapterId", "createdAt", "updatedAt") values ($1, $2, $3, $4) RETURNING *', [topic.name, chapterId, NOW, NOW]);
-
-    const topicId = resultTopic.rows[0].id;
-
-    const response = await agent.delete(`/admin/topics/${topicId}`).set({ 'X-Access-Token': tokenAdmin });
-
-    expect(response.status).toBe(202);
-  });
-
-  it('should return 403 when passed valid Id', async () => {
-    const topicId = -999;
-    const response = await agent.delete(`/admin/topics/${topicId}`).set({ 'X-Access-Token': tokenAdmin });
-
-    expect(response.status).toBe(403);
-  });
-});
-
-describe('GET /admin/topics/:id', () => {
+describe('GET /admin/theories/:id', () => {
   it('should return 200 when passed valid Id', async () => {
-    const topic = {
-      name: 'Introduction JS',
-      chapterId,
-    };
-
-    const resultTopic = await db.query('INSERT INTO topics (name, "chapterId", "createdAt", "updatedAt") values ($1, $2, $3, $4) RETURNING *', [topic.name, chapterId, NOW, NOW]);
-
+    const resultTopic = await db.query('INSERT INTO topics (name, "chapterId", "createdAt", "updatedAt") values ($1, $2, $3, $4) RETURNING *', ['Teste', chapterId, NOW, NOW]);
     const topicId = resultTopic.rows[0].id;
 
-    const response = await agent.get(`/admin/topics/${topicId}`).set({ 'X-Access-Token': tokenAdmin });
+    const theory = {
+      youtubeLink: 'https://www.youtube.com/watch?v=08X9gf3mdKY',
+      topicId,
+    };
+
+    const resultTheory = await db.query('INSERT INTO theories ("youtubeLink", "topicId", "createdAt", "updatedAt") values ($1, $2, $3, $4) RETURNING *', [theory.youtubeLink, topicId, NOW, NOW]);
+    const theoryId = resultTheory.rows[0].id;
+
+    const response = await agent.get(`/admin/theories/${theoryId}`).set({ 'X-Access-Token': tokenAdmin });
 
     expect(response.status).toBe(200);
     expect(response.headers['access-control-expose-headers']).toBeTruthy();
     expect(response.headers['x-total-count']).toBeTruthy();
-    expect.objectContaining({
-      id: topicId,
-      name: topic.name,
-      chapterId,
-    });
+    expect(response.body).toEqual(expect.objectContaining({
+      id: theoryId,
+      youtubeLink: theory.youtubeLink,
+      topicId: theory.topicId,
+    }));
   });
 
   it('should return 403 when passed invalid Id', async () => {
-    const topicId = -999;
-    const response = await agent.get(`/admin/topics/${topicId}`).set({ 'X-Access-Token': tokenAdmin });
+    const theoryId = -999;
+    const response = await agent.get(`/admin/theories/${theoryId}`).set({ 'X-Access-Token': tokenAdmin });
 
     expect(response.status).toBe(403);
   });
 });
 
-describe('GET /admin/topics', () => {
+describe('GET /admin/theories', () => {
   it('should return 200', async () => {
     const topic = {
       name: 'Introduction JS',
@@ -205,18 +148,37 @@ describe('GET /admin/topics', () => {
     };
 
     const resultTopic = await db.query('INSERT INTO topics (name, "chapterId", "createdAt", "updatedAt") values ($1, $2, $3, $4) RETURNING *', [topic.name, chapterId, NOW, NOW]);
-
     const topicId = resultTopic.rows[0].id;
 
-    const response = await agent.get('/admin/topics').set({ 'X-Access-Token': tokenAdmin });
+    const theory = {
+      youtubeLink: 'https://www.youtube.com/watch?v=08X9gf3mdKY',
+      topicId,
+    };
+
+    const resultTheory = await db.query('INSERT INTO theories ("youtubeLink", "topicId", "createdAt", "updatedAt") values ($1, $2, $3, $4) RETURNING *', [theory.youtubeLink, topicId, NOW, NOW]);
+    const theoryId = resultTheory.rows[0].id;
+
+    const response = await agent.get('/admin/theories').set({ 'X-Access-Token': tokenAdmin });
 
     expect(response.status).toBe(200);
     expect(response.headers['access-control-expose-headers']).toBeTruthy();
     expect(response.headers['content-range']).toBeTruthy();
-    expect.arrayContaining([{
-      id: topicId,
-      name: topic.name,
-      chapterId,
-    }]);
+    expect(response.body).toEqual(expect.arrayContaining([{
+      id: theoryId,
+      youtubeLink: theory.youtubeLink,
+      topicId,
+      createdAt: expect.any(String),
+      updatedAt: expect.any(String),
+      topic: {
+        name: resultTopic.rows[0].name,
+        chapter: {
+          id: chapterId,
+          course: {
+            id: courseId,
+          },
+        },
+      },
+    }]));
   });
 });
+
