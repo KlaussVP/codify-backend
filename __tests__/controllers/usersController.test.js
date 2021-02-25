@@ -1,5 +1,6 @@
 /* global jest, describe, it, expect */
 const jwt = require('jsonwebtoken');
+const sgMail = require('@sendgrid/mail');
 const usersController = require('../../src/controllers/usersController');
 const ConflictError = require('../../src/errors/ConflictError');
 const AuthorizationError = require('../../src/errors/AuthorizationError');
@@ -11,6 +12,15 @@ jest.mock('../../src/repositories/sessionStore');
 jest.mock('bcrypt', () => ({
   hashSync: (password) => password,
   compareSync: (password) => password,
+}));
+
+jest.mock('uuid', () => ({
+  v4: () => 'meu_token_uuid',
+}));
+
+jest.mock('@sendgrid/mail', () => ({
+  setApiKey: () => {},
+  send: async (message) => message,
 }));
 
 jest.mock('../../src/models/User');
@@ -222,6 +232,49 @@ describe('postSignOut', () => {
   });
 });
 
+describe('sendEmailWithToken', () => {
+  it('should call the expected functions', async () => {
+    const ObjectFunctionParameter = {
+      email: 'lg@gmail.com',
+    };
+
+    const messageExpected = {
+      to: ObjectFunctionParameter.email,
+      from: process.env.EMAIL_CODIFY,
+      subject: 'Link para recuperar sua senha',
+      html: 'http://localhost:9000/recover-password/meu_token_uuid',
+    };
+
+    const userFound = {
+      id: 1,
+      name: 'test',
+      password: '123456',
+      type: 'CLIENT',
+    };
+
+    jest.spyOn(usersController, 'findUserByEmail').mockImplementationOnce(() => userFound);
+    sessionStore.setSession.mockResolvedValue({});
+
+    const message = await usersController.sendEmailWithToken(ObjectFunctionParameter.email);
+
+    expect(message).toEqual(
+      expect.objectContaining(messageExpected),
+    );
+    expect(sessionStore.setSession).toHaveBeenCalledWith('meu_token_uuid', userFound.id);
+  });
+  it('should throw an Authorization error, because there is no user with this email', async () => {
+    const ObjectFunctionParameter = {
+      email: 'lg@gmail.com',
+    };
+
+    jest.spyOn(usersController, 'findUserByEmail').mockResolvedValue(null);
+
+    expect(async () => {
+      await usersController.sendEmailWithToken(ObjectFunctionParameter.email);
+    }).rejects.toThrow(AuthorizationError);
+  });
+});
+
 describe('editUserPassword', () => {
   it('should return user with the changing password and call the expected functions', async () => {
     const ObjectFunctionParameter = {
@@ -255,7 +308,7 @@ describe('editUserPassword', () => {
     expect(sessionStore.getSession).toHaveBeenCalledWith(ObjectFunctionParameter.token);
     expect(usersController.findUserById).toHaveBeenCalledWith(userId);
   });
-  it('should throwan an Authorization error, because there is no register in Redis', async () => {
+  it('should throw an Authorization error, because there is no register in Redis', async () => {
     const ObjectFunctionParameter = {
       token: 'meu-token-chave-Redis',
       password: 'new-password',

@@ -86,6 +86,7 @@ class UsersController {
       // eslint-disable-next-line no-console
       console.error(error);
     });
+    return message;
   }
 
   async editUserPassword({ password, token }) {
