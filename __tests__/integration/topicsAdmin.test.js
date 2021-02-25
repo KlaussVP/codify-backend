@@ -150,8 +150,9 @@ describe('DELETE /admin/topics/:id', () => {
     };
 
     const resultTopic = await db.query('INSERT INTO topics (name, "chapterId", "createdAt", "updatedAt") values ($1, $2, $3, $4) RETURNING *', [topic.name, chapterId, NOW, NOW]);
-
     const topicId = resultTopic.rows[0].id;
+
+    await db.query('INSERT INTO theories ("youtubeLink", "topicId", "createdAt", "updatedAt") values ($1, $2, $3, $4) RETURNING *', ['https://www.youtube.com/watch?v=efWrIyjmCXg', topicId, NOW, NOW]);
 
     const response = await agent.delete(`/admin/topics/${topicId}`).set({ 'X-Access-Token': tokenAdmin });
 
