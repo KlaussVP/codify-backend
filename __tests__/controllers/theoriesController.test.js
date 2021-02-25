@@ -73,4 +73,11 @@ describe('editTheory', () => {
       save: expect.any(Function),
     }));
   });
+
+  it('should throw an error', async () => {
+    Theory.findByPk.mockResolvedValue(null);
+    expect(async () => {
+      await theoriesController.editTheory(-1, 'https://www.youtube.com/watch?v=nQ1XX0GrBEs');
+    }).rejects.toThrow(InexistingId);
+  });
 });
