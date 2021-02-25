@@ -2,7 +2,7 @@ const router = require('express').Router();
 const coursesController = require('../../controllers/coursesController');
 const verifyJWT = require('../../middlewares/authMiddleware');
 
-router.get('/', async (req, res) => {
+router.get('/', verifyJWT, async (req, res) => {
   const courses = await coursesController.listAllCourses();
   res.send(courses);
 });

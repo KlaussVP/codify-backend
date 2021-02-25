@@ -31,8 +31,10 @@
     "joi": "^17.3.0",
     "jsonwebtoken": "^8.5.1",
     "pg": "^8.5.1",
+    "promise-redis": "^0.0.5",
     "sequelize": "^6.5.0",
-    "sequelize-cli": "^6.2.0"
+    "sequelize-cli": "^6.2.0",
+    "uuid": "^8.3.2"
   },
   "engines": {
     "node": "12.20.1"
