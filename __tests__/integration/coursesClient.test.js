@@ -15,6 +15,7 @@ const db = new Pool({
 });
 
 let tokenClient;
+let idClient;
 
 beforeAll(async () => {
   await agent.post('/clients/signup').send({
@@ -29,6 +30,7 @@ beforeAll(async () => {
     password: '123456',
   });
 
+  idClient = response.body.id;
   tokenClient = response.body.token;
 });
 
@@ -202,7 +204,7 @@ describe('GET /clients/courses', () => {
     const resultCourse = await db.query('INSERT INTO courses (name, image, description) values ($1, $2, $3) RETURNING *', [course.name, course.image, course.description]);
     const courseId = resultCourse.rows[0].id;
 
-    const response = await agent.get('/clients/courses');
+    const response = await agent.get('/clients/courses').set({ 'X-Access-Token': tokenClient });
 
     expect(response.status).toBe(200);
     expect.arrayContaining({
@@ -217,12 +219,6 @@ describe('GET /clients/courses', () => {
 
 describe('POST /clients/courses/:id', () => {
   it('should return 200 when course is successfully started or resumed', async () => {
-    const user = {
-      name: 'Teste Silva',
-      email: 'teste@teste.com',
-      password: 'senha_super_secreta_de_teste',
-    };
-
     const course = {
       name: 'JavaScript21122',
       image: 'https://static.imasters.com.br/wp-content/uploads/2018/12/10164438/javascript.jpg',
@@ -252,15 +248,7 @@ describe('POST /clients/courses/:id', () => {
     const resultTheory = await db.query('INSERT INTO theories ("youtubeLink", "topicId", "createdAt", "updatedAt") values ($1, $2, $3, $4) RETURNING *', [theory.youtubeLink, topicId, Sequelize.NOW, Sequelize.NOW]);
     const theoryId = resultTheory.rows[0].id;
 
-    const testUser = await db.query('INSERT INTO users (name, email, password, "createdAt", "updatedAt", type) values ($1, $2, $3, $4, $5, $6) RETURNING *', [
-      user.name, user.email, user.password, Sequelize.NOW, Sequelize.NOW, 'CLIENT',
-    ]);
-
-    const token = jwt.sign({ id: testUser.rows[0].id }, process.env.SECRET, {
-      expiresIn: 86400,
-    });
-
-    const response = await agent.post(`/clients/courses/${courseId}`).set({ 'X-Access-Token': token });
+    const response = await agent.post(`/clients/courses/${courseId}`).set({ 'X-Access-Token': tokenClient });
     expect(response.status).toBe(200);
     expect.objectContaining({
       courseId,
@@ -271,12 +259,6 @@ describe('POST /clients/courses/:id', () => {
   });
 
   it('should throw an error when course does not have chapters, topics or theories', async () => {
-    const user = {
-      name: 'Teste Silva',
-      email: 'teste@teste.com',
-      password: 'senha_super_secreta_de_teste',
-    };
-
     const course = {
       name: 'JavaScript21122',
       image: 'https://static.imasters.com.br/wp-content/uploads/2018/12/10164438/javascript.jpg',
@@ -286,27 +268,13 @@ describe('POST /clients/courses/:id', () => {
     const resultCourse = await db.query('INSERT INTO courses (name, image, description) values ($1, $2, $3) RETURNING *', [course.name, course.image, course.description]);
     const courseId = resultCourse.rows[0].id;
 
-    const testUser = await db.query('INSERT INTO users (name, email, password, "createdAt", "updatedAt", type) values ($1, $2, $3, $4, $5, $6) RETURNING *', [
-      user.name, user.email, user.password, Sequelize.NOW, Sequelize.NOW, 'CLIENT',
-    ]);
-
-    const token = jwt.sign({ id: testUser.rows[0].id }, process.env.SECRET, {
-      expiresIn: 86400,
-    });
-
-    const response = await agent.post(`/clients/courses/${courseId}`).set({ 'X-Access-Token': token });
+    const response = await agent.post(`/clients/courses/${courseId}`).set({ 'X-Access-Token': tokenClient });
     expect(response.status).toBe(403);
   });
 });
 
 describe('GET /clients/courses/started', () => {
   it('should return all started courses by the specified user', async () => {
-    const user = {
-      name: 'Teste Iniciar',
-      email: 'teste@iniciar.com',
-      password: 'senha_super_secreta_de_teste',
-    };
-
     const courseOne = {
       name: 'Vue.js do zero!',
       description: 'Aprenda Vue.js do zero ao avançado, com muita prática!',
@@ -319,14 +287,6 @@ describe('GET /clients/courses/started', () => {
       image: 'https://blog.trainning.com.br/wp-content/uploads/2018/06/Why-AngularJS-A1.jpg',
     };
 
-    const testUser = await db.query('INSERT INTO users (name, email, password, "createdAt", "updatedAt", type) values ($1, $2, $3, $4, $5, $6) RETURNING *', [
-      user.name, user.email, user.password, Sequelize.NOW, Sequelize.NOW, 'CLIENT',
-    ]);
-
-    const token = jwt.sign({ id: testUser.rows[0].id }, process.env.SECRET, {
-      expiresIn: 86400,
-    });
-
     const testCourseOne = await db.query('INSERT INTO courses (name, description, image, "createdAt", "updatedAt") values ($1, $2, $3, $4, $5) RETURNING *', [
       courseOne.name, courseOne.description, courseOne.image, Sequelize.NOW, Sequelize.NOW,
     ]);
@@ -336,14 +296,14 @@ describe('GET /clients/courses/started', () => {
     ]);
 
     await db.query('INSERT INTO "courseUsers" ("courseId", "userId", "createdAt", "updatedAt", "lastAccessed") values ($1, $2, $3, $4, $5)', [
-      testCourseOne.rows[0].id, testUser.rows[0].id, Sequelize.NOW, Sequelize.NOW, Sequelize.NOW,
+      testCourseOne.rows[0].id, idClient, Sequelize.NOW, Sequelize.NOW, Sequelize.NOW,
     ]);
 
     await db.query('INSERT INTO "courseUsers" ("courseId", "userId", "createdAt", "updatedAt", "lastAccessed") values ($1, $2, $3, $4, $5)', [
-      testCourseTwo.rows[0].id, testUser.rows[0].id, Sequelize.NOW, Sequelize.NOW, Sequelize.NOW,
+      testCourseTwo.rows[0].id, idClient, Sequelize.NOW, Sequelize.NOW, Sequelize.NOW,
     ]);
 
-    const result = await agent.get('/clients/courses/started').set({ 'X-Access-Token': token });
+    const result = await agent.get('/clients/courses/started').set({ 'X-Access-Token': tokenClient });
 
     expect(result.body).toEqual(
       expect.arrayContaining([
@@ -361,17 +321,9 @@ describe('GET /clients/courses/started', () => {
         }),
       ]),
     );
-
-    console.log('It got until here! (This is the end of the first test)');
   });
 
   it('should return status 404 when no course has been started', async () => {
-    const user = {
-      name: 'Teste NãoIniciado',
-      email: 'teste@naoiniciado.com',
-      password: 'senha_super_secreta_de_teste',
-    };
-
     const courseOne = {
       name: 'Vue.js do zero!',
       description: 'Aprenda Vue.js do zero ao avançado, com muita prática!',
@@ -383,14 +335,6 @@ describe('GET /clients/courses/started', () => {
       description: 'Aprenda Angular do zero ao avançado, com muita prática!',
       image: 'https://blog.trainning.com.br/wp-content/uploads/2018/06/Why-AngularJS-A1.jpg',
     };
-
-    const testUser = await db.query('INSERT INTO users (name, email, password, "createdAt", "updatedAt", type) values ($1, $2, $3, $4, $5, $6) RETURNING *', [
-      user.name, user.email, user.password, Sequelize.NOW, Sequelize.NOW, 'CLIENT',
-    ]);
-
-    const token = jwt.sign({ id: testUser.rows[0].id }, process.env.SECRET, {
-      expiresIn: 86400,
-    });
 
     await db.query('INSERT INTO courses (name, description, image, "createdAt", "updatedAt") values ($1, $2, $3, $4, $5) RETURNING *', [
       courseOne.name, courseOne.description, courseOne.image, Sequelize.NOW, Sequelize.NOW,
@@ -400,23 +344,15 @@ describe('GET /clients/courses/started', () => {
       courseTwo.name, courseTwo.description, courseTwo.image, Sequelize.NOW, Sequelize.NOW,
     ]);
 
-    const response = await agent.get('/clients/courses/started').set({ 'X-Access-Token': token });
+    const response = await agent.get('/clients/courses/started').set({ 'X-Access-Token': tokenClient });
 
     expect(response.status).toBe(404);
     expect(response.body.error).toBe('Nenhum curso iniciado.');
-
-    console.log('It got until here! (This is the end of the second test)');
   });
 });
 
 describe('GET /clients/courses/last-accessed', () => {
   it('should return the last accessed course by the specified user', async () => {
-    const user = {
-      name: 'Teste Iniciar',
-      email: 'teste@iniciar.com',
-      password: 'senha_super_secreta_de_teste',
-    };
-
     const courseOne = {
       name: 'Vue.js do zero!',
       description: 'Aprenda Vue.js do zero ao avançado, com muita prática!',
@@ -428,14 +364,6 @@ describe('GET /clients/courses/last-accessed', () => {
       description: 'Aprenda Angular do zero ao avançado, com muita prática!',
       image: 'https://blog.trainning.com.br/wp-content/uploads/2018/06/Why-AngularJS-A1.jpg',
     };
-
-    const testUser = await db.query('INSERT INTO users (name, email, password, "createdAt", "updatedAt", type) values ($1, $2, $3, $4, $5, $6) RETURNING *', [
-      user.name, user.email, user.password, Sequelize.NOW, Sequelize.NOW, 'CLIENT',
-    ]);
-
-    const token = jwt.sign({ id: testUser.rows[0].id }, process.env.SECRET, {
-      expiresIn: 86400,
-    });
 
     const testCourseOne = await db.query('INSERT INTO courses (name, description, image, "createdAt", "updatedAt") values ($1, $2, $3, $4, $5) RETURNING *', [
       courseOne.name, courseOne.description, courseOne.image, Sequelize.NOW, Sequelize.NOW,
@@ -446,14 +374,14 @@ describe('GET /clients/courses/last-accessed', () => {
     ]);
 
     await db.query('INSERT INTO "courseUsers" ("courseId", "userId", "createdAt", "updatedAt", "lastAccessed") values ($1, $2, $3, $4, $5)', [
-      testCourseOne.rows[0].id, testUser.rows[0].id, Sequelize.NOW, Sequelize.NOW, Sequelize.NOW,
+      testCourseOne.rows[0].id, idClient, Sequelize.NOW, Sequelize.NOW, Sequelize.NOW,
     ]);
 
     await db.query('INSERT INTO "courseUsers" ("courseId", "userId", "createdAt", "updatedAt", "lastAccessed") values ($1, $2, $3, $4, $5)', [
-      testCourseTwo.rows[0].id, testUser.rows[0].id, Sequelize.NOW, Sequelize.NOW, Sequelize.NOW,
+      testCourseTwo.rows[0].id, idClient, Sequelize.NOW, Sequelize.NOW, Sequelize.NOW,
     ]);
 
-    const result = await agent.get('/clients/courses/last-accessed').set({ 'X-Access-Token': token });
+    const result = await agent.get('/clients/courses/last-accessed').set({ 'X-Access-Token': tokenClient });
 
     expect(result.body).toMatchObject(
       expect.objectContaining({
@@ -463,17 +391,9 @@ describe('GET /clients/courses/last-accessed', () => {
         description: courseTwo.description,
       }),
     );
-
-    console.log('It got until here! (This is the end of the third test)');
   });
 
   it('should return status 404 when no course has been started', async () => {
-    const user = {
-      name: 'Teste NãoIniciado',
-      email: 'teste@naoiniciado.com',
-      password: 'senha_super_secreta_de_teste',
-    };
-
     const courseOne = {
       name: 'Vue.js do zero!',
       description: 'Aprenda Vue.js do zero ao avançado, com muita prática!',
@@ -486,14 +406,6 @@ describe('GET /clients/courses/last-accessed', () => {
       image: 'https://blog.trainning.com.br/wp-content/uploads/2018/06/Why-AngularJS-A1.jpg',
     };
 
-    const testUser = await db.query('INSERT INTO users (name, email, password, "createdAt", "updatedAt", type) values ($1, $2, $3, $4, $5, $6) RETURNING *', [
-      user.name, user.email, user.password, Sequelize.NOW, Sequelize.NOW, 'CLIENT',
-    ]);
-
-    const token = jwt.sign({ id: testUser.rows[0].id }, process.env.SECRET, {
-      expiresIn: 86400,
-    });
-
     await db.query('INSERT INTO courses (name, description, image, "createdAt", "updatedAt") values ($1, $2, $3, $4, $5) RETURNING *', [
       courseOne.name, courseOne.description, courseOne.image, Sequelize.NOW, Sequelize.NOW,
     ]);
@@ -502,11 +414,9 @@ describe('GET /clients/courses/last-accessed', () => {
       courseTwo.name, courseTwo.description, courseTwo.image, Sequelize.NOW, Sequelize.NOW,
     ]);
 
-    const response = await agent.get('/clients/courses/last-accessed').set({ 'X-Access-Token': token });
-
+    const response = await agent.get('/clients/courses/last-accessed').set({ 'X-Access-Token': tokenClient });
+    console.log(response.body);
     expect(response.status).toBe(404);
     expect(response.body.error).toBe('Nenhum curso iniciado.');
-
-    console.log('It got until here! (This is the end of the fourth test)');
   });
 });
