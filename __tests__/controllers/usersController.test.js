@@ -13,6 +13,15 @@ jest.mock('bcrypt', () => ({
   compareSync: (password) => password,
 }));
 
+jest.mock('uuid', () => ({
+  v4: () => 'meu_token_uuid',
+}));
+
+jest.mock('@sendgrid/mail', () => ({
+  setApiKey: () => {},
+  send: async (message) => message,
+}));
+
 jest.mock('../../src/models/User');
 jest.mock('sequelize');
 
@@ -219,6 +228,98 @@ describe('postSignOut', () => {
     await usersController.postSignOut(token);
 
     expect(sessionStore.deleteSession).toHaveBeenCalledWith(token);
+  });
+});
+
+describe('sendEmailWithToken', () => {
+  it('should call the expected functions', async () => {
+    const ObjectFunctionParameter = {
+      email: 'lg@gmail.com',
+    };
+
+    const messageExpected = {
+      to: ObjectFunctionParameter.email,
+      from: process.env.EMAIL_CODIFY,
+      subject: 'Link para recuperar sua senha',
+      html: 'http://localhost:9000/recover-password/meu_token_uuid',
+    };
+
+    const userFound = {
+      id: 1,
+      name: 'test',
+      password: '123456',
+      type: 'CLIENT',
+    };
+
+    jest.spyOn(usersController, 'findUserByEmail').mockImplementationOnce(() => userFound);
+    sessionStore.setSession.mockResolvedValue({});
+
+    const message = await usersController.sendEmailWithToken(ObjectFunctionParameter.email);
+
+    expect(message).toEqual(
+      expect.objectContaining(messageExpected),
+    );
+    expect(sessionStore.setSession).toHaveBeenCalledWith('meu_token_uuid', userFound.id);
+  });
+  it('should throw an Authorization error, because there is no user with this email', async () => {
+    const ObjectFunctionParameter = {
+      email: 'lg@gmail.com',
+    };
+
+    jest.spyOn(usersController, 'findUserByEmail').mockResolvedValue(null);
+
+    expect(async () => {
+      await usersController.sendEmailWithToken(ObjectFunctionParameter.email);
+    }).rejects.toThrow(AuthorizationError);
+  });
+});
+
+describe('editUserPassword', () => {
+  it('should return user with the changing password and call the expected functions', async () => {
+    const ObjectFunctionParameter = {
+      token: 'meu-token-chave-Redis',
+      password: 'new-password',
+    };
+    const userId = 1;
+
+    const userFound = {
+      id: userId,
+      name: 'test',
+      password: '123456',
+      type: 'CLIENT',
+      save: () => {},
+    };
+    const expectedObject = {
+      id: userId,
+      name: 'test',
+      password: ObjectFunctionParameter.password,
+      type: 'CLIENT',
+    };
+
+    sessionStore.getSession.mockResolvedValue(userId);
+    jest.spyOn(usersController, 'findUserById').mockImplementationOnce(() => userFound);
+
+    const user = await usersController.editUserPassword(ObjectFunctionParameter);
+
+    expect(user).toEqual(
+      expect.objectContaining(expectedObject),
+    );
+    expect(sessionStore.getSession).toHaveBeenCalledWith(ObjectFunctionParameter.token);
+    expect(usersController.findUserById).toHaveBeenCalledWith(userId);
+  });
+  it('should throw an Authorization error, because there is no register in Redis', async () => {
+    const ObjectFunctionParameter = {
+      token: 'meu-token-chave-Redis',
+      password: 'new-password',
+    };
+
+    sessionStore.getSession.mockResolvedValue(false);
+
+    expect(sessionStore.getSession).toHaveBeenCalledWith(ObjectFunctionParameter.token);
+
+    expect(async () => {
+      await usersController.editUserPassword(ObjectFunctionParameter);
+    }).rejects.toThrow(AuthorizationError);
   });
 });
 

@@ -21,4 +21,14 @@ router.post('/logout', verifyJWT, async (req, res) => {
   return res.sendStatus(200);
 });
 
+router.post('/recover-password', clientsMiddlewares.recoverPassword, async (req, res) => {
+  await usersController.sendEmailWithToken(req.body.email);
+  return res.sendStatus(200);
+});
+
+router.post('/new-password', clientsMiddlewares.newPasswordMiddleware, async (req, res) => {
+  await usersController.editUserPassword(req.body);
+  return res.sendStatus(200);
+});
+
 module.exports = router;
