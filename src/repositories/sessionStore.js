@@ -3,7 +3,10 @@ const redis = require('promise-redis')();
 class SessionStore {
   constructor() {
     this.client = redis.createClient({
-      url: process.env.REDISCLOUD_URL,
+      url: process.env.REDIS_URL,
+      tls: {
+        rejectUnauthorized: false
+      } 
     });
     this.client.on('error', (error) => {
       /* eslint-disable-next-line no-console */
