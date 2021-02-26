@@ -1,14 +1,27 @@
 const Topic = require('../models/Topic');
 const InexistingId = require('../errors/InexistingId');
 const Chapter = require('../models/Chapter');
+const Theory = require('../models/Theory');
 
 class TopicsController {
-  async createTopic({ chapterId, name }) {
+  async createTopic({ chapterId, name, youtubeLink }) {
     const chapter = await Chapter.findByPk(chapterId);
     if (!chapter) throw new InexistingId();
 
     const topic = await Topic.create({ chapterId, name });
-    return topic;
+    await Theory.create({ youtubeLink, topicId: topic.id });
+
+    const topicToSend = await Topic.findOne({
+      where: {
+        id: topic.id,
+      },
+      include: [{
+        model: Theory,
+        attributes: ['id', 'youtubeLink'],
+      }],
+    });
+
+    return topicToSend;
   }
 
   async createListOfTopics(topics, chapterId) {
@@ -26,7 +39,12 @@ class TopicsController {
   }
 
   async getAllTopics() {
-    const topics = await Topic.findAll();
+    const topics = await Topic.findAll({
+      include: [{
+        model: Theory,
+        attributes: ['id', 'youtubeLink'],
+      }],
+    });
     return topics;
   }
 
@@ -36,19 +54,42 @@ class TopicsController {
     return topic;
   }
 
-  async editTopic(id, { name, chapterId }) {
+  async editTopic(id, { name, chapterId, theory }) {
     const topic = await Topic.findByPk(id);
     if (!topic) throw new InexistingId();
+
+    const theoryResult = await Theory.findByPk(theory.id);
+    if (!theoryResult) throw new InexistingId();
 
     topic.name = name || topic.name;
     topic.chapterId = chapterId || topic.chapterId;
     await topic.save();
-    return topic;
+
+    theoryResult.youtubeLink = theory.youtubeLink || theoryResult.youtubeLink;
+    await theoryResult.save();
+
+    const topicToSend = await Topic.findOne({
+      where: {
+        id: topic.id,
+      },
+      include: [{
+        model: Theory,
+        attributes: ['id', 'youtubeLink'],
+      }],
+    });
+
+    return topicToSend;
   }
 
   async deleteOneTopic(id) {
     const topic = await Topic.findByPk(id);
     if (!topic) throw new InexistingId();
+
+    await Theory.destroy({
+      where: {
+        topicId: id,
+      },
+    });
 
     await Topic.destroy({
       where: { id },
