@@ -2,22 +2,36 @@
 const topicsController = require('../../src/controllers/topicsController');
 const InexistingId = require('../../src/errors/InexistingId');
 const Chapter = require('../../src/models/Chapter');
+const Theory = require('../../src/models/Theory');
 const Topic = require('../../src/models/Topic');
 
 jest.mock('../../src/models/Topic');
 jest.mock('../../src/models/Chapter');
+jest.mock('../../src/models/Theory');
 jest.mock('sequelize');
 
 describe('createTopic', () => {
   it('should return a topic with id', async () => {
     const name = 'Introduction';
     const chapterId = 1;
-    const expectedObject = { id: 1, name, chapterId };
+    const youtubeLink = 'https://www.youtube.com/watch?v=efWrIyjmCXg';
+    const expectedObject = {
+      id: 1,
+      name,
+      chapterId,
+      theory: {
+        id: 1,
+        youtubeLink,
+      },
+    };
     Chapter.findByPk.mockResolvedValue(true);
-    Topic.create.mockResolvedValue(expectedObject);
-    const topic = await topicsController.createTopic({ name, chapterId });
+    Topic.create.mockResolvedValue({ id: 1, name, chapterId });
+    Theory.create.mockResolvedValue({ id: 1, youtubeLink });
+    Topic.findOne.mockResolvedValue(expectedObject);
+    const topic = await topicsController.createTopic({ name, chapterId, youtubeLink });
     expect(topic).toBe(expectedObject);
     expect(Topic.create).toHaveBeenCalledWith({ chapterId, name });
+    expect(Theory.create).toHaveBeenCalledWith({ topicId: 1, youtubeLink });
   });
 
   it('should throw an error', async () => {
@@ -96,9 +110,29 @@ describe('editTopic', () => {
       chapterId: 1,
       save: () => {},
     };
-    const newTopicData = { chapterId: 2 };
-    const expectedObject = { name: oldTopicMocked.name, chapterId: newTopicData.chapterId };
+    const oldTheoryMocked = {
+      id: 1,
+      youtubeLink: 'https://www.youtube.com/watch?v=efWrIyjmCXg',
+      save: () => {},
+    };
+    const newTopicData = {
+      name: oldTopicMocked.name,
+      chapterId: 2,
+      theory: {
+        id: 1,
+      },
+    };
+    const expectedObject = {
+      name: oldTopicMocked.name,
+      chapterId: newTopicData.chapterId,
+      theory: {
+        id: oldTheoryMocked.id,
+        youtubeLink: oldTheoryMocked.youtubeLink,
+      },
+    };
     Topic.findByPk.mockResolvedValue(oldTopicMocked);
+    Theory.findByPk.mockResolvedValue(oldTheoryMocked);
+    Topic.findOne.mockResolvedValue(expectedObject);
     const topic = await topicsController.editTopic(id, newTopicData);
     expect(topic).toEqual(
       expect.objectContaining(expectedObject),
@@ -107,10 +141,17 @@ describe('editTopic', () => {
 
   it('should throw an error', async () => {
     const id = -1;
+    const newTopicData = {
+      name: 'Test',
+      chapterId: 2,
+      theory: {
+        id: 1,
+      },
+    };
     Topic.findByPk.mockResolvedValue(null);
 
     expect(async () => {
-      await topicsController.editTopic(id);
+      await topicsController.editTopic(id, newTopicData);
     }).rejects.toThrow(InexistingId);
   });
 });
@@ -121,6 +162,7 @@ describe('deleteOneTopic', () => {
     Topic.findByPk.mockResolvedValue(true);
     await topicsController.deleteOneTopic(id);
     expect(Topic.destroy).toHaveBeenCalledWith({ where: { id } });
+    expect(Theory.destroy).toHaveBeenCalledWith({ where: { topicId: id } });
   });
 
   it('should throw an error', async () => {

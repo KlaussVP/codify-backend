@@ -15,7 +15,6 @@ topicRouter.post('/', adminVerifyJWT, async (req, res) => {
 topicRouter.put('/:id', adminVerifyJWT, async (req, res) => {
   const validation = editTopicSchema.validate(req.body);
   if (validation.error) return res.status(422).send({ error: 'Verifique seus dados' });
-
   const topic = await topicsController.editTopic(req.params.id, req.body);
   return res.send(topic);
 });

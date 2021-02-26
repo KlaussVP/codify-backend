@@ -74,6 +74,7 @@ describe('POST /admin/topics', () => {
     const topicBody = {
       name: 'Introduction JS',
       chapterId,
+      youtubeLink: 'https://www.youtube.com/watch?v=efWrIyjmCXg',
     };
 
     const response = await agent.post('/admin/topics').set({ 'X-Access-Token': tokenAdmin }).send(topicBody);
@@ -83,6 +84,10 @@ describe('POST /admin/topics', () => {
       name: topicBody.name,
       createdAt: NOW,
       updatedAt: NOW,
+      theory: {
+        id: expect.any(Number),
+        youtubeLink: topicBody.youtubeLink,
+      },
     });
   });
 
@@ -98,18 +103,19 @@ describe('POST /admin/topics', () => {
 
 describe('PUT /admin/topics/:id', () => {
   it('should return 200 when passed valid parameters', async () => {
-    const topic = {
-      name: 'Introduction JS',
-      chapterId,
-    };
-
-    const resultTopic = await db.query('INSERT INTO topics (name, "chapterId", "createdAt", "updatedAt") values ($1, $2, $3, $4) RETURNING *', [topic.name, chapterId, NOW, NOW]);
+    const resultTopic = await db.query('INSERT INTO topics (name, "chapterId", "createdAt", "updatedAt") values ($1, $2, $3, $4) RETURNING *', ['Introduction JS', chapterId, NOW, NOW]);
 
     const topicId = resultTopic.rows[0].id;
+
+    const resultTheory = await db.query('INSERT INTO theories ("youtubeLink", "topicId", "createdAt", "updatedAt") values ($1, $2, $3, $4) RETURNING *', ['https://www.youtube.com/watch?v=efWrIyjmCXg', topicId, NOW, NOW]);
+    const theoryId = resultTheory.rows[0].id;
 
     const topicToBeEdited = {
       id: topicId,
       name: 'Introdução EDITADO ',
+      theory: {
+        id: theoryId,
+      },
     };
     const response = await agent.put(`/admin/topics/${topicId}`).set({ 'X-Access-Token': tokenAdmin }).send(topicToBeEdited);
 
@@ -118,6 +124,10 @@ describe('PUT /admin/topics/:id', () => {
       id: topicId,
       name: topicToBeEdited.name,
       chapterId,
+      theory: {
+        id: theoryId,
+        youtubeLink: resultTheory.rows[0].youtubeLink,
+      },
     });
   });
 
@@ -140,8 +150,9 @@ describe('DELETE /admin/topics/:id', () => {
     };
 
     const resultTopic = await db.query('INSERT INTO topics (name, "chapterId", "createdAt", "updatedAt") values ($1, $2, $3, $4) RETURNING *', [topic.name, chapterId, NOW, NOW]);
-
     const topicId = resultTopic.rows[0].id;
+
+    await db.query('INSERT INTO theories ("youtubeLink", "topicId", "createdAt", "updatedAt") values ($1, $2, $3, $4) RETURNING *', ['https://www.youtube.com/watch?v=efWrIyjmCXg', topicId, NOW, NOW]);
 
     const response = await agent.delete(`/admin/topics/${topicId}`).set({ 'X-Access-Token': tokenAdmin });
 

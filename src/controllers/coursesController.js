@@ -211,17 +211,19 @@ class CoursesController {
   }
 
   async listStartedCourses(userId) {
-    const onGoingCourses = await Course.findAll({ 
+    const onGoingCourses = await Course.findAll({
       include: [
         {
           model: CourseUser,
           where: {
             userId,
-            deleted: false 
-          }
-        }
-      ]
+            deleted: false,
+          },
+        },
+      ],
     });
+
+    if (onGoingCourses.length === 0) throw new NoCourseStarted();
 
     return onGoingCourses;
   }
