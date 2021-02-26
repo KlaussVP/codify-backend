@@ -79,13 +79,7 @@ class UsersController {
       html: `http://localhost:9000/recover-password/${token}`,
     };
 
-    sgMail.send(message).then(() => {
-      // eslint-disable-next-line no-console
-      console.log('Email sent');
-    }).catch((error) => {
-      // eslint-disable-next-line no-console
-      console.error(error);
-    });
+    await sgMail.send(message);
     return message;
   }
 
