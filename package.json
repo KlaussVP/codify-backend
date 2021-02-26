@@ -28,6 +28,7 @@
     "express": "^4.17.1",
     "express-async-errors": "^3.1.1",
     "git-commit-msg-linter": "^3.0.0",
+    "ioredis": "^4.23.0",
     "jest": "^26.6.3",
     "joi": "^17.3.0",
     "jsonwebtoken": "^8.5.1",
@@ -35,6 +36,7 @@
     "promise-redis": "^0.0.5",
     "sequelize": "^6.5.0",
     "sequelize-cli": "^6.2.0",
+    "url": "^0.11.0",
     "uuid": "^8.3.2"
   },
   "engines": {
