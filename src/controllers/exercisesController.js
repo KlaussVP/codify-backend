@@ -62,6 +62,12 @@ class ExercisesController {
 
     return exercise;
   }
+
+  async deleteOneExercise(id) {
+    const exercise = await Exercise.findByPk(id);
+    if (!exercise) throw new InexistingId();
+    await exercise.destroy();
+  }
 }
 
 module.exports = new ExercisesController();

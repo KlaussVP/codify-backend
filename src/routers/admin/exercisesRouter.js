@@ -34,4 +34,9 @@ exercisesRouter.put('/:id', adminVerifyJWT, async (req, res) => {
   return res.send(exercise);
 });
 
+exercisesRouter.delete('/:id', adminVerifyJWT, async (req, res) => {
+  await exercisesController.deleteOneExercise(req.params.id);
+  res.sendStatus(202);
+});
+
 module.exports = exercisesRouter;

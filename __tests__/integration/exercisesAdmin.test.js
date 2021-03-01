@@ -230,3 +230,21 @@ describe('PUT /admin/exercises/:id', () => {
   });
 });
 
+describe('DELETE /admin/exercises/:id', () => {
+  it('should return status 202 when passed valid id', async () => {
+    const tokenAdmin = await getToken();
+    const ids = await insertCompleteCourse();
+
+    const response = await agent.delete(`/admin/exercises/${ids.exerciseId}`).set({ 'X-Access-Token': tokenAdmin });
+    expect(response.status).toBe(202);
+  });
+
+  it('should return 403 when passed invalid Id', async () => {
+    const id = -999;
+    const tokenAdmin = await getToken();
+    const response = await agent.delete(`/admin/exercises/${id}`).set({ 'X-Access-Token': tokenAdmin });
+
+    expect(response.status).toBe(403);
+  });
+});
+
