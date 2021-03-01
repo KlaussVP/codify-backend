@@ -121,3 +121,34 @@ describe('GET /admin/exercises', () => {
     }]));
   });
 });
+
+describe('GET /admin/exercises/:id', () => {
+  it('should return 200 when passed valid Id', async () => {
+    const tokenAdmin = await getToken();
+    const ids = await insertCompleteCourse();
+
+    const response = await agent.get(`/admin/exercises/${ids.exerciseId}`).set({ 'X-Access-Token': tokenAdmin });
+
+    expect(response.status).toBe(200);
+    expect(response.headers['access-control-expose-headers']).toBeTruthy();
+    expect(response.headers['x-total-count']).toBeTruthy();
+    expect(response.body).toEqual(expect.objectContaining({
+      id: ids.exerciseId,
+      baseCode: expect.any(String),
+      topicId: ids.topicId,
+      testCode: expect.any(String),
+      solutionCode: expect.any(String),
+      statement: expect.any(String),
+      position: 1,
+    }));
+  });
+
+  it('should return 403 when passed invalid Id', async () => {
+    const tokenAdmin = await getToken();
+    insertCompleteCourse();
+    const exerciseId = -999;
+    const response = await agent.get(`/admin/exercises/${exerciseId}`).set({ 'X-Access-Token': tokenAdmin });
+
+    expect(response.status).toBe(403);
+  });
+});

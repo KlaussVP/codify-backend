@@ -34,6 +34,14 @@ class ExercisesController {
     });
     return exercises;
   }
+
+  async getExerciseByIdAsAdmin(id) {
+    const exercise = await Exercise.findByPk(id);
+
+    if (!exercise) throw new InexistingId();
+
+    return exercise;
+  }
 }
 
 module.exports = new ExercisesController();

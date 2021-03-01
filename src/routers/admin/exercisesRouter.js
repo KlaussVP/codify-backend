@@ -10,4 +10,12 @@ exercisesRouter.get('/', adminVerifyJWT, async (req, res) => {
     .send(exercises);
 });
 
+exercisesRouter.get('/:id', adminVerifyJWT, async (req, res) => {
+  const exercise = await exercisesController.getExerciseByIdAsAdmin(req.params.id);
+  res
+    .header('Access-Control-Expose-Headers', 'X-Total-Count')
+    .set('X-Total-Count', 1)
+    .send(exercise);
+});
+
 module.exports = exercisesRouter;
