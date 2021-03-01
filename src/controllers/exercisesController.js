@@ -37,9 +37,14 @@ class ExercisesController {
 
   async getExerciseByIdAsAdmin(id) {
     const exercise = await Exercise.findByPk(id);
-
     if (!exercise) throw new InexistingId();
+    return exercise;
+  }
 
+  async createExercise(exerciseInfo) {
+    const topic = await Topic.findByPk(exerciseInfo.topicId);
+    if (!topic) throw new InexistingId();
+    const exercise = await Exercise.create(exerciseInfo);
     return exercise;
   }
 }

@@ -152,3 +152,45 @@ describe('GET /admin/exercises/:id', () => {
     expect(response.status).toBe(403);
   });
 });
+
+describe('POST /admin/exercises', () => {
+  it('should return 201 when passed valid parameters', async () => {
+    const tokenAdmin = await getToken();
+    const ids = await insertCompleteCourse();
+    const body = {
+      topicId: ids.topicId,
+      baseCode: 'Base Code 2',
+      testCode: 'Test Code 2',
+      solutionCode: 'Solution Code 2',
+      statement: 'Statement Code',
+      position: 2,
+    };
+
+    const response = await agent.post('/admin/exercises').set({ 'X-Access-Token': tokenAdmin }).send(body);
+
+    expect(response.status).toBe(201);
+    expect(response.body).toEqual(expect.objectContaining({
+      id: expect.any(Number),
+      topicId: ids.topicId,
+      baseCode: 'Base Code 2',
+      testCode: 'Test Code 2',
+      solutionCode: 'Solution Code 2',
+      statement: 'Statement Code',
+      position: 2,
+      createdAt: expect.any(String),
+      updatedAt: expect.any(String),
+    }));
+  });
+
+  it('should return 422 when passed invalid parameters', async () => {
+    const tokenAdmin = await getToken();
+    const ids = await insertCompleteCourse();
+    const body = {
+      topicId: ids.topicId,
+      baseCode: 'Base Code 2',
+      testCode: 'Test Code 2',
+    };
+    const response = await agent.post('/admin/topics').set({ 'X-Access-Token': tokenAdmin }).send(body);
+    expect(response.status).toBe(422);
+  });
+});
