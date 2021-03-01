@@ -16,7 +16,7 @@ const editExerciseSchema = joi.object({
   solutionCode: joi.string().min(10),
   statement: joi.string().min(10),
   position: joi.number(),
-});
+}).unknown(true);
 
 module.exports = {
   postExerciseSchema,

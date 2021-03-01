@@ -47,6 +47,21 @@ class ExercisesController {
     const exercise = await Exercise.create(exerciseInfo);
     return exercise;
   }
+
+  async editExercise(id, editExerciseInfo) {
+    const exercise = await Exercise.findByPk(id);
+    if (!exercise) throw new InexistingId();
+
+    exercise.baseCode = editExerciseInfo.baseCode || exercise.baseCode;
+    exercise.testCode = editExerciseInfo.testCode || exercise.testCode;
+    exercise.solutionCode = editExerciseInfo.solutionCode || exercise.solutionCode;
+    exercise.statement = editExerciseInfo.statement || exercise.statement;
+    exercise.position = editExerciseInfo.position || exercise.position;
+
+    await exercise.save();
+
+    return exercise;
+  }
 }
 
 module.exports = new ExercisesController();

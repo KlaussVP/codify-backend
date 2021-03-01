@@ -1,7 +1,7 @@
 const exercisesRouter = require('express').Router();
 const { adminVerifyJWT } = require('../../middlewares/adminMiddlewares');
 const exercisesController = require('../../controllers/exercisesController');
-const { postExerciseSchema } = require('../../schemas/exercisesSchema');
+const { postExerciseSchema, editExerciseSchema } = require('../../schemas/exercisesSchema');
 
 exercisesRouter.get('/', adminVerifyJWT, async (req, res) => {
   const exercises = await exercisesController.getAllExercises();
@@ -25,6 +25,13 @@ exercisesRouter.post('/', adminVerifyJWT, async (req, res) => {
 
   const exercise = await exercisesController.createExercise(req.body);
   return res.status(201).send(exercise);
+});
+
+exercisesRouter.put('/:id', adminVerifyJWT, async (req, res) => {
+  const validation = editExerciseSchema.validate(req.body);
+  if (validation.error) return res.status(422).send({ error: 'Verifique seus dados' });
+  const exercise = await exercisesController.editExercise(req.params.id, req.body);
+  return res.send(exercise);
 });
 
 module.exports = exercisesRouter;

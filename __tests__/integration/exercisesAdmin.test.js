@@ -194,3 +194,39 @@ describe('POST /admin/exercises', () => {
     expect(response.status).toBe(422);
   });
 });
+
+describe('PUT /admin/exercises/:id', () => {
+  it('should return 200 when passed valid parameters', async () => {
+    const tokenAdmin = await getToken();
+    const ids = await insertCompleteCourse();
+
+    const exerciseToBeEdited = {
+      baseCode: 'Base Code Edited',
+    };
+    const response = await agent.put(`/admin/exercises/${ids.exerciseId}`).set({ 'X-Access-Token': tokenAdmin }).send(exerciseToBeEdited);
+
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual(expect.objectContaining({
+      id: ids.exerciseId,
+      baseCode: exerciseToBeEdited.baseCode,
+      topicId: ids.topicId,
+      testCode: expect.any(String),
+      solutionCode: expect.any(String),
+      statement: expect.any(String),
+      position: 1,
+    }));
+  });
+
+  it('should return 422 when passed invalid parameters', async () => {
+    const tokenAdmin = await getToken();
+    const ids = await insertCompleteCourse();
+
+    const exerciseToBeEdited = {
+      position: 'position',
+    };
+
+    const response = await agent.put(`/admin/theories/${ids.exerciseId}`).set({ 'X-Access-Token': tokenAdmin }).send(exerciseToBeEdited);
+    expect(response.status).toBe(422);
+  });
+});
+
