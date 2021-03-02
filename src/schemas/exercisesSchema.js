@@ -7,7 +7,7 @@ const postExerciseSchema = joi.object({
   solutionCode: joi.string().min(10).required(),
   statement: joi.string().min(10).required(),
   position: joi.number().required(),
-});
+}).unknown(true);
 
 const editExerciseSchema = joi.object({
   topicId: joi.number().greater(0),
