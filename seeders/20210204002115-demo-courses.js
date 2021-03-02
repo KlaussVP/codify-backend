@@ -367,68 +367,9 @@ module.exports = {
           topicId: topicsIds[0][3].id,
         },
       ], {});
-
-    const exercise = {
-      title: 'Exercício',
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-
-    await queryInterface.bulkInsert('exercises',
-      [
-        {
-          ...exercise,
-          topicId: topicsIds[0][0].id,
-        },
-        {
-          ...exercise,
-          topicId: topicsIds[0][0].id,
-        },
-        {
-          ...exercise,
-          topicId: topicsIds[0][0].id,
-        },
-        {
-          ...exercise,
-          topicId: topicsIds[0][1].id,
-        },
-        {
-          ...exercise,
-          topicId: topicsIds[0][1].id,
-        },
-        {
-          ...exercise,
-          topicId: topicsIds[0][1].id,
-        },
-        {
-          ...exercise,
-          topicId: topicsIds[0][2].id,
-        },
-        {
-          ...exercise,
-          topicId: topicsIds[0][2].id,
-        },
-        {
-          ...exercise,
-          topicId: topicsIds[0][2].id,
-        },
-        {
-          ...exercise,
-          topicId: topicsIds[0][3].id,
-        },
-        {
-          ...exercise,
-          topicId: topicsIds[0][3].id,
-        },
-        {
-          ...exercise,
-          topicId: topicsIds[0][3].id,
-        },
-      ], {});
   },
 
   down: async (queryInterface) => {
-    await queryInterface.bulkDelete('exercises', null, {});
     await queryInterface.bulkDelete('theories', null, {});
     await queryInterface.bulkDelete('topics', null, {});
     await queryInterface.bulkDelete('chapters', null, {});

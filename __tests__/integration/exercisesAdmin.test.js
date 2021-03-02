@@ -123,7 +123,7 @@ describe('GET /admin/exercises', () => {
 });
 
 describe('GET /admin/exercises/:id', () => {
-  it('should return 200 when passed valid Id', async () => {
+  it('should return 200 and an object with the exercise when passed valid Id', async () => {
     const tokenAdmin = await getToken();
     const ids = await insertCompleteCourse();
 
@@ -154,7 +154,7 @@ describe('GET /admin/exercises/:id', () => {
 });
 
 describe('POST /admin/exercises', () => {
-  it('should return 201 when passed valid parameters', async () => {
+  it('should return 201 and an object with the exercise when passed valid parameters', async () => {
     const tokenAdmin = await getToken();
     const ids = await insertCompleteCourse();
     const body = {
@@ -196,7 +196,7 @@ describe('POST /admin/exercises', () => {
 });
 
 describe('PUT /admin/exercises/:id', () => {
-  it('should return 200 when passed valid parameters', async () => {
+  it('should return 200 and the modified exercise when passed valid parameters', async () => {
     const tokenAdmin = await getToken();
     const ids = await insertCompleteCourse();
 
