@@ -150,6 +150,10 @@ class CoursesController {
         include: [{
           model: Topic,
           attributes: ['id', 'name'],
+          include: [{
+            model: Theory,
+            attributes: ['id'],
+          }],
         }],
         order: [
           [Chapter, 'id', 'ASC'],
@@ -278,11 +282,18 @@ class CoursesController {
     let totalActivitiesCourse = 0;
     let totalActivitiesCourseDone = 0;
     const newChapters = [];
+    const startedCourse = await CourseUser.findAll({
+      where: {
+        courseId: course.id,
+        userId,
+      },
+    });
     const courseToSend = {
       id: course.id,
       name: course.name,
       description: course.description,
       image: course.image,
+      started: startedCourse.length > 0,
     };
     // eslint-disable-next-line no-restricted-syntax
     for (const chapter of course.chapters) {
@@ -298,6 +309,7 @@ class CoursesController {
         const newTopic = {
           id: topic.id,
           name: topic.name,
+          theoryId: topic.theory ? topic.theory.id : 0,
         };
         const exercises = await Exercise.findAll({
           where: {

@@ -9,6 +9,7 @@ const Chapter = require('../../src/models/Chapter');
 const Topic = require('../../src/models/Topic');
 const TheoryUser = require('../../src/models/TheoryUser');
 const ExerciseUser = require('../../src/models/ExerciseUser');
+const CourseUser = require('../../src/models/CourseUser');
 
 jest.mock('../../src/models/Course');
 jest.mock('../../src/models/Theory');
@@ -17,6 +18,7 @@ jest.mock('../../src/models/Chapter');
 jest.mock('../../src/models/Topic');
 jest.mock('../../src/models/TheoryUser');
 jest.mock('../../src/models/ExerciseUser');
+jest.mock('../../src/models/CourseUser');
 
 jest.mock('sequelize');
 
@@ -412,10 +414,16 @@ describe('getCourseProgress', () => {
             {
               id: 1,
               name: 'First step',
+              theory: {
+                id: 6,
+              },
             },
             {
               id: 2,
               name: 'Second step',
+              theory: {
+                id: 7,
+              },
             },
           ],
         },
@@ -425,6 +433,7 @@ describe('getCourseProgress', () => {
       id: 1,
       name: 'JavaScript',
       description: 'Test',
+      started: false,
       chapters: [
         {
           exerciseCount: 4,
@@ -436,11 +445,13 @@ describe('getCourseProgress', () => {
               id: 1,
               name: 'First step',
               done: false,
+              theoryId: 6,
             },
             {
               id: 2,
               name: 'Second step',
               done: false,
+              theoryId: 7,
             },
           ],
         },
@@ -448,6 +459,7 @@ describe('getCourseProgress', () => {
     };
     Theory.findAll.mockResolvedValue(['Th1']);
     Exercise.findAll.mockResolvedValue(['Ex1', 'Ex2']);
+    CourseUser.findAll.mockResolvedValue([]);
     TheoryUser.count(1);
     ExerciseUser.count(1);
     const result = await coursesController.getCourseProgress(course, 1);
