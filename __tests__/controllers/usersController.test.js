@@ -99,6 +99,7 @@ describe('postSignIn', () => {
       name: 'test',
       type: 'CLIENT',
       token: 'token',
+      email: 'teste@gmail.com',
     };
 
     const userFound = {
@@ -106,6 +107,7 @@ describe('postSignIn', () => {
       name: 'test',
       password: '123456',
       type: 'CLIENT',
+      email: 'teste@gmail.com',
     };
 
     jest.spyOn(usersController, 'findUserByEmail').mockImplementationOnce(() => userFound);
@@ -118,6 +120,7 @@ describe('postSignIn', () => {
       token: 'token',
       type: userFound.type,
       name: userFound.name,
+      email: userFound.email,
     });
   });
 
@@ -135,6 +138,7 @@ describe('postSignIn', () => {
       name: 'test',
       type: 'ADMIN',
       token: 'token',
+      email: 'teste@gmail.com',
     };
 
     const userFound = {
@@ -142,6 +146,7 @@ describe('postSignIn', () => {
       name: 'test',
       password: '123456',
       type: 'ADMIN',
+      email: 'teste@gmail.com',
     };
 
     jest.spyOn(usersController, 'findUserByEmail').mockImplementationOnce(() => userFound);
@@ -154,6 +159,7 @@ describe('postSignIn', () => {
       token: 'token',
       type: userFound.type,
       name: userFound.name,
+      email: userFound.email,
     });
   });
 
@@ -319,6 +325,84 @@ describe('editUserPassword', () => {
 
     expect(async () => {
       await usersController.editUserPassword(ObjectFunctionParameter);
+    }).rejects.toThrow(AuthorizationError);
+  });
+});
+
+describe('editUserData', () => {
+  it('should return user with the changing fields', async () => {
+    const ObjectFunctionParameter = {
+      email: 'lg@gmail.com',
+      name: 'Teste nome',
+    };
+    const userId = 1;
+
+    const userFound = {
+      id: userId,
+      name: 'test',
+      password: '123456',
+      type: 'CLIENT',
+      save: () => {},
+    };
+    const expectedObject = {
+      id: userId,
+      name: ObjectFunctionParameter.name,
+      password: '123456',
+      email: ObjectFunctionParameter.email,
+      type: 'CLIENT',
+    };
+
+    jest.spyOn(usersController, 'findUserById').mockImplementationOnce(() => userFound);
+
+    const user = await usersController.editUserData(userId, ObjectFunctionParameter);
+
+    expect(user).toEqual(
+      expect.objectContaining(expectedObject),
+    );
+    expect(usersController.findUserById).toHaveBeenCalledWith(userId);
+  });
+  it('should return user with the changing fields - password and name', async () => {
+    const ObjectFunctionParameter = {
+      password: 'new-password',
+      name: 'Teste nome',
+    };
+    const userId = 1;
+
+    const userFound = {
+      id: userId,
+      name: 'test',
+      password: '123456',
+      type: 'CLIENT',
+      email: 'lg@gmail.com',
+      save: () => {},
+    };
+    const expectedObject = {
+      id: userId,
+      name: ObjectFunctionParameter.name,
+      email: userFound.email,
+      password: ObjectFunctionParameter.password,
+      type: 'CLIENT',
+    };
+
+    jest.spyOn(usersController, 'findUserById').mockImplementationOnce(() => userFound);
+
+    const user = await usersController.editUserData(userId, ObjectFunctionParameter);
+
+    expect(user).toEqual(
+      expect.objectContaining(expectedObject),
+    );
+    expect(usersController.findUserById).toHaveBeenCalledWith(userId);
+  });
+  it('should throw an Authorization error, because there is no user with this Id', async () => {
+    const ObjectFunctionParameter = {
+      email: 'lg@gmail.com',
+      name: 'Teste nome',
+    };
+
+    jest.spyOn(usersController, 'findUserById').mockImplementationOnce(() => null);
+
+    expect(async () => {
+      await usersController.editUserData(ObjectFunctionParameter);
     }).rejects.toThrow(AuthorizationError);
   });
 });

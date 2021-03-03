@@ -1,5 +1,6 @@
 const signInSchema = require('../schemas/signInSchema');
 const signUpSchema = require('../schemas/signUpSchema');
+const { editUserDataSchema } = require('../schemas/editUserDataSchema');
 const { recoverPasswordSchema, newPasswordSchema } = require('../schemas/recoverPasswordSchema');
 
 function signUpMiddleware(req, res, next) {
@@ -49,9 +50,20 @@ function newPasswordMiddleware(req, res, next) {
   return next();
 }
 
+function editUserData(req, res, next) {
+  const validation = editUserDataSchema.validate(req.body).error;
+
+  if (validation) {
+    return res.status(422).send({ error: 'Verifique os dados enviados.' });
+  }
+
+  return next();
+}
+
 module.exports = {
   signUpMiddleware,
   signInMiddleware,
   recoverPassword,
   newPasswordMiddleware,
+  editUserData,
 };

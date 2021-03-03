@@ -1,4 +1,5 @@
 const redis = require('promise-redis')();
+const url = require('url');
 
 class SessionStore {
   constructor() {

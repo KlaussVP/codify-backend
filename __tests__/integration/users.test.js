@@ -329,3 +329,101 @@ describe('POST /clients/new-password', () => {
     expect(response.status).toBe(401);
   });
 });
+
+describe('POST /clients/change-profile', () => {
+  it('should return 200 when data is valid', async () => {
+    const bodyNewDataUser = {
+      name: 'Novo nome do usuario',
+    };
+
+    const newUser = {
+      name: 'test AAAAAAAA',
+      email: 'lg@gmail.com',
+      password: '123456',
+    };
+
+    const resultUser = await db.query('INSERT INTO users (name, email, password, type, "createdAt", "updatedAt") values ($1, $2, $3, $4, $5, $6) RETURNING *', [newUser.name, newUser.email, bcrypt.hashSync(newUser.password, 10), 'CLIENT', 'now()', 'now()']);
+
+    const userId = resultUser.rows[0].id;
+
+    const token = jwt.sign({ id: userId }, process.env.SECRET, {
+      expiresIn: 86400,
+    });
+
+    const userData = {
+      id: userId,
+      token,
+      type: 'CLIENT',
+      name: newUser.name,
+      email: newUser.email,
+    };
+    await sessionStore.setSession(token, userData);
+
+    const response = await agent.post('/clients/change-profile').send(bodyNewDataUser).set({ 'x-access-token': token });
+    expect(response.status).toBe(200);
+  });
+  it('should return 200 when data is valid', async () => {
+    const bodyNewDataUser = {
+      password: 'Nova senha',
+      confirmPassword: 'Nova senha',
+    };
+
+    const newUser = {
+      name: 'test AAAAAAAA',
+      email: 'lg@gmail.com',
+      password: '123456',
+    };
+
+    const resultUser = await db.query('INSERT INTO users (name, email, password, type, "createdAt", "updatedAt") values ($1, $2, $3, $4, $5, $6) RETURNING *', [newUser.name, newUser.email, bcrypt.hashSync(newUser.password, 10), 'CLIENT', 'now()', 'now()']);
+
+    const userId = resultUser.rows[0].id;
+
+    const token = jwt.sign({ id: userId }, process.env.SECRET, {
+      expiresIn: 86400,
+    });
+
+    const userData = {
+      id: userId,
+      token,
+      type: 'CLIENT',
+      name: newUser.name,
+      email: newUser.email,
+    };
+    await sessionStore.setSession(token, userData);
+
+    const response = await agent.post('/clients/change-profile').send(bodyNewDataUser).set({ 'x-access-token': token });
+    expect(response.status).toBe(200);
+  });
+  it('should return 422 when password is not equal', async () => {
+    const bodyNewDataUser = {
+      password: 'Nova senha',
+      confirmPassword: 'Nova senha diferente',
+    };
+
+    const newUser = {
+      name: 'test AAAAAAAA',
+      email: 'lg@gmail.com',
+      password: '123456',
+    };
+
+    const resultUser = await db.query('INSERT INTO users (name, email, password, type, "createdAt", "updatedAt") values ($1, $2, $3, $4, $5, $6) RETURNING *', [newUser.name, newUser.email, bcrypt.hashSync(newUser.password, 10), 'CLIENT', 'now()', 'now()']);
+
+    const userId = resultUser.rows[0].id;
+
+    const token = jwt.sign({ id: userId }, process.env.SECRET, {
+      expiresIn: 86400,
+    });
+
+    const userData = {
+      id: userId,
+      token,
+      type: 'CLIENT',
+      name: newUser.name,
+      email: newUser.email,
+    };
+    await sessionStore.setSession(token, userData);
+
+    const response = await agent.post('/clients/change-profile').send(bodyNewDataUser).set({ 'x-access-token': token });
+    expect(response.status).toBe(422);
+  });
+});
