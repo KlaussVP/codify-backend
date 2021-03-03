@@ -20,6 +20,7 @@ const {
   chapterRouter,
   topicRouter,
   theoryRouter,
+  exerciseRouter,
 } = require('./routers/admin/coursesRouter');
 
 app.use(cors());
@@ -34,6 +35,7 @@ app.use('/admin/courses', coursesRouter);
 app.use('/admin/chapters', chapterRouter);
 app.use('/admin/topics', topicRouter);
 app.use('/admin/theories', theoryRouter);
+app.use('/admin/exercises', exerciseRouter);
 
 // eslint-disable-next-line no-unused-vars
 app.use((error, req, res, next) => {

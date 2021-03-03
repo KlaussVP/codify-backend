@@ -3,18 +3,8 @@ const url = require('url');
 
 class SessionStore {
   constructor() {
-    const redisUri = url.parse(process.env.REDIS_URL);
-
     this.client = redis.createClient({
-      port: Number(redisUri.port),
-      host: redisUri.hostname,
-      password: redisUri.auth.split(':')[1],
-      db: 0,
-      tls: {
-        rejectUnauthorized: false,
-        requestCert: true,
-        agent: false
-      }
+      url: process.env.REDIS_URL,
     });
     this.client.on('error', (error) => {
       /* eslint-disable-next-line no-console */
