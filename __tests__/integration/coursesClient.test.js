@@ -35,6 +35,10 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
+  await db.query('DELETE FROM "theoryUsers"');
+  await db.query('DELETE FROM "exerciseUsers"');
+  await db.query('DELETE FROM exercises');
+  await db.query('DELETE FROM theories');
   await db.query('DELETE FROM topics');
   await db.query('DELETE FROM chapters');
   await db.query('DELETE FROM "courseUsers"');
@@ -42,6 +46,10 @@ beforeEach(async () => {
 });
 
 afterAll(async () => {
+  await db.query('DELETE FROM "theoryUsers"');
+  await db.query('DELETE FROM "exerciseUsers"');
+  await db.query('DELETE FROM exercises');
+  await db.query('DELETE FROM theories');
   await db.query('DELETE FROM topics');
   await db.query('DELETE FROM chapters');
   await db.query('DELETE FROM "courseUsers"');
@@ -69,9 +77,7 @@ describe('GET /clients/courses/:id', () => {
     const theory = {
       youtubeLink: 'https://www.youtube.com/embed/Ptbk2af68e8',
     };
-    const exercise = {
-      title: 'Exercise',
-    };
+
     const resultCourse = await db.query('INSERT INTO courses (name, image, description) values ($1, $2, $3) RETURNING *', [course.name, course.image, course.description]);
     const courseId = resultCourse.rows[0].id;
 
@@ -81,10 +87,9 @@ describe('GET /clients/courses/:id', () => {
     const resultTopic = await db.query('INSERT INTO topics (name, "chapterId", "createdAt", "updatedAt") values ($1, $2, $3, $4) RETURNING *', [chapter.topics[0].name, chapterId, Sequelize.NOW, Sequelize.NOW]);
     const topicId = resultTopic.rows[0].id;
 
-    await db.query('INSERT INTO theories ("youtubeLink", "topicId", "createdAt", "updatedAt") values ($1, $2, $3, $4) RETURNING *', [theory.youtubeLink, topicId, Sequelize.NOW, Sequelize.NOW]);
+    const resultTheory = await db.query('INSERT INTO theories ("youtubeLink", "topicId", "createdAt", "updatedAt") values ($1, $2, $3, $4) RETURNING *', [theory.youtubeLink, topicId, Sequelize.NOW, Sequelize.NOW]);
 
-    await db.query('INSERT INTO exercises (title, "topicId", "createdAt", "updatedAt") values ($1, $2, $3, $4) RETURNING *', [exercise.title, topicId, Sequelize.NOW, Sequelize.NOW]);
-
+    await db.query('INSERT INTO exercises ("baseCode", "topicId", "createdAt", "updatedAt", "testCode", "statement", "solutionCode", position) values ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *', ['Base Code', topicId, Sequelize.NOW, Sequelize.NOW, 'Test Code', 'Statement', 'Solution Code', 1]);
     const response = await agent.get(`/clients/courses/${courseId}`).set({ 'X-Access-Token': tokenClient });
 
     expect(response.status).toBe(200);
@@ -93,6 +98,8 @@ describe('GET /clients/courses/:id', () => {
       name: course.name,
       image: course.image,
       description: course.description,
+      progress: 0,
+      started: false,
       chapters: [
         {
           id: chapterId,
@@ -103,6 +110,8 @@ describe('GET /clients/courses/:id', () => {
             {
               id: topicId,
               name: chapter.topics[0].name,
+              theoryId: resultTheory.rows[0].id,
+              done: false,
             },
           ],
         },
@@ -134,9 +143,7 @@ describe('GET /clients/courses/:id/activities', () => {
     const theory = {
       youtubeLink: 'https://www.youtube.com/embed/Ptbk2af68e8',
     };
-    const exercise = {
-      title: 'Exercise',
-    };
+
     const resultCourse = await db.query('INSERT INTO courses (name, image, description) values ($1, $2, $3) RETURNING *', [course.name, course.image, course.description]);
     const courseId = resultCourse.rows[0].id;
 
@@ -149,7 +156,7 @@ describe('GET /clients/courses/:id/activities', () => {
     const resultTheory = await db.query('INSERT INTO theories ("youtubeLink", "topicId", "createdAt", "updatedAt") values ($1, $2, $3, $4) RETURNING *', [theory.youtubeLink, topicId, Sequelize.NOW, Sequelize.NOW]);
     const theoryId = resultTheory.rows[0].id;
 
-    const resultExercise = await db.query('INSERT INTO exercises (title, "topicId", "createdAt", "updatedAt") values ($1, $2, $3, $4) RETURNING *', [exercise.title, topicId, Sequelize.NOW, Sequelize.NOW]);
+    const resultExercise = await db.query('INSERT INTO exercises ("baseCode", "topicId", "createdAt", "updatedAt", "testCode", "statement", "solutionCode", position) values ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *', ['Base Code', topicId, Sequelize.NOW, Sequelize.NOW, 'Test Code', 'Statement', 'Solution Code', 1]);
     const exerciseId = resultExercise.rows[0].id;
 
     const response = await agent.get(`/clients/courses/${courseId}/activities`).set({ 'X-Access-Token': tokenClient });
@@ -176,7 +183,11 @@ describe('GET /clients/courses/:id/activities', () => {
               exercises: [
                 {
                   id: exerciseId,
-                  title: exercise.title,
+                  baseCode: resultExercise.rows[0].baseCode,
+                  testCode: resultExercise.rows[0].testCode,
+                  solutionCode: resultExercise.rows[0].solutionCode,
+                  statement: resultExercise.rows[0].statement,
+                  position: 1,
                   exerciseUsers: [],
                 },
               ],
@@ -415,7 +426,6 @@ describe('GET /clients/courses/last-accessed', () => {
     ]);
 
     const response = await agent.get('/clients/courses/last-accessed').set({ 'X-Access-Token': tokenClient });
-    console.log(response.body);
     expect(response.status).toBe(404);
     expect(response.body.error).toBe('Nenhum curso iniciado.');
   });

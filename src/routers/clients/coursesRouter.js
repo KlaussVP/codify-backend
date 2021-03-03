@@ -18,7 +18,7 @@ router.get('/last-accessed', verifyJWT, async (req, res) => {
 });
 
 router.get('/:id', verifyJWT, async (req, res) => {
-  const course = await coursesController.getCourseWithNumberActivities(req.params.id);
+  const course = await coursesController.getCourseWithNumberActivities(req.params.id, req.userId);
   res.send(course);
 });
 

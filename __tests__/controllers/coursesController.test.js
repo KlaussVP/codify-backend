@@ -7,12 +7,18 @@ const Theory = require('../../src/models/Theory');
 const Exercise = require('../../src/models/Exercise');
 const Chapter = require('../../src/models/Chapter');
 const Topic = require('../../src/models/Topic');
+const TheoryUser = require('../../src/models/TheoryUser');
+const ExerciseUser = require('../../src/models/ExerciseUser');
+const CourseUser = require('../../src/models/CourseUser');
 
 jest.mock('../../src/models/Course');
 jest.mock('../../src/models/Theory');
 jest.mock('../../src/models/Exercise');
 jest.mock('../../src/models/Chapter');
 jest.mock('../../src/models/Topic');
+jest.mock('../../src/models/TheoryUser');
+jest.mock('../../src/models/ExerciseUser');
+jest.mock('../../src/models/CourseUser');
 
 jest.mock('sequelize');
 
@@ -283,7 +289,7 @@ describe('getCourseWithNumberActivities', () => {
     const id = 1;
     const expectedObject = { id, name: 'JavaScript' };
     Course.findOne.mockResolvedValue(expectedObject);
-    jest.spyOn(coursesController, 'getNumberOfActivities').mockImplementationOnce(() => expectedObject);
+    jest.spyOn(coursesController, 'getCourseProgress').mockImplementationOnce(() => expectedObject);
     const course = await coursesController.getCourseWithNumberActivities(id);
     expect(course).toBe(expectedObject);
   });
@@ -394,7 +400,7 @@ describe('deleteCourse', () => {
   });
 });
 
-describe('getNumberOfActivities', () => {
+describe('getCourseProgress', () => {
   it('should return a course with number of theories and exercises', async () => {
     const course = {
       id: 1,
@@ -408,24 +414,16 @@ describe('getNumberOfActivities', () => {
             {
               id: 1,
               name: 'First step',
+              theory: {
+                id: 6,
+              },
             },
             {
               id: 2,
               name: 'Second step',
-            },
-          ],
-        },
-        {
-          id: 2,
-          name: 'Introduction',
-          topics: [
-            {
-              id: 3,
-              name: 'First step',
-            },
-            {
-              id: 4,
-              name: 'Second step',
+              theory: {
+                id: 7,
+              },
             },
           ],
         },
@@ -435,6 +433,7 @@ describe('getNumberOfActivities', () => {
       id: 1,
       name: 'JavaScript',
       description: 'Test',
+      started: false,
       chapters: [
         {
           exerciseCount: 4,
@@ -445,34 +444,25 @@ describe('getNumberOfActivities', () => {
             {
               id: 1,
               name: 'First step',
+              done: false,
+              theoryId: 6,
             },
             {
               id: 2,
               name: 'Second step',
-            },
-          ],
-        },
-        {
-          exerciseCount: 4,
-          id: 2,
-          name: 'Introduction',
-          theoryCount: 2,
-          topics: [
-            {
-              id: 3,
-              name: 'First step',
-            },
-            {
-              id: 4,
-              name: 'Second step',
+              done: false,
+              theoryId: 7,
             },
           ],
         },
       ],
     };
-    Theory.count.mockResolvedValue(1);
-    Exercise.count.mockResolvedValue(2);
-    const result = await coursesController.getNumberOfActivities(course);
+    Theory.findAll.mockResolvedValue(['Th1']);
+    Exercise.findAll.mockResolvedValue(['Ex1', 'Ex2']);
+    CourseUser.findAll.mockResolvedValue([]);
+    TheoryUser.count(1);
+    ExerciseUser.count(1);
+    const result = await coursesController.getCourseProgress(course, 1);
     expect(result).toMatchObject(expectedObject);
   });
 });

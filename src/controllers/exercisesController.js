@@ -44,7 +44,14 @@ class ExercisesController {
   async createExercise(exerciseInfo) {
     const topic = await Topic.findByPk(exerciseInfo.topicId);
     if (!topic) throw new InexistingId();
-    const exercise = await Exercise.create(exerciseInfo);
+    const exercise = await Exercise.create({
+      topicId: exerciseInfo.topicId,
+      baseCode: exerciseInfo.baseCode,
+      testCode: exerciseInfo.testCode,
+      solutionCode: exerciseInfo.solutionCode,
+      statement: exerciseInfo.statement,
+      position: exerciseInfo.position,
+    });
     return exercise;
   }
 
