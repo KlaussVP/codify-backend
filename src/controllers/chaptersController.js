@@ -26,7 +26,7 @@ class ChaptersController {
     await topicsController.deleteTopicsFromChapter(chapterId);
     await Chapter.destroy({
       where: { id: chapterId },
-      cascade: true
+      cascade: true,
     });
   }
 
@@ -42,25 +42,26 @@ class ChaptersController {
 
     await Chapter.destroy({
       where: { courseId },
-      cascade: true
+      cascade: true,
     });
   }
 
   async getAllChapters() {
     const chapters = await Chapter.findAll({
       include: {
-        model: Topic
+        model: Topic,
       },
     });
     return chapters;
   }
 
-  async getAllChaptersAsAdmin() {
+  async getAllChaptersAsAdmin(filter) {
     const chapters = await Chapter.findAll({
       include: {
         model: Topic,
         attributes: ['id'],
       },
+      where: filter,
     });
 
     const chaptersArrayAdminFormat = [];

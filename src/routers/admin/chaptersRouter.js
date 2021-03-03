@@ -20,7 +20,8 @@ chapterRouter.put('/:id', adminVerifyJWT, async (req, res) => {
 });
 
 chapterRouter.get('/', async (req, res) => {
-  const chapters = await chaptersController.getAllChaptersAsAdmin();
+  const filter = req.query.filter ? JSON.parse(req.query.filter) : {};
+  const chapters = await chaptersController.getAllChaptersAsAdmin(filter);
   return res
     .header('Access-Control-Expose-Headers', 'Content-Range')
     .set('Content-Range', chapters.length)

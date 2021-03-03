@@ -124,7 +124,7 @@ class CoursesController {
               },
               required: false,
             },
-            attributes: ['id', 'title'],
+            attributes: ['id', 'statement', 'baseCode', 'testCode', 'solutionCode', 'position'],
           }],
         },
       }],
@@ -132,7 +132,7 @@ class CoursesController {
         [Chapter, 'id', 'ASC'],
         [Chapter, Topic, 'id', 'ASC'],
         [Chapter, Topic, Theory, 'id', 'ASC'],
-        [Chapter, Topic, Exercise, 'id', 'ASC'],
+        [Chapter, Topic, Exercise, 'position', 'ASC'],
       ],
     });
     if (!course) throw new InexistingId();

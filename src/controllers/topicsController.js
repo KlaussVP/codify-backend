@@ -38,12 +38,13 @@ class TopicsController {
     });
   }
 
-  async getAllTopics() {
+  async getAllTopics(filter) {
     const topics = await Topic.findAll({
       include: [{
         model: Theory,
         attributes: ['id', 'youtubeLink'],
       }],
+      where: filter,
     });
     return topics;
   }
