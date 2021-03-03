@@ -11,10 +11,6 @@ Exercise.init(
       allowNull: false,
       autoIncrement: true,
     },
-    title: {
-      type: Sequelize.STRING,
-      allowNull: false,
-    },
     topicId: {
       type: Sequelize.INTEGER,
       allowNull: false,
@@ -23,6 +19,26 @@ Exercise.init(
         key: 'id',
       },
       onDelete: 'CASCADE',
+    },
+    baseCode: {
+      type: Sequelize.STRING(100000),
+      allowNull: false,
+    },
+    testCode: {
+      type: Sequelize.STRING(100000),
+      allowNull: false,
+    },
+    solutionCode: {
+      type: Sequelize.STRING(100000),
+      allowNull: false,
+    },
+    statement: {
+      type: Sequelize.STRING(100000),
+      allowNull: false,
+    },
+    position: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
     },
   },
   {

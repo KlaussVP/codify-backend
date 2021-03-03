@@ -20,7 +20,8 @@ topicRouter.put('/:id', adminVerifyJWT, async (req, res) => {
 });
 
 topicRouter.get('/', async (req, res) => {
-  const topics = await topicsController.getAllTopics();
+  const filter = req.query.filter ? JSON.parse(req.query.filter) : {};
+  const topics = await topicsController.getAllTopics(filter);
   res
     .header('Access-Control-Expose-Headers', 'Content-Range')
     .set('Content-Range', topics.length)
