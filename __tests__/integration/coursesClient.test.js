@@ -38,6 +38,7 @@ beforeEach(async () => {
   await db.query('DELETE FROM topics');
   await db.query('DELETE FROM chapters');
   await db.query('DELETE FROM "courseUsers"');
+  await db.query('DELETE FROM "theoryUsers"');
   await db.query('DELETE FROM courses');
 });
 
@@ -46,6 +47,7 @@ afterAll(async () => {
   await db.query('DELETE FROM chapters');
   await db.query('DELETE FROM "courseUsers"');
   await db.query('DELETE FROM courses');
+  await db.query('DELETE FROM "theoryUsers"');
   await db.query('DELETE FROM users');
   await sequelize.close();
   await db.end();
@@ -90,6 +92,7 @@ describe('GET /clients/courses/:id', () => {
       name: course.name,
       image: course.image,
       description: course.description,
+      progress: 0,
       chapters: [
         {
           id: chapterId,
@@ -100,6 +103,7 @@ describe('GET /clients/courses/:id', () => {
             {
               id: topicId,
               name: chapter.topics[0].name,
+              done: false,
             },
           ],
         },

@@ -140,7 +140,7 @@ class CoursesController {
     return course;
   }
 
-  async getCourseWithNumberActivities(id) {
+  async getCourseWithNumberActivities(id, userId) {
     const course = await Course.findOne({
       where: { id },
       attributes: ['id', 'name', 'image', 'description'],
@@ -158,9 +158,9 @@ class CoursesController {
     });
     if (!course) throw new InexistingId();
 
-    const courseToSend = await this.getNumberOfActivities(course);
+    const courseWithProgress = await this.getCourseProgress(course, userId);
 
-    return courseToSend;
+    return courseWithProgress;
   }
 
   async startOrContinueCourse(courseId, userId) {
@@ -241,46 +241,6 @@ class CoursesController {
     return lastCourse;
   }
 
-  async getNumberOfActivities(course) {
-    const newChapters = [];
-    const courseToSend = {
-      id: course.id,
-      name: course.name,
-      description: course.description,
-      image: course.image,
-    };
-    for (let i = 0; i < course.chapters.length; i++) {
-      const newChapter = {
-        id: course.chapters[i].id,
-        name: course.chapters[i].name,
-        topics: course.chapters[i].topics,
-        theoryCount: 0,
-        exerciseCount: 0,
-      };
-      let totalTheory = 0;
-      let totalExercise = 0;
-      for (let j = 0; j < course.chapters[i].topics.length; j++) {
-        const countExercise = await Exercise.count({
-          where: {
-            topicId: course.chapters[i].topics[j].id,
-          },
-        });
-        const countTheory = await Theory.count({
-          where: {
-            topicId: course.chapters[i].topics[j].id,
-          },
-        });
-        totalExercise += countExercise;
-        totalTheory += countTheory;
-      }
-      newChapter.exerciseCount = totalExercise;
-      newChapter.theoryCount = totalTheory;
-      newChapters.push(newChapter);
-    }
-    courseToSend.chapters = newChapters;
-    return courseToSend;
-  }
-
   async getIdsToStartACourse(courseId) {
     const chapter = await Chapter.findOne({
       where: {
@@ -312,6 +272,73 @@ class CoursesController {
     return {
       courseId, chapterId: chapter.id, topicId: topic.id, theoryId: theory.id,
     };
+  }
+
+  async getCourseProgress(course, userId) {
+    let totalActivitiesCourse = 0;
+    let totalActivitiesCourseDone = 0;
+    const newChapters = [];
+    const courseToSend = {
+      id: course.id,
+      name: course.name,
+      description: course.description,
+      image: course.image,
+    };
+    // eslint-disable-next-line no-restricted-syntax
+    for (const chapter of course.chapters) {
+      const newChapter = {
+        id: chapter.id,
+        name: chapter.name,
+        topics: [],
+        theoryCount: 0,
+        exerciseCount: 0,
+      };
+      // eslint-disable-next-line no-restricted-syntax
+      for (const topic of chapter.topics) {
+        const newTopic = {
+          id: topic.id,
+          name: topic.name,
+        };
+        const exercises = await Exercise.findAll({
+          where: {
+            topicId: topic.id,
+          },
+        });
+        const theories = await Theory.findAll({
+          where: {
+            topicId: topic.id,
+          },
+        });
+        const doneExercises = await ExerciseUser.count({
+          where: {
+            exerciseId: exercises.map((e) => e.id),
+            userId,
+          },
+        });
+        const doneTheories = await TheoryUser.count({
+          where: {
+            theoryId: theories.map((t) => t.id),
+            userId,
+          },
+        });
+        newChapter.theoryCount += theories.length;
+        newChapter.exerciseCount += exercises.length;
+        const totalActivities = exercises.length + theories.length;
+        const totalDoneActivities = doneExercises + doneTheories;
+        if (totalActivities === totalDoneActivities) {
+          newTopic.done = true;
+        } else {
+          newTopic.done = false;
+        }
+        totalActivitiesCourse += totalActivities;
+        totalActivitiesCourseDone += totalDoneActivities;
+        newChapter.topics.push(newTopic);
+      }
+      newChapters.push(newChapter);
+    }
+    courseToSend.progress = Math.floor((totalActivitiesCourseDone / totalActivitiesCourse) * 100);
+    courseToSend.chapters = newChapters;
+    return courseToSend;
   }
 }
 
