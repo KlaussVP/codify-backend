@@ -124,7 +124,7 @@ class CoursesController {
               },
               required: false,
             },
-            attributes: ['id', 'title'],
+            attributes: ['id', 'statement', 'baseCode', 'testCode', 'solutionCode', 'position'],
           }],
         },
       }],
