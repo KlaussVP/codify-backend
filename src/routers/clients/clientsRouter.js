@@ -31,4 +31,9 @@ router.post('/new-password', clientsMiddlewares.newPasswordMiddleware, async (re
   return res.sendStatus(200);
 });
 
+router.post('/change-profile', verifyJWT, clientsMiddlewares.editUserData, async (req, res) => {
+  const user = await usersController.editUserData(req.userId, req.body);
+  return res.send(user);
+});
+
 module.exports = router;

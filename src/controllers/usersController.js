@@ -52,6 +52,7 @@ class UsersController {
         token,
         type: user.type,
         name: user.name,
+        email: user.email,
       };
       await sessionStore.setSession(token, userData);
       return userData;
@@ -90,6 +91,20 @@ class UsersController {
     const user = await this.findUserById(id);
     const hashedPassword = bcrypt.hashSync(password, 10);
     user.password = hashedPassword;
+    await user.save();
+    return user;
+  }
+
+  async editUserData(id, { name, email, password }) {
+    const user = await this.findUserById(id);
+    if (!user) throw new AuthorizationError();
+
+    let hashedPassword = null;
+    if (password) hashedPassword = bcrypt.hashSync(password, 10);
+
+    user.name = name || user.name;
+    user.email = email || user.email;
+    user.password = hashedPassword || user.password;
     await user.save();
     return user;
   }
