@@ -13,7 +13,12 @@ jest.mock('../../src/models/Topic');
 describe('postExerciseUser', () => {
   it('should return undefined', async () => {
     Exercise.findByPk.mockResolvedValue({ id: 1 });
-    ExerciseUser.findOrCreate.mockResolvedValue({});
+    ExerciseUser.findOrCreate.mockResolvedValue([{
+      id: 1,
+      userId: 2,
+      exerciseId: 1,
+      destroy: () => {},
+    }, null]);
     const result = await exercisesController.postExerciseUser(1, 2);
     expect(result).toBe(undefined);
   });

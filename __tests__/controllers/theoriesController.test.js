@@ -11,7 +11,12 @@ jest.mock('../../src/models/TheoryUser');
 describe('postTheoryUser', () => {
   it('should return undefined', async () => {
     Theory.findByPk.mockResolvedValue({ id: 1 });
-    TheoryUser.findOrCreate.mockResolvedValue({});
+    TheoryUser.findOrCreate.mockResolvedValue([{
+      id: 1,
+      userId: 2,
+      theoryId: 1,
+      destroy: () => {},
+    }, null]);
     const result = await theoriesController.postTheoryUser(1, 2);
     expect(result).toBe(undefined);
   });

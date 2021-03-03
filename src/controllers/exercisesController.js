@@ -7,14 +7,18 @@ const Topic = require('../models/Topic');
 
 class ExercisesController {
   async postExerciseUser(exerciseId, userId) {
-    const exercise = Exercise.findByPk(exerciseId);
+    const exercise = await Exercise.findByPk(exerciseId);
     if (!exercise) throw new InexistingId();
-    await ExerciseUser.findOrCreate({
+    const [foundExerciseUser, createdExerciseUser] = await ExerciseUser.findOrCreate({
       where: {
         exerciseId,
         userId,
       },
     });
+
+    if (!createdExerciseUser) {
+      await foundExerciseUser.destroy();
+    }
   }
 
   async getAllExercises() {
