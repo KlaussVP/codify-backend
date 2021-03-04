@@ -35,6 +35,10 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
+  await db.query('DELETE FROM "theoryUsers"');
+  await db.query('DELETE FROM "exerciseUsers"');
+  await db.query('DELETE FROM exercises');
+  await db.query('DELETE FROM theories');
   await db.query('DELETE FROM topics');
   await db.query('DELETE FROM chapters');
   await db.query('DELETE FROM "courseUsers"');
@@ -42,6 +46,10 @@ beforeEach(async () => {
 });
 
 afterAll(async () => {
+  await db.query('DELETE FROM "theoryUsers"');
+  await db.query('DELETE FROM "exerciseUsers"');
+  await db.query('DELETE FROM exercises');
+  await db.query('DELETE FROM theories');
   await db.query('DELETE FROM topics');
   await db.query('DELETE FROM chapters');
   await db.query('DELETE FROM "courseUsers"');
@@ -79,7 +87,7 @@ describe('GET /clients/courses/:id', () => {
     const resultTopic = await db.query('INSERT INTO topics (name, "chapterId", "createdAt", "updatedAt") values ($1, $2, $3, $4) RETURNING *', [chapter.topics[0].name, chapterId, Sequelize.NOW, Sequelize.NOW]);
     const topicId = resultTopic.rows[0].id;
 
-    await db.query('INSERT INTO theories ("youtubeLink", "topicId", "createdAt", "updatedAt") values ($1, $2, $3, $4) RETURNING *', [theory.youtubeLink, topicId, Sequelize.NOW, Sequelize.NOW]);
+    const resultTheory = await db.query('INSERT INTO theories ("youtubeLink", "topicId", "createdAt", "updatedAt") values ($1, $2, $3, $4) RETURNING *', [theory.youtubeLink, topicId, Sequelize.NOW, Sequelize.NOW]);
 
     await db.query('INSERT INTO exercises ("baseCode", "topicId", "createdAt", "updatedAt", "testCode", "statement", "solutionCode", position) values ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *', ['Base Code', topicId, Sequelize.NOW, Sequelize.NOW, 'Test Code', 'Statement', 'Solution Code', 1]);
     const response = await agent.get(`/clients/courses/${courseId}`).set({ 'X-Access-Token': tokenClient });
@@ -90,6 +98,8 @@ describe('GET /clients/courses/:id', () => {
       name: course.name,
       image: course.image,
       description: course.description,
+      progress: 0,
+      started: false,
       chapters: [
         {
           id: chapterId,
@@ -100,6 +110,8 @@ describe('GET /clients/courses/:id', () => {
             {
               id: topicId,
               name: chapter.topics[0].name,
+              theoryId: resultTheory.rows[0].id,
+              done: false,
             },
           ],
         },
