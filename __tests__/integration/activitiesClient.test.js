@@ -6,6 +6,7 @@ const { Pool } = require('pg');
 const { Sequelize } = require('sequelize');
 const supertest = require('supertest');
 const jwt = require('jsonwebtoken');
+const { NOW } = require('sequelize');
 const app = require('../../src/app');
 const sequelize = require('../../src/utils/database');
 const sessionStore = require('../../src/repositories/sessionStore');
@@ -42,6 +43,38 @@ async function getToken() {
   return token;
 }
 
+async function insertCompleteCourse() {
+  const course = {
+    name: 'JavaScript',
+    image: 'https://static.imasters.com.br/wp-content/uploads/2018/12/10164438/javascript.jpg',
+    description: 'JavaScript do Zero',
+  };
+  const chapter = { name: 'Apresentação Programação' };
+
+  const resultCourse = await db.query('INSERT INTO courses (name, image, description, "createdAt", "updatedAt") values ($1, $2, $3, $4, $5) RETURNING *', [course.name, course.image, course.description, NOW, NOW]);
+  const courseId = resultCourse.rows[0].id;
+
+  const resultChapter = await db.query('INSERT INTO chapters (name, "courseId", "createdAt", "updatedAt") values ($1, $2, $3, $4) RETURNING *', [chapter.name, courseId, NOW, NOW]);
+  const chapterId = resultChapter.rows[0].id;
+
+  const resultTopic = await db.query('INSERT INTO topics (name, "chapterId", "createdAt", "updatedAt") values ($1, $2, $3, $4) RETURNING *', ['Introduction JS', chapterId, NOW, NOW]);
+  const topicId = resultTopic.rows[0].id;
+
+  const resultTheory = await db.query('INSERT INTO theories ("youtubeLink", "topicId", "createdAt", "updatedAt") values ($1, $2, $3, $4) RETURNING *', ['https://www.youtube.com/watch?v=efWrIyjmCXg', topicId, NOW, NOW]);
+  const theoryId = resultTheory.rows[0].id;
+
+  const resultExercise = await db.query('INSERT INTO exercises ("baseCode", "topicId", "createdAt", "updatedAt", "testCode", "statement", "solutionCode", position) values ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *', ['Base Code', topicId, NOW, NOW, 'Test Code', 'Statement', 'Solution Code', 1]);
+  const exerciseId = resultExercise.rows[0].id;
+
+  return {
+    courseId,
+    chapterId,
+    topicId,
+    theoryId,
+    exerciseId,
+  };
+}
+
 beforeEach(async () => {
   await db.query('DELETE FROM "theoryUsers"');
   await db.query('DELETE FROM "exerciseUsers"');
@@ -69,43 +102,32 @@ afterAll(async () => {
 describe('POST /clients/activities/theory/:id', () => {
   it('should return 200 when passed valid Id', async () => {
     const tokenClient = await getToken();
-    const course = {
-      name: 'JavaScript21122',
-      image: 'https://static.imasters.com.br/wp-content/uploads/2018/12/10164438/javascript.jpg',
-      description: 'JavaScript do Zero',
-    };
-    const chapter = {
-      name: 'Apresentação Programação',
-      topics: [
-        {
-          name: 'Introdução a programação',
-        },
-      ],
-    };
-    const theory = {
-      youtubeLink: 'https://www.youtube.com/embed/Ptbk2af68e8',
-    };
+    const ids = await insertCompleteCourse();
+    const response = await agent.post(`/clients/activities/theory/${ids.theoryId}`).set({ 'X-Access-Token': tokenClient });
 
-    const resultCourse = await db.query('INSERT INTO courses (name, image, description) values ($1, $2, $3) RETURNING *', [course.name, course.image, course.description]);
-    const courseId = resultCourse.rows[0].id;
-
-    const resultChapter = await db.query('INSERT INTO chapters (name, "courseId", "createdAt", "updatedAt") values ($1, $2, $3, $4) RETURNING *', [chapter.name, courseId, Sequelize.NOW, Sequelize.NOW]);
-    const chapterId = resultChapter.rows[0].id;
-
-    const resultTopic = await db.query('INSERT INTO topics (name, "chapterId", "createdAt", "updatedAt") values ($1, $2, $3, $4) RETURNING *', [chapter.topics[0].name, chapterId, Sequelize.NOW, Sequelize.NOW]);
-    const topicId = resultTopic.rows[0].id;
-
-    const resultTheory = await db.query('INSERT INTO theories ("youtubeLink", "topicId", "createdAt", "updatedAt") values ($1, $2, $3, $4) RETURNING *', [theory.youtubeLink, topicId, Sequelize.NOW, Sequelize.NOW]);
-    const theoryId = resultTheory.rows[0].id;
-
-    const response = await agent.post(`/clients/activities/theory/${theoryId}`).set({ 'X-Access-Token': tokenClient });
-
-    expect(response.status).toBe(201);
+    expect(response.status).toBe(200);
   });
 
   it('should return status 403 when passed invalid id', async () => {
     const tokenClient = await getToken();
     const response = await agent.post('/clients/activities/theory/1').set({ 'X-Access-Token': tokenClient });
+    expect(response.status).toBe(403);
+  });
+});
+
+describe('POST /clients/activities/exercise/:id', () => {
+  it('should return 200 when passed valid Id', async () => {
+    const tokenClient = await getToken();
+    const ids = await insertCompleteCourse();
+    const response = await agent.post(`/clients/activities/exercise/${ids.exerciseId}`).set({ 'X-Access-Token': tokenClient });
+
+    expect(response.status).toBe(200);
+  });
+
+  it('should return status 403 when passed invalid id', async () => {
+    const tokenClient = await getToken();
+    await insertCompleteCourse();
+    const response = await agent.post('/clients/activities/exercise/1').set({ 'X-Access-Token': tokenClient });
     expect(response.status).toBe(403);
   });
 });

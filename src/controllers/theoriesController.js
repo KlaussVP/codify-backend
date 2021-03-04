@@ -9,12 +9,16 @@ class TheoriesController {
   async postTheoryUser(theoryId, userId) {
     const theory = await Theory.findByPk(theoryId);
     if (!theory) throw new InexistingId();
-    await TheoryUser.findOrCreate({
+    const [foundTheoryUser, createdTheoryUser] = await TheoryUser.findOrCreate({
       where: {
         theoryId,
         userId,
       },
     });
+
+    if (!createdTheoryUser) {
+      await foundTheoryUser.destroy();
+    }
   }
 
   async getAllTheories() {
