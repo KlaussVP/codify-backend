@@ -72,12 +72,16 @@ async function insertCompleteCourse() {
 }
 
 beforeEach(async () => {
+  await db.query('DELETE FROM "theoryUsers"');
+  await db.query('DELETE FROM "exerciseUsers"');
   await db.query('DELETE FROM exercises');
   await db.query('DELETE FROM theories');
   await db.query('DELETE FROM topics');
 });
 
 afterAll(async () => {
+  await db.query('DELETE FROM "theoryUsers"');
+  await db.query('DELETE FROM "exerciseUsers"');
   await db.query('DELETE FROM exercises');
   await db.query('DELETE FROM theories');
   await db.query('DELETE FROM topics');
