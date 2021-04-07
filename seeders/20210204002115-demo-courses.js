@@ -1,3 +1,4 @@
+/* eslint-disable linebreak-style */
 
 module.exports = {
   up: async (queryInterface) => {
@@ -367,9 +368,215 @@ module.exports = {
           topicId: topicsIds[0][3].id,
         },
       ], {});
+
+    const exercises = [
+      {
+        baseCode: `
+        function sumArray(array) {
+          //Insira seu código aqui
+        }`,
+        testCode: `
+        describe('sumArray', () => {
+          it('should return the sum of all numbers from the passed array', () => {
+            const array = [2,4,6,8,10];
+        
+            const result = sumArray(array);
+        
+            expect(result).to.equal(30);
+          });
+        
+          it('should return 0 when passed an empty array', () => {
+            const array = [];
+        
+            const result = sumArray(array);
+        
+            expect(result).to.equal(0);
+          });
+        
+          it('should return a negative number when the sum is negative', () => {
+            const array = [3, -12, 5, 6, -8];
+        
+            const result = sumArray(array);
+        
+            expect(result).to.equal(-6);
+          });
+        })`,
+        statement: `
+          Dada uma array não ordenada de números inteiros,
+          retorne a soma de todos os números.
+          Exemplo: 
+          Quando enviado [2,1,-4,6,8], retornar 13.`,
+        solutionCode: `
+        function sumArray(array) {
+          let sum = 0;
+        
+          for (let i = 0; i < array.length; i++) {
+            sum += array[i];
+          }
+        
+          return sum;
+        }`,
+        position: 1,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        baseCode: `
+        function sumArray2(array) {
+          //Insira seu código aqui
+        }`,
+        testCode: `
+        describe('sumArray', () => {
+          it('should return the sum of all numbers from the passed array', () => {
+            const array = [2,4,6,8,10];
+        
+            const result = sumArray(array);
+        
+            expect(result).to.equal(30);
+          });
+        
+          it('should return 0 when passed an empty array', () => {
+            const array = [];
+        
+            const result = sumArray(array);
+        
+            expect(result).to.equal(0);
+          });
+        
+          it('should return a negative number when the sum is negative', () => {
+            const array = [3, -12, 5, 6, -8];
+        
+            const result = sumArray(array);
+        
+            expect(result).to.equal(-6);
+          });
+        })`,
+        statement: `
+          Dada uma array não ordenada de números inteiros,
+          retorne a soma de todos os números.
+          Exemplo: 
+          Quando enviado [2,1,-4,6,8], retornar 13.`,
+        solutionCode: `
+        function sumArray2(array) {
+          let sum = 0;
+        
+          for (let i = 0; i < array.length; i++) {
+            sum += array[i];
+          }
+        
+          return sum;
+        }`,
+        position: 2,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        baseCode: `
+        function sumArray3(array) {
+          //Insira seu código aqui
+        }`,
+        testCode: `
+        describe('sumArray', () => {
+          it('should return the sum of all numbers from the passed array', () => {
+            const array = [2,4,6,8,10];
+        
+            const result = sumArray(array);
+        
+            expect(result).to.equal(30);
+          });
+        
+          it('should return 0 when passed an empty array', () => {
+            const array = [];
+        
+            const result = sumArray(array);
+        
+            expect(result).to.equal(0);
+          });
+        
+          it('should return a negative number when the sum is negative', () => {
+            const array = [3, -12, 5, 6, -8];
+        
+            const result = sumArray(array);
+        
+            expect(result).to.equal(-6);
+          });
+        })`,
+        statement: `
+          Dada uma array não ordenada de números inteiros,
+          retorne a soma de todos os números.
+          Exemplo: 
+          Quando enviado [2,1,-4,6,8], retornar 13.`,
+        solutionCode: `
+        function sumArray3(array) {
+          let sum = 0;
+        
+          for (let i = 0; i < array.length; i++) {
+            sum += array[i];
+          }
+        
+          return sum;
+        }`,
+        position: 3,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    ];
+
+    await queryInterface.bulkInsert('exercises',
+      [
+        {
+          ...exercises[0],
+          topicId: topicsIds[0][0].id,
+        },
+        {
+          ...exercises[1],
+          topicId: topicsIds[0][0].id,
+        },
+        {
+          ...exercises[2],
+          topicId: topicsIds[0][0].id,
+        },
+        {
+          ...exercises[0],
+          topicId: topicsIds[0][1].id,
+        },
+        {
+          ...exercises[1],
+          topicId: topicsIds[0][1].id,
+        },
+        {
+          ...exercises[2],
+          topicId: topicsIds[0][1].id,
+        },
+        {
+          ...exercises[0],
+          topicId: topicsIds[0][2].id,
+        },
+        {
+          ...exercises[1],
+          topicId: topicsIds[0][2].id,
+        },
+        {
+          ...exercises[2],
+          topicId: topicsIds[0][2].id,
+        },
+        {
+          ...exercises[0],
+          topicId: topicsIds[0][3].id,
+        },
+        {
+          ...exercises[1],
+          topicId: topicsIds[0][3].id,
+        },
+        {
+          ...exercises[2],
+          topicId: topicsIds[0][3].id,
+        },
+      ], {});
   },
 
   down: async (queryInterface) => {
+    await queryInterface.bulkDelete('exercises', null, {});
     await queryInterface.bulkDelete('theories', null, {});
     await queryInterface.bulkDelete('topics', null, {});
     await queryInterface.bulkDelete('chapters', null, {});

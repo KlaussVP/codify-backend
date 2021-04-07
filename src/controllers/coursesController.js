@@ -1,3 +1,4 @@
+/* eslint-disable linebreak-style */
 const Course = require('../models/Course');
 const ConflictError = require('../errors/ConflictError');
 const InexistingId = require('../errors/InexistingId');
